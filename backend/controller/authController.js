@@ -36,6 +36,7 @@ const userRegister = async (req, res) => {
         height: height,
         gender: gender,
         password: hashedPassword,
+        role:'user'
       },
     });
     console.log(allData);
@@ -79,7 +80,27 @@ const loginUser = async (req, res) => {
     return res.status(500).json({ message: "failed to login" });
   }
 };
+
+const showUser = async (req, res) => {
+  try {
+    // const {username, email, }
+  } catch (error) {
+    
+  }
+}
+const resetPassword = async (req, res) => {
+  try {
+    const {email} = req.body;
+    
+  } catch (error) {
+    
+  }
+}
+
+
+
 module.exports = {
   userRegister,
   loginUser,
+  resetPassword
 };

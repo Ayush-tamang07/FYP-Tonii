@@ -8,10 +8,6 @@ const router = express.Router();
 router.post("/register", userRegister)
 router.post("/login", loginUser)
 
-
-
 router.post("/calculate", calculate)
-
- 
 
 module.exports = router;

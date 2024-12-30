@@ -21,6 +21,17 @@ model User {
   age      Int?     // Optional field
   height   Int?     // Optional field
   gender   String?  // Optional field
-  password String           
+  password String   
+  role String @default("user")    
+}
+
+model Exercise {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String
+  muscle      String
+  equipment   String
+  difficulty  String
+  instructions String
 }
 
