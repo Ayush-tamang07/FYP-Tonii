@@ -1,4 +1,8 @@
-const data = [
+// const { exercise } = require("./prismaClient");
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+const exerciseData = [
     {
         "name": "Smith machine shrug",
         "type": "strength",
@@ -1281,3 +1285,25 @@ const data = [
     }
 
 ]
+
+// async function main() {
+//     try {
+//       const result = await prisma.exercise.createMany({
+//         data: exerciseData,
+//         skipDuplicates: true, // Avoid duplicates if the same data exists
+//       });
+//       console.log(`${result.count} records inserted successfully.`);
+//     } catch (error) {
+//       console.error("Error inserting data: ", error);
+//     } finally {
+//       await prisma.$disconnect();
+//     }
+//   }
+  
+//   main();
+// console.log(exerciseData);
+
+// module.exports = {
+//  exerciseData
+//   };
+  

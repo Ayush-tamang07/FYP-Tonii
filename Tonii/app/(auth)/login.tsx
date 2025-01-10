@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,8 +14,12 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../assets/images/app_icon.png')} 
+        style={styles.image}
+      />
       <Text style={styles.title}>WELCOME BACK</Text>
-
+dad
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -60,13 +64,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: 30,
     backgroundColor: '#f9f9f9',
   },
+  image: {
+    width:120, // Adjust the width of the image
+    marginBottom: 16, // Add spacing between the image and the title
+  },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 90,
     color: '#FF6909',
   },
   inputContainer: {

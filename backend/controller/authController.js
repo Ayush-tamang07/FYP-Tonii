@@ -1,7 +1,7 @@
 // const { join } = require("@prisma/client/runtime/library");
-const prisma = require("../prismaClient.js");
+const prisma = require("../utils/PrismaClient.js");
 const bcrypt = require("bcrypt");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 const userRegister = async (req, res) => {
   try {
@@ -36,17 +36,18 @@ const userRegister = async (req, res) => {
         height: height,
         gender: gender,
         password: hashedPassword,
-        role:'user'
+        role: "user",
       },
     });
     console.log(allData);
 
-    return res.status(201).json({ message: "user created successfully", allData });
+    return res
+      .status(201)
+      .json({ message: "user created successfully", allData });
   } catch (error) {
     return res.status(500).json({ error: "failed to register user" });
   }
 };
-
 
 const loginUser = async (req, res) => {
   try {
@@ -60,7 +61,7 @@ const loginUser = async (req, res) => {
     const user = await prisma.user.findFirst({
       where: {
         email: email,
-      },  
+      },
     });
 
     // checking user
@@ -70,13 +71,23 @@ const loginUser = async (req, res) => {
 
     // Compare the provided password with the hashed password stored in the database
     const checkPassword = await bcrypt.compare(password, user.password);
-    
+
     if (!checkPassword) {
       return res.status(401).json({ message: "Incorrect Password" });
     }
-
-    return res.status(200).json({ message: "Login Successfully", user });
+    const token = jwt.sign(
+      { userId: user.id, email: user.email }, // Payload
+      process.env.JWT_SECRET, // Secret key
+      { expiresIn: "1h" } // Token expiration time
+    );
+    return res.status(200).json({
+      message: "Login Successfully",
+      user,
+      token,
+    });
+    // return res.status(200).json({ message: "Login Successfully", user });
   } catch (error) {
+    console.error("Error logging in user:", error);
     return res.status(500).json({ message: "failed to login" });
   }
 };
@@ -84,23 +95,16 @@ const loginUser = async (req, res) => {
 const showUser = async (req, res) => {
   try {
     // const {username, email, }
-  } catch (error) {
-    
-  }
-}
+  } catch (error) {}
+};
 const resetPassword = async (req, res) => {
   try {
-    const {email} = req.body;
-    
-  } catch (error) {
-    
-  }
-}
-
-
+    const { email } = req.body;
+  } catch (error) {}
+};
 
 module.exports = {
   userRegister,
   loginUser,
-  resetPassword
+  resetPassword,
 };

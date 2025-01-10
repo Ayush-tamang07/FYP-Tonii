@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require("dotenv").config();
 const routes = require('./routes/route.js');
-
 const app = express()
 
 // middleware

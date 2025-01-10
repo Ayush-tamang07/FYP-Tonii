@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import React, { Component } from 'react';
-import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, StyleSheet, Image} from 'react-native';
 
 export class Register extends Component {
   state = {
@@ -16,9 +16,13 @@ export class Register extends Component {
     console.log('Password:', password);
   };
 
-  render() {
+  render() {  
     return (
       <View style={styles.container}>
+              <Image
+                source={require('../../assets/images/app_icon.png')} 
+                style={styles.image}
+              />
         <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
 
         <View style={styles.inputContainer}>
@@ -85,8 +89,12 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f9f9f9',
   },
+  image: {
+    width:120, // Adjust the width of the image
+    marginBottom: 16, // Add spacing between the image and the title
+  },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
     color: '#FF6909', // Matched with Login component

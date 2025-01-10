@@ -33,5 +33,22 @@ model Exercise {
   equipment   String
   difficulty  String
   instructions String
+  workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans
 }
 
+model WorkoutPlan {
+  id          Int                   @id @default(autoincrement())
+  name        String
+  description String
+  userId      Int                   // Foreign key to User
+  user        User                  @relation(fields: [userId], references: [id])
+  exercises   WorkoutPlanExercise[] // Many-to-many relation with exercises
+}
+
+model WorkoutPlanExercise {
+  id          Int       @id @default(autoincrement())
+  workoutPlanId Int     // Foreign key to WorkoutPlan
+  exerciseId   Int     // Foreign key to Exercise
+  workoutPlan  WorkoutPlan @relation(fields: [workoutPlanId], references: [id])
+  exercise     Exercise   @relation(fields: [exerciseId], references: [id])
+}

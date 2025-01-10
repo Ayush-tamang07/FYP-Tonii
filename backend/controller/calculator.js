@@ -1,4 +1,4 @@
-const prisma = require("../prismaClient.js");
+const prisma = require("../utils/PrismaClient.js");
 
 const calculate = async (req, res) => {
   try {
