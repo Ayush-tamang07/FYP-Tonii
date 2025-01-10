@@ -8,7 +8,7 @@ const calculate = async (req, res) => {
       return res.status(400).json({ error: "Please enter all fields" });
     }
 
-    // Calculate BMR
+    // Calculate BMR 
     let BMR;
     if (gender.toLowerCase() === "male") {
       BMR = 10 * weight + 6.25 * height - 5 * age + 5;
