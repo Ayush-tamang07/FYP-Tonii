@@ -1,7 +1,7 @@
 // const { join } = require("@prisma/client/runtime/library");
 const prisma = require("../utils/PrismaClient.js");
 const bcrypt = require("bcrypt");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 const userRegister = async (req, res) => {
   try {
@@ -75,15 +75,15 @@ const loginUser = async (req, res) => {
     if (!checkPassword) {
       return res.status(401).json({ message: "Incorrect Password" });
     }
-    // const token = jwt.sign(
-    //   { userId: user.id, email: user.email }, // Payload
-    //   process.env.JWT_SECRET, // Secret key
-    //   { expiresIn: "1h" } // Token expiration time
-    // );
+    const token = jwt.sign(
+      { userId: user.id, email: user.email }, // Payload
+      process.env.JWT_SECRET, // Secret key
+      { expiresIn: "1h" } // Token expiration time
+    );
     return res.status(200).json({
       message: "Login Successfully",
       user,
-      // token,
+      token,
     });
     // return res.status(200).json({ message: "Login Successfully", user });
   } catch (error) {

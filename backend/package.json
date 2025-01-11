@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index"
+    "start":"nodemon index"
   },
   "keywords": [],
   "author": "",
@@ -17,9 +17,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.16",
-    "nodemon": "^3.1.9",
-    "validator": "^13.12.0"
+    "nodemon": "^3.1.9"
   },
   "devDependencies": {
     "prisma": "^6.1.0"
