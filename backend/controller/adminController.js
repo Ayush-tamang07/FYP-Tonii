@@ -2,7 +2,7 @@ const prisma = require("../utils/PrismaClient.js");
 
 const addExercise = async (req, res) => {
     try {
-      const { name, type, muscle, equipment, difficulty, instructions } = req.body;
+      const { name, type, muscle, equipment, difficulty, instructions, id } = req.body;
   
       // Validate required fields
       if (!name || !type || !muscle || !equipment || !difficulty || !instructions) {
@@ -49,20 +49,21 @@ const addExercise = async (req, res) => {
   };
   
 
-  const deleteExercise = async (req, res) => {
-    try {
-      const { id } = req.params;
+//   const deleteExercise = async (req, res) => {
+//     try {
+//       const { id } = req.params;
   
-      const exercise = await prisma.exercise.delete({ where: { id: parseInt(id, 10) } });
+//       const exercise = await prisma.exercise.delete({ where: { id: parseInt(id, 10) } });
   
-      res.status(200).json({ success: true, message: "Exercise deleted successfully.", data: exercise });
-    } catch (error) {
-      console.error("Error deleting exercise:", error);
-      res.status(500).json({ success: false, message: "Failed to delete exercise.", error: error.message });
-    }
-  };
+//       res.status(200).json({ success: true, message: "Exercise deleted successfully.", data: exercise });
+//     } catch (error) {
+//       console.error("Error deleting exercise:", error);
+//       res.status(500).json({ success: false, message: "Failed to delete exercise.", error: error.message });
+//     }
+//   };
+
 
   module.exports = {
     addExercise,
-    deleteExercise
+    // deleteExercise
   };

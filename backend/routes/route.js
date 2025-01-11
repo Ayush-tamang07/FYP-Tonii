@@ -1,24 +1,35 @@
 const express = require('express');
-const { userRegister, loginUser} = require('../controller/authController');
+const authController= require('../controller/authController.js');
 const { calculate } = require('../controller/calculator');
-const { readExercise, createWorkoutPlan, getUserWorkoutPlans, addExerciseToWorkoutPlan, removeExerciseFromWorkoutPlan } = require('../controller/customWorkout');
-const { addExercise } = require('../controller/adminController');
+const customWorkout = require('../controller/customWorkout.js');
+const adminController = require('../controller/adminController');
+const resetPassword = require('../controller/resetPassword.js');
 
 const router = express.Router();
 
 // Authentication routes
-router.post("/register", userRegister)
-router.post("/login", loginUser)
+router.post("/register", authController.userRegister)
+router.post("/login", authController.loginUser)
+
+// reset resetPassword
+router.post('/requestOtp',resetPassword.reqOTP)
+router.post('/verifyOtp',resetPassword.verifyOTP)
+router.post('/resetPassword',resetPassword.resetPassword)
 
 router.post("/calculate", calculate)
+router.get('/exercise', customWorkout.readExercise)
 
-router.get('/exercise',readExercise)
-router.post('/workout-plans', createWorkoutPlan);  // Create workout plan
-router.get('/workout-plans/:userId', getUserWorkoutPlans);  // Get workout plans for a user
-router.post('/workout-plans/add-exercise', addExerciseToWorkoutPlan);  // Add exercise to workout plan
-router.post('/workout-plans/remove-exercise', removeExerciseFromWorkoutPlan); 
+// Routes for workout plans
+router.post('/createWorkoutPlan', customWorkout.createWorkoutPlan); // test success
+router.get('/:userId', customWorkout.getWorkoutPlans);  // test success
+router.put('/:id', customWorkout.updateWorkoutPlan);
+router.delete('/:id', customWorkout.deleteWorkoutPlan);
 
+// Routes for exercises in workout plans
+router.post('/add-exercise', customWorkout.addExerciseToWorkoutPlan);  // test success
+router.post('/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan);
 
 // Admin
-router.post("/addExercise", addExercise); // Add a new exercise
+router.post("/addExercise", adminController.addExercise); // Admin can add new exercise
+
 module.exports = router;

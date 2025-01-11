@@ -23,6 +23,8 @@ model User {
   gender    String?      // Optional field
   password  String
   role      String       @default("user")
+  otp       String?
+  otp_exp   DateTime?
 
   workoutPlans WorkoutPlan[] // A user can have many workout plans, no foreign key in User
 }
@@ -30,7 +32,6 @@ model User {
 model WorkoutPlan {
   id          Int                   @id @default(autoincrement())
   name        String
-  description String
   userId      Int                   // Foreign key to User (in WorkoutPlan, not User)
   user        User                  @relation(fields: [userId], references: [id]) // This creates the relation with User
   exercises   WorkoutPlanExercise[] // Many-to-many relation with exercises
