@@ -1,22 +1,83 @@
 import { Link } from 'expo-router';
 import React, { Component } from 'react';
+import { useRouter } from "expo-router";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Image} from 'react-native';
+import Toast from "react-native-toast-message";
+import { useState } from "react";
+// import * as SecureStore from "expo-secure-store";
+import { registerUser } from "@/context/userAPI";
 
-export class Register extends Component {
-  state = {
-    name: '',
-    email: '',
-    password: '',
+const Register = () => {
+    const router = useRouter();
+
+    const [form, setForm] = useState({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+
+  const handleRegister = () => {
+    // const { name, email, password } = this.state;
+    // console.log('Name:', name);
+    // console.log('Email:', email);
+    // console.log('Password:', password);
+    try {
+      if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+        Toast.show({
+          type: "error",
+          text1: "Validation Error", 
+          text2: "Please fill in all fields.",
+        });
+        return;
+      }
+      // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email)) {
+          Toast.show({
+            type: "error",
+            text1: "Validation Error",
+            text2: "Please enter a valid email address",
+          });
+          return;
+        }
+  
+      if (form.password !== form.confirmPassword) {
+        Toast.show({
+          type: "error",
+          text1: "Validation Error",
+          text2: "Passwords do not match.",
+        });
+        return;
+      }
+  
+        const result = await registerUser(form.name, form.email, form.password , form.confirmPassword);
+        if (result?.status == 201) {
+          await SecureStore.setItemAsync("AccessToken", result.token);
+          console.log(result.token);
+          Toast.show({
+            type: "success", 
+            text1: "Success",
+            text2: "Account created successfully! Please login.",
+            visibilityTime: 1000,
+            onHide: () => {
+              router.replace("../(auth)/sign_in");
+            }
+          });
+        } else {
+          Alert.alert("Error", "Invalid credentials");
+        }
+      } catch (error) {
+        console.error(error);
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Something went wrong. Please try again.",
+        });
+      }
+    
   };
 
-  handleRegister = () => {
-    const { name, email, password } = this.state;
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password);
-  };
-
-  render() {  
     return (
       <View style={styles.container}>
               <Image
@@ -78,7 +139,7 @@ export class Register extends Component {
         </Link>
       </View>
     );
-  }
+  
 }
 
 const styles = StyleSheet.create({
@@ -142,3 +203,4 @@ const styles = StyleSheet.create({
 });
 
 export default Register;
+

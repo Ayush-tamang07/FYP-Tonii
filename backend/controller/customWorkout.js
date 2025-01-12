@@ -97,17 +97,13 @@ const readExercise = async (req, res) => {
 
 const createWorkoutPlan = async (req, res) => {
   try {
-    const { name, description, userId, exerciseIds } = req.body;
+    const { name, userId, exerciseIds } = req.body;
 
     // Create the workout plan
     const workoutPlan = await prisma.workoutPlan.create({
       data: {
         name,
-        description,
         userId,
-        exercises: {
-          connect: exerciseIds.map((id) => ({ id })),
-        },
       },
     });
 
@@ -157,32 +153,50 @@ const getUserWorkoutPlans = async (req, res) => {
   }
 };
 
-// Add an exercise to a workout plan
 const addExerciseToWorkoutPlan = async (req, res) => {
   try {
     const { workoutPlanId, exerciseId } = req.body;
 
-    // Add exercise to the workout plan
-    const workoutPlanExercise = await prisma.workoutPlanExercise.create({
-      data: {
-        workoutPlanId,
-        exerciseId,
+    if (!Array.isArray(exerciseId)) {
+      return res.status(400).json({
+        error: "exerciseId must be an array of integers.",
+      });
+    }
+
+    // Validate all exercise IDs
+    const validExercises = await prisma.exercise.findMany({
+      where: {
+        id: { in: exerciseId },
       },
+      select: { id: true },
     });
 
-    res.status(201).json({
-      success: true,
-      data: workoutPlanExercise,
-    });
+    const validExerciseIds = validExercises.map((exercise) => exercise.id);
+
+    // Check if any invalid IDs exist
+    const invalidIds = exerciseId.filter((id) => !validExerciseIds.includes(id));
+    if (invalidIds.length > 0) {
+      return res.status(400).json({
+        error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
+      });
+    }
+
+    // Add valid exercise IDs to the workout plan
+    const workoutPlanExercises = await Promise.all(
+      validExerciseIds.map((id) =>
+        prisma.workoutPlanExercise.create({
+          data: { workoutPlanId, exerciseId: id },
+        })
+      )
+    );
+
+    res.status(201).json(workoutPlanExercises);
   } catch (error) {
-    console.error("Error adding exercise:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to add exercise to workout plan.",
-      error: error.message,
-    });
+    console.error("Error adding exercises to workout plan:", error);
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 // Remove an exercise from a workout plan
 const removeExerciseFromWorkoutPlan = async (req, res) => {

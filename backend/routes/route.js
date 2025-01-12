@@ -1,24 +1,24 @@
 const express = require('express');
-const { userRegister, loginUser} = require('../controller/authController');
+const authController= require('../controller/authController.js');
 const { calculate } = require('../controller/calculator');
-const { readExercise, createWorkoutPlan, getUserWorkoutPlans, addExerciseToWorkoutPlan, removeExerciseFromWorkoutPlan } = require('../controller/customWorkout');
-const { addExercise } = require('../controller/adminController');
+const customWorkout = require('../controller/customWorkout.js');
+const adminController = require('../controller/adminController.js');
 
 const router = express.Router();
 
 // Authentication routes
-router.post("/register", userRegister)
-router.post("/login", loginUser)
+router.post("/user/register", authController.userRegister)
+router.post("/user/login", authController.loginUser)
 
 router.post("/calculate", calculate)
 
-router.get('/exercise',readExercise)
-router.post('/workout-plans', createWorkoutPlan);  // Create workout plan
-router.get('/workout-plans/:userId', getUserWorkoutPlans);  // Get workout plans for a user
-router.post('/workout-plans/add-exercise', addExerciseToWorkoutPlan);  // Add exercise to workout plan
-router.post('/workout-plans/remove-exercise', removeExerciseFromWorkoutPlan); 
+router.get('/exercise',customWorkout.readExercise)
+router.post('/workout-plans', customWorkout.createWorkoutPlan);  // Create workout plan
+router.get('/workout-plans/:userId', customWorkout.getUserWorkoutPlans);  // Get workout plans for a user
+router.post('/workout-plans/add-exercise', customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
+router.post('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 
 
 // Admin
-router.post("/addExercise", addExercise); // Add a new exercise
+router.post("/addExercise", adminController.addExercise); // Add a new exercise
 module.exports = router;
