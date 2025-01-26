@@ -199,29 +199,89 @@ const addExerciseToWorkoutPlan = async (req, res) => {
 
 
 // Remove an exercise from a workout plan
+// const removeExerciseFromWorkoutPlan = async (req, res) => {
+//   try {
+//     const { workoutPlanId, exerciseId } = req.body;
+
+//     // Remove the exercise from the workout plan
+//     const workoutPlanExercise = await prisma.workoutPlanExercise.delete({
+//       where: {
+//         workoutPlanId_exerciseId: {
+//           workoutPlanId,
+//           exerciseId,
+//         },
+//       },
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       data: workoutPlanExercise,
+//     });
+//   } catch (error) {
+//     console.error("Error removing exercise:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to remove exercise from workout plan.",
+//       error: error.message,
+//     });
+//   }
+// };
 const removeExerciseFromWorkoutPlan = async (req, res) => {
   try {
-    const { workoutPlanId, exerciseId } = req.body;
+    const { workoutPlanId, exerciseIds } = req.body;
 
-    // Remove the exercise from the workout plan
-    const workoutPlanExercise = await prisma.workoutPlanExercise.delete({
+    if (!workoutPlanId || !exerciseIds) {
+      return res.status(400).json({
+        success: false,
+        message: "WorkoutPlanId and exerciseIds are required.",
+      });
+    }
+
+    if (!Array.isArray(exerciseIds)) {
+      return res.status(400).json({
+        success: false,
+        message: "exerciseIds must be an array of integers.",
+      });
+    }
+
+    // Validate that exercises exist in the database
+    const validExercises = await prisma.workoutPlanExercise.findMany({
       where: {
-        workoutPlanId_exerciseId: {
-          workoutPlanId,
-          exerciseId,
-        },
+        workoutPlanId,
+        exerciseId: { in: exerciseIds },
       },
+      select: { id: true },
     });
+
+    const validExerciseIds = validExercises.map((exercise) => exercise.id);
+
+    if (validExerciseIds.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No valid exercises found for the given workout plan.",
+      });
+    }
+
+    // Remove all valid exercises from the workout plan
+    const deletionPromises = validExerciseIds.map((id) =>
+      prisma.workoutPlanExercise.delete({
+        where: {
+          id,
+        },
+      })
+    );
+
+    await Promise.all(deletionPromises);
 
     res.status(200).json({
       success: true,
-      data: workoutPlanExercise,
+      message: "Exercises removed successfully from the workout plan.",
     });
   } catch (error) {
-    console.error("Error removing exercise:", error);
+    console.error("Error removing exercises from workout plan:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to remove exercise from workout plan.",
+      message: "Failed to remove exercises from workout plan.",
       error: error.message,
     });
   }
