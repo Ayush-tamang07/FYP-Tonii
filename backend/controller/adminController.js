@@ -92,6 +92,64 @@ const deleteExercise = async (req, res) => {
   }
 };
 
+const updateExercise = async (req, res) => {
+  try {
+    const { id } = req.params; // Get exercise ID from URL parameters
+    const { name, type, muscle, equipment, difficulty, instructions } = req.body;
+
+    // Validate that an ID is provided
+    if (!id) {
+      return res.status(400).json({ success: false, message: "Exercise ID is required." });
+    }
+
+    // Validate at least one field to update
+    if (!name && !type && !muscle && !equipment && !difficulty && !instructions) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field is required to update.",
+      });
+    }
+
+    // Find the existing exercise
+    const existingExercise = await prisma.exercise.findUnique({
+      where: { id: parseInt(id) }, // Ensure ID is an integer
+    });
+
+    if (!existingExercise) {
+      return res.status(404).json({
+        success: false,
+        message: "Exercise not found.",
+      });
+    }
+
+    // Update the exercise
+    const updatedExercise = await prisma.exercise.update({
+      where: { id: parseInt(id) },
+      data: {
+        ...(name && { name }),
+        ...(type && { type }),
+        ...(muscle && { muscle }),
+        ...(equipment && { equipment }),
+        ...(difficulty && { difficulty }),
+        ...(instructions && { instructions }),
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Exercise updated successfully.",
+      data: updatedExercise,
+    });
+  } catch (error) {
+    console.error("Error updating exercise:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update exercise.",
+      error: error.message,
+    });
+  }
+};
+
 const readUser = async (req, res) => {
   try {
     // Fetch all user details from the database
@@ -114,8 +172,11 @@ const readUser = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   addExercise,
   deleteExercise,
   readUser,
+  updateExercise
 };

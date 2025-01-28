@@ -7,9 +7,14 @@ const resetPassword = require('../controller/resetPassword.js');
 
 const router = express.Router();
 
-// Authentication routes
+// User Authentication routes
 router.post("/user/register", authController.userRegister)
 router.post("/user/login", authController.loginUser)
+
+// Admin Authentication routes
+// router.post("/admin/register", authController.adminRegister)
+// router.post("/admin/login", authController.loginAdmin)
+
 // password reset
 router.post('/requestOtp',resetPassword.reqOTP)
 router.post('/verifyOtp',resetPassword.verifyOTP)
@@ -25,6 +30,8 @@ router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFrom
 
 
 // Admin
-router.post("/addExercise", adminController.addExercise); // Add a new exercise
+router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
 router.get("/admin/readUser",adminController.readUser);
+router.put("/admin/updateExercise/:id",adminController.updateExercise);
+router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 module.exports = router;
