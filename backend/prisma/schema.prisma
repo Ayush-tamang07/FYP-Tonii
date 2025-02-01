@@ -55,5 +55,13 @@ model Exercise {
   workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans, no foreign key in Exercise
 }
 
+model Feedback {
+  id           Int      @id @default(autoincrement())
+  feedback_type String
+  description  String   @db.Text
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+}
 
 

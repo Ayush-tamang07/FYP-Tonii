@@ -4,6 +4,7 @@ const { calculate } = require('../controller/calculator');
 const customWorkout = require('../controller/customWorkout.js');
 const adminController = require('../controller/adminController.js');
 const resetPassword = require('../controller/resetPassword.js');
+const userController = require('../controller/useController.js');
 
 const router = express.Router();
 
@@ -28,8 +29,9 @@ router.get('/workout-plans/:userId', customWorkout.getUserWorkoutPlans);  // Get
 router.post('/workout-plans/add-exercise', customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 
-
-// Admin
+// User Funciton
+router.post('/user/addFeedback', userController.addFeedback)
+// Admin Funciton
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
 router.get("/admin/readUser",adminController.readUser);
 router.put("/admin/updateExercise/:id",adminController.updateExercise);

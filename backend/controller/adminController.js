@@ -177,6 +177,6 @@ const readUser = async (req, res) => {
 module.exports = {
   addExercise,
   deleteExercise,
-  readUser,
+  readUser,      
   updateExercise
 };
