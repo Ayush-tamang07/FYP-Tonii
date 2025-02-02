@@ -21,6 +21,8 @@ router.post('/requestOtp',resetPassword.reqOTP)
 router.post('/verifyOtp',resetPassword.verifyOTP)
 router.post('/resetPassword',resetPassword.resetPassword)
 
+// User Function
+router.post('/user/addFeedback/:userId', userController.addFeedback)
 router.post("/calculate", calculate)
 
 router.get('/exercise',customWorkout.readExercise)
@@ -29,9 +31,7 @@ router.get('/workout-plans/:userId', customWorkout.getUserWorkoutPlans);  // Get
 router.post('/workout-plans/add-exercise', customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 
-// User Funciton
-router.post('/user/addFeedback', userController.addFeedback)
-// Admin Funciton
+// Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
 router.get("/admin/readUser",adminController.readUser);
 router.put("/admin/updateExercise/:id",adminController.updateExercise);

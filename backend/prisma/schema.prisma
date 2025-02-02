@@ -25,7 +25,10 @@ model User {
   role      String       @default("user")
 
   workoutPlans WorkoutPlan[] // A user can have many workout plans, no foreign key in User
+  feedbacks    Feedback[]    // A user can have many feedback entries
 }
+
+
 
 model WorkoutPlan {
   id          Int                   @id @default(autoincrement())
@@ -51,6 +54,7 @@ model Exercise {
   muscle      String
   equipment   String
   difficulty  String
+  category    String @default("Uncategorized")
   instructions String @db.Text
   workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans, no foreign key in Exercise
 }
