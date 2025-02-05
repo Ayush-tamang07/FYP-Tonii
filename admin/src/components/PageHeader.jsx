@@ -2,8 +2,8 @@ import React from 'react'
 
 export default function PageHeader({title}) {
   return (
-    <header className='bg-white p-6 rounded-xl'>
-        <h1 className='text-2xl'>{title}</h1>
+    <header className='rounded-xl'>
+        <h1 className='text-4xl ml-6 font-semibold'>{title}</h1>
     </header>
   )
 }

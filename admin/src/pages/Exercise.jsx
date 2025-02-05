@@ -30,13 +30,13 @@ function Exercise() {
   // Handle Delete
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5500/api/deleteExercise/${id}`);
-      setExercises(exercises.filter((exercise) => exercise.id !== id));
+      await axios.delete(`http://localhost:5500/api/admin/deleteExercise/${id}`);
+      setExercises((prevExercises) => prevExercises.filter((exercise) => exercise.id !== id));
     } catch (error) {
       console.error("Error deleting exercise:", error);
     }
   };
-
+  
   // Toggle Expand/Collapse Instructions
   const toggleExpand = (id) => {
     setExpandedRows((prev) => ({

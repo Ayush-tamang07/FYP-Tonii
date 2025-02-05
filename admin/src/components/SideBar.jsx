@@ -2,7 +2,7 @@ import React from 'react';
 
 function SideBar() {
   return (
-    <aside className="min-h-screen white p-4 rounded-xl fixed bg-white  ">
+    <aside className="">
       <nav className="space-y-4">
         <a
           href="/dashboard"
