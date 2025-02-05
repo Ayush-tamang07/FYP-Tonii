@@ -3,6 +3,7 @@ import PageHeader from "../components/PageHeader";
 import SideBar from '../components/SideBar';
 import Feedback from './Feedback';
 import Exercise from './Exercise';
+import UserContent from '../components/UserContent';
 
 
 function User() {
@@ -18,7 +19,7 @@ function User() {
       
       {/* Scrollable Content */}
       <div className="bg-white p-4 overflow-auto">
-        <Exercise/>
+        <UserContent/>
       </div>
     </div>
   </div>

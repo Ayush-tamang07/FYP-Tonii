@@ -1,8 +1,6 @@
 import React from "react";
 import PageHeader from "../components/PageHeader";
 import SideBar from "../components/SideBar";
-import Feedback from "./Feedback";
-// import Exercise from "./Exercise";
 
 function Dashboard() {
   return (
@@ -17,7 +15,7 @@ function Dashboard() {
         
         {/* Scrollable Content */}
         <div className="bg-white p-4 overflow-auto">
-          <Feedback/>
+          Dashboard
         </div>
       </div>
     </div>
