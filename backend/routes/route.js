@@ -36,4 +36,6 @@ router.post("/admin/addExercise", adminController.addExercise); // Add a new exe
 router.get("/admin/readUser",adminController.readUser);
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
+router.get("/admin/readFeedback",adminController.readFeedback);
+
 module.exports = router;

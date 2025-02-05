@@ -187,10 +187,43 @@ const readUser = async (req, res) => {
     return res.status(500).json({ message: "Internal server error." });
   }
 };
+const readFeedback = async (req, res) => {
+  try {
+    const { feedback_type, date } = req.query; // Get query parameters
+
+    // Define filter conditions dynamically
+    const filterCondition = {};
+
+    if (feedback_type) {
+      filterCondition.feedback_type = feedback_type; // Apply type filter
+    }
+
+    if (date) {
+      filterCondition.createdAt = { 
+        gte: new Date(date + "T00:00:00.000Z"), // Start of the day
+        lt: new Date(date + "T23:59:59.999Z"), // End of the day
+      };
+    }
+
+    // Fetch filtered data from Prisma
+    const feedback = await prisma.feedback.findMany({
+      where: filterCondition, // Apply dynamic filtering
+    });
+
+    return res.status(200).json(feedback);
+  } catch (error) {
+    console.error("Error fetching feedback:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
+
 
 module.exports = {
   addExercise,
   deleteExercise,
   readUser,
   updateExercise,
+  readFeedback
 };
