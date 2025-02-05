@@ -103,8 +103,48 @@ const resetPassword = async (req, res) => {
   } catch (error) {}
 };
 
+// admin authentication
+const loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "all field is required" });
+    }
+    console.log(email);
+    console.log(password);
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+    // checking admin
+    if (!user) {
+      return res.status(404).json({ message: "user does not exist" });
+    }
+    // Checking if user is an admin
+    if (user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    // Compare the provided password with the hashed password stored in the database
+    const checkPassword = await bcrypt.compare(password, user.password);
+    if (!checkPassword) {
+      return res.status(401).json({ message: "Incorrect Password" });
+    }
+    return res.status(200).json({
+      message: "Login Successfully",
+      user,
+      // token,
+    });
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    return res.status(500).json({ message: "failed to login" });
+  }
+};
+
 module.exports = {
   userRegister,
   loginUser,
   resetPassword,
+  loginAdmin
 };

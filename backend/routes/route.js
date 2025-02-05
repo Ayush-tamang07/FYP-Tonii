@@ -14,7 +14,7 @@ router.post("/user/login", authController.loginUser)
 
 // Admin Authentication routes
 // router.post("/admin/register", authController.adminRegister)
-// router.post("/admin/login", authController.loginAdmin)
+router.post("/admin/login", authController.loginAdmin)
 
 // password reset
 router.post('/requestOtp',resetPassword.reqOTP)
