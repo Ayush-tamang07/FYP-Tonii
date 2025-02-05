@@ -1,21 +1,50 @@
-import React from "react";
+import React from 'react';
 
-export default function SideBar() {
+function SideBar() {
   return (
-    <aside>
-        <nav>
-            <a href="/dashboard"><ul>Dashboard</ul></a>
-            <a href="/user"><ul>User Details</ul></a>
-            <a href="/exercise"><ul>Exercise</ul></a>
-            <a href="/feedback"><ul>Feedback</ul></a>
-            <a href="#"><ul>Setting</ul></a>
-        </nav>
+    <aside className="min-h-screen white p-4 rounded-xl fixed bg-white  ">
+      <nav className="space-y-4">
+        <a
+          href="/dashboard"
+          className="block p-2 rounded hover:bg-gray-200 transition"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/user"
+          className="block p-2 rounded hover:bg-gray-200 transition"
+        >
+          User Details
+        </a>
+        <a
+          href="/exercise"
+          className="block p-2 rounded hover:bg-gray-200 transition"
+        >
+          Exercise
+        </a>
+        <a
+          href="/feedback"
+          className="block p-2 rounded hover:bg-gray-200 transition"
+        >
+          Feedback
+        </a>
+        <a
+          href="#"
+          className="block p-2 rounded hover:bg-gray-200 transition"
+        >
+          Setting
+        </a>
+      </nav>
+      <div className="mt-10">
         <button
           type="button"
-          className="focus:outline-none text-[#FF0000] bg-[#FFEDED] hover:bg-red-300 font-semibold rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+          className="w-full focus:outline-none text-red-500 bg-red-100 hover:bg-red-200 font-semibold rounded-lg text-sm px-5 py-2.5"
         >
           Logout
         </button>
+      </div>
     </aside>
   );
 }
+
+export default SideBar;

@@ -1,8 +1,10 @@
 import React from 'react'
+import PageHeader from "../components/PageHeader";
+
 
 function User() {
   return (
-    <div>User</div>
+    <PageHeader title="User" />
   )
 }
 

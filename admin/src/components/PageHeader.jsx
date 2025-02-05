@@ -1,9 +1,9 @@
 import React from 'react'
 
-function PageHeader() {
+export default function PageHeader({title}) {
   return (
-    <header>PageHeader</header>
+    <header className='bg-white p-6 rounded-xl'>
+        <h1 className='text-2xl'>{title}</h1>
+    </header>
   )
 }
-
-export default PageHeader

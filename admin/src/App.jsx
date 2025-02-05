@@ -1,9 +1,11 @@
 import { BrowserRouter,Routes, Route } from "react-router-dom";
-import { Login, Dashboard, User, Exercise, Feedback, SideBar } from "../reference.js";
+// import { Login, Dashboard, User, Exercise, SideBar } from "./reference";
+import { Login, Dashboard, User, Exercise, Feedback, SideBar } from "./reference.js";
 
-export default function App() {
+import React from 'react'
+
+function App() {
   return (
-    // <Login/>
     <BrowserRouter>
     <Routes>
       <Route/>
@@ -18,3 +20,5 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
+export default App
