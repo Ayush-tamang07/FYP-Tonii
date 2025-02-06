@@ -4,27 +4,29 @@ import { useLocation } from 'react-router-dom';
 function SideBar() {
   const location = useLocation(); // Get current route path
 
-  // Function to apply active background color
-  const getLinkClass = (path) =>
-    location.pathname === path ? "bg-[#E3F2FD]" : "";
+  // Function to apply active background color and text color
+  const getLinkClass = (path) => 
+    location.pathname === path 
+      ? "bg-[#E3F2FD] text-[#2D60FF]"  // Active state
+      : "text-[#B1B1B1]";               // Inactive state
 
   return (
     <aside className="flex flex-col h-full">
       {/* Navigation Links */}
       <nav className="space-y-4 flex-1">
-        <a href="/dashboard" className={`block p-2 rounded text-[#2196F3] text-xl transition ${getLinkClass("/dashboard")}`}>
+        <a href="/dashboard" className={`block p-2 rounded font-semibold text-xl transition ${getLinkClass("/dashboard")}`}>
           Dashboard
         </a>
-        <a href="/user" className={`block p-2 rounded text-[#2196F3] text-xl transition ${getLinkClass("/user")}`}>
+        <a href="/user" className={`block p-2 rounded font-semibold text-xl transition ${getLinkClass("/user")}`}>
           User Details
         </a>
-        <a href="/exercise" className={`block p-2 rounded text-[#2196F3] text-xl transition ${getLinkClass("/exercise")}`}>
+        <a href="/exercise" className={`block p-2 rounded font-semibold text-xl transition ${getLinkClass("/exercise")}`}>
           Exercise
         </a>
-        <a href="/feedback" className={`block p-2 rounded text-[#2196F3] text-xl transition ${getLinkClass("/feedback")}`}>
+        <a href="/feedback" className={`block p-2 rounded font-semibold text-xl transition ${getLinkClass("/feedback")}`}>
           Feedback
         </a>
-        <a href="#" className={`block p-2 rounded text-[#2196F3] text-xl transition ${getLinkClass("/settings")}`}>
+        <a href="#" className={`block p-2 rounded font-semibold text-xl transition ${getLinkClass("/settings")}`}>
           Setting
         </a>
       </nav>
