@@ -14,6 +14,9 @@ function ExerciseContent() {
     category: "",
     instructions: "",
   });
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // "success" or "error"
+
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -62,16 +65,59 @@ function ExerciseContent() {
     setNewExercise((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddExercise = async () => {
-    try {
-      const response = await axios.post("http://localhost:5500/api/admin/addExercise", newExercise);
-      setExercises([...exercises, response.data]);
+const handleAddExercise = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:5500/api/admin/addExercise",
+      {
+        ...newExercise,
+        instructions: newExercise.instructions || "No instructions provided.",
+      }
+    );
+
+    // Re-fetch all exercises after successful addition
+    const updatedExercises = await axios.get("http://localhost:5500/api/exercise");
+    setExercises(updatedExercises.data.data);
+
+    // Show success message in the form
+    setMessage("Exercise added successfully!");
+    setMessageType("success");
+
+    // Reset form after a delay
+    setTimeout(() => {
       setIsModalOpen(false);
-      setNewExercise({ name: "", type: "", muscle: "", equipment: "", difficulty: "", category: "", instructions: "" });
-    } catch (error) {
+      setMessage(""); // Clear message after closing
+      setNewExercise({
+        name: "",
+        type: "",
+        muscle: "",
+        equipment: "",
+        difficulty: "",
+        category: "",
+        instructions: "",
+      });
+    }, 1500); // Close modal after 1.5 seconds
+
+  } catch (error) {
+    if (error.response) {
+      // Handle duplicate exercise error (409 Conflict)
+      if (error.response.status === 409) {
+        setMessage("An exercise with the same name, muscle, and equipment already exists.");
+        setMessageType("error");
+      } else {
+        setMessage(`Error: ${error.response.data.message}`);
+        setMessageType("error");
+      }
+    } else {
       console.error("Error adding exercise:", error);
+      setMessage("An unexpected error occurred. Please try again.");
+      setMessageType("error");
     }
-  };
+  }
+};
+
+
+  // setExercises([...exercises, response.data]);
   const typeOptions = [
     "cardio",
     "olympic_weightlifting",
@@ -138,9 +184,11 @@ function ExerciseContent() {
                     {exercise.equipment}
                   </td>
                   <td className="border border-gray-300 p-2">
-                    {expandedRows[exercise.id]
-                      ? exercise.instructions
-                      : `${exercise.instructions.substring(0, 100)}... `}
+                    {expandedRows[exercise.id] ? (
+                      exercise.instructions || "No instructions provided."
+                    ) : (
+                      `${exercise.instructions ? exercise.instructions.substring(0, 100) : "No instructions provided."}...`
+                    )}
                     <button
                       onClick={() => toggleExpand(exercise.id)}
                       className="text-blue-500 underline text-sm"
@@ -148,6 +196,7 @@ function ExerciseContent() {
                       {expandedRows[exercise.id] ? "Read Less" : "Read More"}
                     </button>
                   </td>
+
                   <td className="p-2 flex space-x-2">
                     <button
                       onClick={() =>
@@ -176,48 +225,121 @@ function ExerciseContent() {
           </tbody>
         </table>
       </div>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-1/3">
-            <h2 className="text-lg font-bold mb-4">Add New Exercise</h2>
-            <input type="text" name="name" placeholder="Name" value={newExercise.name} onChange={handleInputChange} className="border p-2 w-full mb-2" />
-            {/* exercise type */}
-            <select name="type" value={newExercise.type} onChange={handleInputChange} className="border p-2 w-full mb-2">
-              <option value="">Type</option>
-              {typeOptions.map((type) => (
-                <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
-              ))}
-              </select>
-            {/* muscle */}
-            <select name="muscle" value={newExercise.muscle} onChange={handleInputChange} className="border p-2 w-full mb-2">
-              <option value="">Muscle</option>
-              {muscleOptions.map((muscle) => (
-                <option key={muscle} value={muscle}>{muscle.charAt(0).toUpperCase() + muscle.slice(1)}</option>
-              ))}
-            </select>
-            {/* difficulty */}
-            <select name="difficulty" value={newExercise.difficulty} onChange={handleInputChange} className="border p-2 w-full mb-2">
-              <option value="">Difficulty</option>
-              {difficultyOptions.map((difficulty) => (
-                <option key={difficulty} value={difficulty}>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</option>
-              ))}
-            </select>
-            {/* category */}
-            <select name="category" value={newExercise.category} onChange={handleInputChange} className="border p-2 w-full mb-2">
-              <option value="">Category</option>
-              {categoryOptions.map((category) => (
-              <option key={category} value={category}>{category.charAt(0).toUpperCase() + category.slice(1)}</option>
-              ))}
-            </select>
-            <input type="text" name="equipment" placeholder="Equipment" value={newExercise.equipment} onChange={handleInputChange} className="border p-2 w-full mb-2" />
-            <textarea name="instructions" placeholder="Instructions" value={newExercise.instructions} onChange={handleInputChange} className="border p-2 w-full mb-2"></textarea>
-            <div className="flex justify-end">
-              <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
-              <button onClick={handleAddExercise} className="bg-green-500 text-white px-4 py-2 rounded">Add</button>
-            </div>
-          </div>
+      {/* Modal */}
+{isModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg w-1/3">
+      <h2 className="text-lg font-bold mb-4">Add New Exercise</h2>
+
+      {/* Show Success or Error Message inside the form */}
+      {message && (
+        <div
+          className={`text-white p-2 rounded mb-4 ${
+            messageType === "success" ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          {message}
         </div>
       )}
+
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        value={newExercise.name}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      />
+      {/* exercise type */}
+      <select
+        name="type"
+        value={newExercise.type}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      >
+        <option value="">Type</option>
+        {typeOptions.map((type) => (
+          <option key={type} value={type}>
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </option>
+        ))}
+      </select>
+      {/* muscle */}
+      <select
+        name="muscle"
+        value={newExercise.muscle}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      >
+        <option value="">Muscle</option>
+        {muscleOptions.map((muscle) => (
+          <option key={muscle} value={muscle}>
+            {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
+          </option>
+        ))}
+      </select>
+      {/* difficulty */}
+      <select
+        name="difficulty"
+        value={newExercise.difficulty}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      >
+        <option value="">Difficulty</option>
+        {difficultyOptions.map((difficulty) => (
+          <option key={difficulty} value={difficulty}>
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </option>
+        ))}
+      </select>
+      {/* category */}
+      <select
+        name="category"
+        value={newExercise.category}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      >
+        <option value="">Category</option>
+        {categoryOptions.map((category) => (
+          <option key={category} value={category}>
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </option>
+        ))}
+      </select>
+      <input
+        type="text"
+        name="equipment"
+        placeholder="Equipment"
+        value={newExercise.equipment}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      />
+      <textarea
+        name="instructions"
+        placeholder="Instructions"
+        value={newExercise.instructions}
+        onChange={handleInputChange}
+        className="border p-2 w-full mb-2"
+      ></textarea>
+      <div className="flex justify-end">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleAddExercise}
+          className="bg-green-500 text-white px-4 py-2 rounded"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </>
   );
 }
