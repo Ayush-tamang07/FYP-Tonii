@@ -2,6 +2,7 @@ import React from "react";
 import PageHeader from "../components/PageHeader";
 import SideBar from "../components/SideBar";
 import ExerciseContent from "../components/ExerciseContent";
+import TestExercise from "../components/TestExercise";
 
 function Exercise() {
   return (
@@ -16,7 +17,7 @@ function Exercise() {
         
         {/* Scrollable Content */}
         <div className="bg-white p-4 overflow-auto">
-          <ExerciseContent/>
+          <TestExercise/>
         </div>
       </div>
     </div>
