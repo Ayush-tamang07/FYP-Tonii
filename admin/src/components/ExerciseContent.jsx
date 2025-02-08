@@ -160,13 +160,81 @@ function ExerciseContent() {
 
   return (
     <>
-      <button
-        type="button"
-        className="focus:outline-none text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-        onClick={() => setIsModalOpen(true)}
-      >
-        Add
-      </button>
+      <div className="mb-4 flex space-x-4">
+        <button
+          type="button"
+          className="focus:outline-none text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+          onClick={() => setIsModalOpen(true)}
+        >
+          Add
+        </button>
+        <select name="" id="" className="border p-2 rounded">
+          <option value="">type</option>
+          <option value="cardio">Cardio</option>
+          <option value="olympic_weightlifting">Olympic Weightlifting</option>
+          <option value="plyometrics">Plyometrics</option>
+          <option value="powerlifting">Powerlifting</option>
+          <option value="strength">Strength</option>
+          <option value="stretching">Stretching</option>
+          <option value="strongman">Strongman</option>
+        </select>
+        <select
+          name="muscle"
+          value={newExercise.muscle}
+          onChange={handleInputChange}
+          className="border p-2 mb-2"
+        >
+          <option value="">Muscle</option>
+          {muscleOptions.map((muscle) => (
+            <option key={muscle} value={muscle}>
+              {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
+            </option>
+          ))}
+        </select>
+        {/* difficulty */}
+        <select
+          name="difficulty"
+          value={newExercise.difficulty}
+          onChange={handleInputChange}
+          className="border p-2 mb-2"
+        >
+          <option value="">Difficulty</option>
+          {difficultyOptions.map((difficulty) => (
+            <option key={difficulty} value={difficulty}>
+              {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+            </option>
+          ))}
+        </select>
+        <select
+          name="category"
+          value={newExercise.category}
+          onChange={handleInputChange}
+          className="border p-2 mb-2"
+        >
+          <option value="">Category</option>
+          {categoryOptions.map((category) => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
+        {/* Apply Filter Button */}
+        <button
+          // onClick={}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Apply Filter
+        </button>
+
+        {/* Clear Filters Button */}
+        <button
+          // onClick={}
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Clear Filters
+        </button>
+      </div>
+
       <div className="container mx-auto p-4">
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>

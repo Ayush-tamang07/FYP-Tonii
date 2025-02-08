@@ -17,7 +17,7 @@ function Exercise() {
         
         {/* Scrollable Content */}
         <div className="bg-white p-4 overflow-auto">
-          <TestExercise/>
+          <ExerciseContent/>
         </div>
       </div>
     </div>
