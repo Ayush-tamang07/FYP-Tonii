@@ -163,20 +163,23 @@ function ExerciseContent() {
       <div className="mb-4 flex space-x-4">
         <button
           type="button"
-          className="focus:outline-none text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+          className=" bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded"
           onClick={() => setIsModalOpen(true)}
         >
           Add
         </button>
-        <select name="" id="" className="border p-2 rounded">
-          <option value="">type</option>
-          <option value="cardio">Cardio</option>
-          <option value="olympic_weightlifting">Olympic Weightlifting</option>
-          <option value="plyometrics">Plyometrics</option>
-          <option value="powerlifting">Powerlifting</option>
-          <option value="strength">Strength</option>
-          <option value="stretching">Stretching</option>
-          <option value="strongman">Strongman</option>
+        <select
+          name="type"
+          value={newExercise.type}
+          onChange={handleInputChange}
+          className="border p-2 mb-2"
+        >
+          <option value="">Type</option>
+          {typeOptions.map((type) => (
+            <option key={type} value={type}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </option>
+          ))}
         </select>
         <select
           name="muscle"
