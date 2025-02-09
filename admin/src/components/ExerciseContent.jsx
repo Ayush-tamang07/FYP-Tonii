@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  typeOptions,
+  muscleOptions,
+  difficultyOptions,
+  categoryOptions,
+} from "../data/exerciseOption.js";
 
 function ExerciseContent() {
   const [exercises, setExercises] = useState([]); // Default empty array
@@ -117,46 +123,6 @@ function ExerciseContent() {
       }
     }
   };
-
-  // setExercises([...exercises, response.data]);
-  const typeOptions = [
-    "cardio",
-    "olympic_weightlifting",
-    "plyometrics",
-    "powerlifting",
-    "strength",
-    "stretching",
-    "strongman",
-  ];
-
-  // console.log(typeOptions);
-  const muscleOptions = [
-    "abdominals",
-    "abductors",
-    "adductors",
-    "biceps",
-    "calves",
-    "chest",
-    "forearms",
-    "glutes",
-    "hamstrings",
-    "lats",
-    "lower_back",
-    "middle_back",
-    "neck",
-    "quadriceps",
-    "traps",
-    "triceps",
-  ];
-  const difficultyOptions = ["beginner", "intermediate", "advanced"];
-  const categoryOptions = [
-    "chest",
-    "back",
-    "arms",
-    "shoulders",
-    "core",
-    "legs",
-  ];
 
   return (
     <>
