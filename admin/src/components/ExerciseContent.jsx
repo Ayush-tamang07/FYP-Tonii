@@ -22,6 +22,7 @@ function ExerciseContent() {
     category: "",
     instructions: "",
   });
+  const [originalExercises, setOriginalExercises] = useState([]); 
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -38,6 +39,7 @@ function ExerciseContent() {
       } catch (error) {
         console.error("Error fetching exercises:", error);
         setExercises([]);
+        setOriginalExercises([]);
       }
     };
 
@@ -123,6 +125,30 @@ function ExerciseContent() {
       }
     }
   };
+  const [type, setType] = useState([]);
+  const [muscle, setMuscle] = useState([]);
+  const [difficulty, setDifficulty] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [filteredExercise, setFilteredExercise] = useState([]); 
+
+  const applyFilter = () =>{
+    let filteredData = exercises
+    if (type || muscle ||difficulty || category) {
+      filteredData = filteredData.filter(
+        (item) =>
+          item.feedback_type.toLowerCase() === filteredExercise.toLowerCase()
+      );
+    }
+    setFilteredExercise(filteredData)
+  }
+
+  const clearFilters = () => {
+    setType([]); // Reset type filter
+    setMuscle([]);
+    setDifficulty([]);
+    setCategory([]);
+    setFilteredExercise(originalExercises); // Restore original exercises
+  };
 
   return (
     <>
@@ -189,7 +215,7 @@ function ExerciseContent() {
         </select>
         {/* Apply Filter Button */}
         <button
-          // onClick={}
+          onClick={applyFilter}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
           Apply Filter
@@ -197,7 +223,7 @@ function ExerciseContent() {
 
         {/* Clear Filters Button */}
         <button
-          // onClick={}
+          onClick={clearFilters}
           className="bg-red-500 text-white px-4 py-2 rounded"
         >
           Clear Filters
