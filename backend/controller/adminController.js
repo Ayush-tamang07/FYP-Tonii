@@ -187,6 +187,7 @@ const readUser = async (req, res) => {
     return res.status(500).json({ message: "Internal server error." });
   }
 };
+
 const readFeedback = async (req, res) => {
   try {
     const { feedback_type, date } = req.query; // Get query parameters
@@ -205,9 +206,14 @@ const readFeedback = async (req, res) => {
       };
     }
 
-    // Fetch filtered data from Prisma
+    // Fetch feedback with user name using Prisma `include`
     const feedback = await prisma.feedback.findMany({
-      where: filterCondition, // Apply dynamic filtering
+      where: filterCondition,
+      include: {
+        user: {
+          select: { username: true } // Select only the user's name
+        }
+      }
     });
 
     return res.status(200).json(feedback);
@@ -216,6 +222,7 @@ const readFeedback = async (req, res) => {
     return res.status(500).json({ message: "Internal server error." });
   }
 };
+
 
 
 

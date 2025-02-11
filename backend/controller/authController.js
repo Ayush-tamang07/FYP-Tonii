@@ -6,48 +6,49 @@ const bcrypt = require("bcrypt");
 const userRegister = async (req, res) => {
   try {
     const { username, email, weight, age, height, gender, password } = req.body;
-    if (
-      !username ||
-      !email ||
-      !age ||
-      !weight ||
-      !height ||
-      !gender ||
-      !password
-    ) {
-      return res.status(300).json({ error: "provide all fields" });
+
+    // ✅ Check if all required fields are provided
+    if (!username || !email || !age || !weight || !height || !gender || !password) {
+      return res.status(400).json({ error: "All fields are required." });
     }
-    // checking if email already exists
-    const existingEmail = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
+
+    // ✅ Check if email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email },
     });
-    if (existingEmail) {
-      return res.status(400).json({ message: "Email already exists" });
+
+    if (existingUser) {
+      return res.status(409).json({ error: "Email already exists." }); // 409 Conflict
     }
+
+    // ✅ Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const allData = await prisma.user.create({
+
+    // ✅ Create user in database
+    const newUser = await prisma.user.create({
       data: {
-        username: username,
-        email: email,
-        weight: weight,
-        age: age,
-        height: height,
-        gender: gender,
+        username,
+        email,
+        weight: parseFloat(weight),
+        age: parseInt(age),
+        height: parseFloat(height),
+        gender,
         password: hashedPassword,
         role: "user",
       },
     });
-    console.log(allData);
 
-    return res
-      .status(201)
-      .json({ message: "user created successfully", allData });
+    console.log("User registered:", newUser);
+    return res.status(201).json({ message: "User registered successfully", user: newUser });
+
   } catch (error) {
-    return res.status(500).json({ error: "failed to register user" });
+    console.error("Registration error:", error);
+    return res.status(500).json({ error: "Failed to register user" });
   }
 };
+
+module.exports = { userRegister };
+
 
 const loginUser = async (req, res) => {
   try {
