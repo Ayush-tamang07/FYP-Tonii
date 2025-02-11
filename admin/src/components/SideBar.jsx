@@ -35,7 +35,7 @@ function SideBar() {
           <VscFeedback className="text-xl" />
           <span>Feedback</span>
         </a>
-        <a href="" className={`flex items-center space-x-2 p-2 rounded font-semibold text-sm hover:bg-[#E3F2FD] transition ${getLinkClass("/settings")}`}>
+        <a href="/setting" className={`flex items-center space-x-2 p-2 rounded font-semibold text-sm hover:bg-[#E3F2FD] transition ${getLinkClass("/settings")}`}>
           <IoSettings className="text-xl" />
           <span>Settings</span>
         </a>

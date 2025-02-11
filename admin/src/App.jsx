@@ -3,6 +3,7 @@ import { BrowserRouter,Routes, Route } from "react-router-dom";
 import { Login, Dashboard, User, Exercise, Feedback, SideBar } from "./reference.js";
 
 import React from 'react'
+import Setting from "./pages/Setting.jsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/exercise" element={<Exercise />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/Sidebar" element={<SideBar />} />
+      <Route path="/setting" element={<Setting />} />
       {/* <Route path="/*" element={<Navigate to="/" />} /> */}
     </Routes>
     </BrowserRouter>
