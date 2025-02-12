@@ -22,7 +22,9 @@ function ExerciseContent() {
     category: "",
     instructions: "",
   });
-  const [originalExercises, setOriginalExercises] = useState([]); 
+  // const [originalExercises, setOriginalExercises] = useState([]);
+  const [editExercise, setEditExercise] = useState(null); // Track the exercise being edited
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -130,7 +132,7 @@ function ExerciseContent() {
     equipment: "",
     category: "",
   });
-  
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
@@ -138,14 +140,14 @@ function ExerciseContent() {
       [name]: value,
     }));
   };
-  
+
   const applyFilter = async () => {
     try {
       const queryParams = new URLSearchParams(filters).toString();
       const response = await axios.get(
         `http://localhost:5500/api/exercise?${queryParams}`
       );
-  
+
       if (response.data && Array.isArray(response.data.data)) {
         setExercises(response.data.data);
       } else {
@@ -156,10 +158,10 @@ function ExerciseContent() {
       setExercises([]);
     }
   };
-  
+
   const clearFilters = async () => {
     setFilters({ equipment: "", category: "" });
-  
+
     try {
       const response = await axios.get("http://localhost:5500/api/exercise");
       if (response.data && Array.isArray(response.data.data)) {
@@ -172,7 +174,45 @@ function ExerciseContent() {
       setExercises([]);
     }
   };
-  
+
+  const handleEditClick = (exercise) => {
+    setEditExercise(exercise);
+    setIsEditModalOpen(true);
+  };
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditExercise((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleUpdateExercise = async () => {
+    if (!editExercise || !editExercise.id) {
+      console.error("Invalid exercise data");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5500/api/admin/updateExercise/${editExercise.id}`,
+        editExercise
+      );
+
+      if (response.data.success) {
+        // Update exercise list after successful update
+        const updatedExercises = await axios.get(
+          "http://localhost:5500/api/exercise"
+        );
+        setExercises(updatedExercises.data.data);
+
+        // Close the modal
+        setIsEditModalOpen(false);
+        setEditExercise(null);
+      }
+    } catch (error) {
+      console.error("Error updating exercise:", error);
+    }
+  };
 
   return (
     <>
@@ -185,39 +225,43 @@ function ExerciseContent() {
           Add
         </button>
         <select
-  name="equipment"
-  value={filters.equipment}
-  onChange={handleFilterChange}
-  className="border p-2 mb-2"
->
-  <option value="">Equipment</option>
-  <option value="dumbbell">Dumbbell</option>
-  <option value="barbell">Barbell</option>
-</select>
+          name="equipment"
+          value={filters.equipment}
+          onChange={handleFilterChange}
+          className="border p-2 mb-2"
+        >
+          <option value="">Equipment</option>
+          <option value="dumbbell">Dumbbell</option>
+          <option value="barbell">Barbell</option>
+        </select>
 
-<select
-  name="category"
-  value={filters.category}
-  onChange={handleFilterChange}
-  className="border p-2 mb-2"
->
-  <option value="">Category</option>
-  {categoryOptions.map((category) => (
-    <option key={category} value={category}>
-      {category.charAt(0).toUpperCase() + category.slice(1)}
-    </option>
-  ))}
-</select>
+        <select
+          name="category"
+          value={filters.category}
+          onChange={handleFilterChange}
+          className="border p-2 mb-2"
+        >
+          <option value="">Category</option>
+          {categoryOptions.map((category) => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
 
-<button onClick={applyFilter} className="bg-blue-500 text-white px-4 py-2 rounded">
-  Apply Filter
-</button>
+        <button
+          onClick={applyFilter}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Apply Filter
+        </button>
 
-<button onClick={clearFilters} className="bg-red-500 text-white px-4 py-2 rounded">
-  Clear Filters
-</button>
-
-        
+        <button
+          onClick={clearFilters}
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Clear Filters
+        </button>
       </div>
 
       <div className="container mx-auto p-4">
@@ -276,13 +320,12 @@ function ExerciseContent() {
 
                   <td className="p-2 flex space-x-2">
                     <button
-                      onClick={() =>
-                        console.log("Edit exercise with ID:", exercise.id)
-                      }
+                      onClick={() => handleEditClick(exercise)}
                       className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700"
                     >
                       Edit
                     </button>
+
                     <button
                       onClick={() => handleDelete(exercise.id)}
                       className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
@@ -410,6 +453,104 @@ function ExerciseContent() {
                 className="bg-green-500 text-white px-4 py-2 rounded"
               >
                 Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isEditModalOpen && editExercise && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-1/3">
+            <h2 className="text-lg font-bold mb-4">Edit Exercise</h2>
+
+            <input
+              type="text"
+              name="name"
+              placeholder="Exercise name"
+              value={editExercise.name}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            />
+            <select
+              name="type"
+              value={editExercise.type}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            >
+              <option value="">Type</option>
+              {typeOptions.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
+            </select>
+            <select
+              name="muscle"
+              value={editExercise.muscle}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            >
+              <option value="">Muscle</option>
+              {muscleOptions.map((muscle) => (
+                <option key={muscle} value={muscle}>
+                  {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              name="equipment"
+              placeholder="Equipment"
+              value={editExercise.equipment}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            />
+            <select
+              name="difficulty"
+              value={editExercise.difficulty}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            >
+              <option value="">Difficulty</option>
+              {difficultyOptions.map((difficulty) => (
+                <option key={difficulty} value={difficulty}>
+                  {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                </option>
+              ))}
+            </select>
+            <select
+              name="category"
+              value={editExercise.category}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            >
+              <option value="">Category</option>
+              {categoryOptions.map((category) => (
+                <option key={category} value={category}>
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </option>
+              ))}
+            </select>
+            <textarea
+              name="instructions"
+              placeholder="Instructions"
+              value={editExercise.instructions}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            ></textarea>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateExercise}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+              >
+                Save Changes
               </button>
             </div>
           </div>
