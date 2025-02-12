@@ -125,30 +125,54 @@ function ExerciseContent() {
       }
     }
   };
-  const [type, setType] = useState([]);
-  const [muscle, setMuscle] = useState([]);
-  const [difficulty, setDifficulty] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [filteredExercise, setFilteredExercise] = useState([]); 
 
-  const applyFilter = () =>{
-    let filteredData = exercises
-    if (type || muscle ||difficulty || category) {
-      filteredData = filteredData.filter(
-        (item) =>
-          item.feedback_type.toLowerCase() === filteredExercise.toLowerCase()
-      );
-    }
-    setFilteredExercise(filteredData)
-  }
-
-  const clearFilters = () => {
-    setType([]); // Reset type filter
-    setMuscle([]);
-    setDifficulty([]);
-    setCategory([]);
-    setFilteredExercise(originalExercises); // Restore original exercises
+  const [filters, setFilters] = useState({
+    equipment: "",
+    category: "",
+  });
+  
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
   };
+  
+  const applyFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams(filters).toString();
+      const response = await axios.get(
+        `http://localhost:5500/api/exercise?${queryParams}`
+      );
+  
+      if (response.data && Array.isArray(response.data.data)) {
+        setExercises(response.data.data);
+      } else {
+        setExercises([]);
+      }
+    } catch (error) {
+      console.error("Error applying filters:", error);
+      setExercises([]);
+    }
+  };
+  
+  const clearFilters = async () => {
+    setFilters({ equipment: "", category: "" });
+  
+    try {
+      const response = await axios.get("http://localhost:5500/api/exercise");
+      if (response.data && Array.isArray(response.data.data)) {
+        setExercises(response.data.data);
+      } else {
+        setExercises([]);
+      }
+    } catch (error) {
+      console.error("Error clearing filters:", error);
+      setExercises([]);
+    }
+  };
+  
 
   return (
     <>
@@ -161,73 +185,39 @@ function ExerciseContent() {
           Add
         </button>
         <select
-          name="type"
-          value={newExercise.type}
-          onChange={handleInputChange}
-          className="border p-2 mb-2"
-        >
-          <option value="">Type</option>
-          {typeOptions.map((type) => (
-            <option key={type} value={type}>
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </option>
-          ))}
-        </select>
-        <select
-          name="muscle"
-          value={newExercise.muscle}
-          onChange={handleInputChange}
-          className="border p-2 mb-2"
-        >
-          <option value="">Muscle</option>
-          {muscleOptions.map((muscle) => (
-            <option key={muscle} value={muscle}>
-              {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
-            </option>
-          ))}
-        </select>
-        {/* difficulty */}
-        <select
-          name="difficulty"
-          value={newExercise.difficulty}
-          onChange={handleInputChange}
-          className="border p-2 mb-2"
-        >
-          <option value="">Difficulty</option>
-          {difficultyOptions.map((difficulty) => (
-            <option key={difficulty} value={difficulty}>
-              {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-            </option>
-          ))}
-        </select>
-        <select
-          name="category"
-          value={newExercise.category}
-          onChange={handleInputChange}
-          className="border p-2 mb-2"
-        >
-          <option value="">Category</option>
-          {categoryOptions.map((category) => (
-            <option key={category} value={category}>
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </option>
-          ))}
-        </select>
-        {/* Apply Filter Button */}
-        <button
-          onClick={applyFilter}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Apply Filter
-        </button>
+  name="equipment"
+  value={filters.equipment}
+  onChange={handleFilterChange}
+  className="border p-2 mb-2"
+>
+  <option value="">Equipment</option>
+  <option value="dumbbell">Dumbbell</option>
+  <option value="barbell">Barbell</option>
+</select>
 
-        {/* Clear Filters Button */}
-        <button
-          onClick={clearFilters}
-          className="bg-red-500 text-white px-4 py-2 rounded"
-        >
-          Clear Filters
-        </button>
+<select
+  name="category"
+  value={filters.category}
+  onChange={handleFilterChange}
+  className="border p-2 mb-2"
+>
+  <option value="">Category</option>
+  {categoryOptions.map((category) => (
+    <option key={category} value={category}>
+      {category.charAt(0).toUpperCase() + category.slice(1)}
+    </option>
+  ))}
+</select>
+
+<button onClick={applyFilter} className="bg-blue-500 text-white px-4 py-2 rounded">
+  Apply Filter
+</button>
+
+<button onClick={clearFilters} className="bg-red-500 text-white px-4 py-2 rounded">
+  Clear Filters
+</button>
+
+        
       </div>
 
       <div className="container mx-auto p-4">
