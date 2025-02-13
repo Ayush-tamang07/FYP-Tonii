@@ -5,6 +5,7 @@ import {
   muscleOptions,
   difficultyOptions,
   categoryOptions,
+  equipmentOptions
 } from "../data/exerciseOption.js";
 
 function ExerciseContent() {
@@ -231,8 +232,11 @@ function ExerciseContent() {
           className="border p-2 mb-2"
         >
           <option value="">Equipment</option>
-          <option value="dumbbell">Dumbbell</option>
-          <option value="barbell">Barbell</option>
+          {equipmentOptions.map((equipment) => (
+            <option key={equipment} value={equipment}>
+              {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
+            </option>
+          ))}
         </select>
 
         <select

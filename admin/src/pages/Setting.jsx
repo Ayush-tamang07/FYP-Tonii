@@ -13,7 +13,7 @@ function Setting() {
       {/* Header and Main Content */}
       <div className="grid grid-rows-[auto_1fr] gap-5 min-h-0">
         {/* Header */}
-        <div className="h-[100px] bg-white flex items-center">
+        <div className="h-[100px] bg-white flex items-center shadow-sm">
           <PageHeader title="Setting" />
         </div>
 

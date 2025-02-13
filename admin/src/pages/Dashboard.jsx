@@ -1,6 +1,7 @@
 import React from "react";
 import PageHeader from "../components/PageHeader";
 import SideBar from "../components/SideBar";
+import DashboardContent from "../components/DashboardContent";
 
 function Dashboard() {
   return (
@@ -11,11 +12,11 @@ function Dashboard() {
       {/* Header and Main Content */}
       <div className="grid grid-rows-[auto_1fr] gap-5 min-h-0">
         {/* Header */}
-        <div className="h-[100px] bg-white flex items-center"><PageHeader title='Dashboard'/></div>
+        <div className="h-[100px] bg-white flex items-center shadow-sm"><PageHeader title='Dashboard'/></div>
         
         {/* Scrollable Content */}
         <div className="bg-white p-4 overflow-auto">
-          Dashboard
+          <DashboardContent/>
         </div>
       </div>
     </div>

@@ -39,4 +39,10 @@ export const typeOptions = [
     "core",
     "legs",
   ];
+  export const equipmentOptions =[
+    "barbell",
+    "dumbbell",
+    "machine",
+    "body_only",
+  ]
   

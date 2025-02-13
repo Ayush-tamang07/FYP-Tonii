@@ -12,7 +12,7 @@ function Exercise() {
       {/* Header and Main Content */}
       <div className="grid grid-rows-[auto_1fr] gap-5 min-h-0">
         {/* Header */}
-        <div className="h-[100px] bg-white flex items-center"><PageHeader title='Feedback'/></div>
+        <div className="h-[100px] bg-white flex items-center shadow-sm"><PageHeader title='Feedback'/></div>
         
         {/* Scrollable Content */}
         <div className="bg-white p-4 overflow-auto">

@@ -16,8 +16,8 @@ function User() {
       {/* Header and Main Content */}
       <div className="grid grid-rows-[auto_1fr] gap-5 min-h-0">
         {/* Header */}
-        <div className="h-[100px] bg-white flex items-center">
-          <PageHeader title="User" />
+        <div className="h-[100px] bg-white flex items-center shadow-sm">
+          <PageHeader title="User Details" />
         </div>
 
         {/* Scrollable Content */}
