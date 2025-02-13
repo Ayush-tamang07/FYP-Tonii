@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaUsers, FaDumbbell } from 'react-icons/fa';
+import { FaUsers, FaDumbbell, FaComment } from 'react-icons/fa';
 
 function DashboardContent() {
   const [userCount, setUserCount] = useState(0);
   const [exerciseCount, setExerciseCount] = useState(0);
+  const [feedbackCount, setFeedbackCount] = useState(0);
 
   useEffect(() => {
     // Fetch user count
@@ -16,6 +17,10 @@ function DashboardContent() {
     axios.get('http://localhost:5500/api/exercise')
       .then(response => setExerciseCount(response.data.count))
       .catch(error => console.error('Error fetching exercise count:', error));
+
+    axios.get('http://localhost:5500/api/admin/readfeedback')
+      .then(response => setFeedbackCount(response.data.length))
+      .catch(error => console.error('Error fetching feedback count:', error));
   }, []);
 
   return (
@@ -30,6 +35,11 @@ function DashboardContent() {
           <FaDumbbell className="text-4xl text-green-500 mb-2" />
           <h3 className="text-xl font-semibold mb-2">Exercises</h3>
           <p className="text-2xl font-bold text-green-500">{exerciseCount}</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md text-center flex flex-col items-center">
+          <FaComment className="text-4xl text-orange-500 mb-2" />
+          <h3 className="text-xl font-semibold mb-2">Feedback</h3>
+          <p className="text-2xl font-bold text-orange-500">{feedbackCount}</p>
         </div>
       </div>
     </div>
