@@ -7,6 +7,7 @@ import { VscFeedback } from "react-icons/vsc";
 import { IoSettings } from "react-icons/io5";
 // import { BiClipboardCheck } from "react-icons/bi";
 // import { BiClipboardCheck } from "react-icons/bi";
+import { LuClipboardList } from "react-icons/lu";
 
 function SideBar() {
   const location = useLocation(); // Get current route path
@@ -35,6 +36,7 @@ function SideBar() {
         </a>
         <a href="/workoutPlans" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/workoutPlans")}`}>
           {/* <BiClipboardCheck className="text-xl" /> */}
+          <LuClipboardList className="text-xl" />
           <span>WorkoutPlans</span>
         </a>
         <a href="/feedback" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/feedback")}`}>
