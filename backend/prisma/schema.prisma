@@ -29,11 +29,13 @@ model User {
 }
 
 model WorkoutPlan {
-  id          Int                   @id @default(autoincrement())
-  name        String
-  userId      Int                   // Foreign key to User (in WorkoutPlan, not User)
-  user        User                  @relation(fields: [userId], references: [id]) // This creates the relation with User
-  exercises   WorkoutPlanExercise[] // Many-to-many relation with exercises
+  id             Int                   @id @default(autoincrement())
+  name           String
+  createdByAdmin Boolean               @default(false) // Admin-created flag
+  assignedToUserId Int?                 // If NULL, it's available to all users. If set, it's user-specific.
+  user           User?                  @relation(fields: [assignedToUserId], references: [id])
+  exercises      WorkoutPlanExercise[]  // Many-to-many relation with exercises
+  createdAt      DateTime               @default(now())
 }
 
 model WorkoutPlanExercise {

@@ -26,8 +26,8 @@ router.post('/user/addFeedback/:userId', userController.addFeedback)
 router.post("/calculate", calculate)
 
 router.get('/exercise',customWorkout.readExercise)
-router.post('/workout-plans', customWorkout.createWorkoutPlan);  // Create workout plan
-router.get('/workout-plans/:userId', customWorkout.getUserWorkoutPlans);  // Get workout plans for a user
+router.post('/user/workout-plans', customWorkout.createUserWorkoutPlan);  // Create workout plan
+router.get('/user/:userId/workout-plans', customWorkout.getUserWorkoutPlans);  // Get workout plans for a user
 router.post('/workout-plans/add-exercise', customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 
@@ -37,5 +37,9 @@ router.get("/admin/readUser",adminController.readUser);
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 router.get("/admin/readFeedback",adminController.readFeedback);
+
+// workout plan created by admin
+router.post("/admin/workout-plans",adminController.createAdminWorkoutPlan);
+router.get("/admin/workout-plans",adminController.getAdminWorkoutPlans);
 
 module.exports = router;

@@ -2,8 +2,15 @@ const prisma = require("../utils/PrismaClient.js");
 
 const addExercise = async (req, res) => {
   try {
-    const { name, type, muscle, equipment, difficulty, instructions, category } =
-      req.body;
+    const {
+      name,
+      type,
+      muscle,
+      equipment,
+      difficulty,
+      instructions,
+      category,
+    } = req.body;
 
     // Validate required fields
     if (
@@ -200,7 +207,7 @@ const readFeedback = async (req, res) => {
     }
 
     if (date) {
-      filterCondition.createdAt = { 
+      filterCondition.createdAt = {
         gte: new Date(date + "T00:00:00.000Z"), // Start of the day
         lt: new Date(date + "T23:59:59.999Z"), // End of the day
       };
@@ -211,9 +218,9 @@ const readFeedback = async (req, res) => {
       where: filterCondition,
       include: {
         user: {
-          select: { username: true } // Select only the user's name
-        }
-      }
+          select: { username: true }, // Select only the user's name
+        },
+      },
     });
 
     return res.status(200).json(feedback);
@@ -223,8 +230,41 @@ const readFeedback = async (req, res) => {
   }
 };
 
+const createAdminWorkoutPlan  = async (req, res) => {
+  try {
+    const { name } = req.body;
 
+    // Create the workout plan for admin
+    const workoutPlan = await prisma.WorkoutPlan.create({
+      data: {
+        name,
+        createdByAdmin: true, // Admin-created
+      },
+    });
 
+    res.status(201).json({
+      success: true,
+      data: workoutPlan,
+    });
+  } catch (error) {
+    console.error("Error creating workout plan:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+const getAdminWorkoutPlans = async (req, res) => {
+  try {
+    const workoutPlans = await prisma.workoutPlan.findMany({
+      where: {
+        createdByAdmin: true,
+      },
+    });
+    res.status(200).json(workoutPlans);
+  } catch (error) {
+    console.error("Error fetching admin workout plans:", error);
+    res.status(500).json({ message: "Failed to fetch workout plans" });
+  }
+}
 
 
 module.exports = {
@@ -232,5 +272,7 @@ module.exports = {
   deleteExercise,
   readUser,
   updateExercise,
-  readFeedback
+  readFeedback,
+  createAdminWorkoutPlan,
+  getAdminWorkoutPlans
 };

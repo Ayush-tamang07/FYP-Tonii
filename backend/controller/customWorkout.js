@@ -3,64 +3,65 @@
 const prisma = require("../utils/PrismaClient.js");
 
 const readExercise = async (req, res) => {
-    try {
-      // Extract query parameters
-      const { equipment, category } = req.query;
-  
-      // Initialize a filter object
-      const filters = {};
-  
-      // Add filters based on the query parameters
-      if (equipment && category) {
-        // If both equipment and category are provided, filter by both
-        filters.equipment = equipment;
-        filters.category = category;
-      } else if (equipment) {
-        // If only equipment is provided, filter by equipment
-        filters.equipment = equipment;
-      } else if (category) {
-        // If only category is provided, filter by category
-        filters.category = category;
-      }
-  
-      // Fetch exercises from the database based on the dynamic filters
-      const exercises = await prisma.exercise.findMany({
-        where: filters,
-      });
-  
-      // Handle no results
-      if (exercises.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "No exercises found matching the given criteria.",
-        });
-      }
-  
-      // Send response with count and exercises
-      res.status(200).json({
-        success: true,
-        count: exercises.length,
-        data: exercises,
-      });
-    } catch (error) {
-      console.error("Error reading exercises:", error);
-      res.status(500).json({
+  try {
+    // Extract query parameters
+    const { equipment, category } = req.query;
+
+    // Initialize a filter object
+    const filters = {};
+
+    // Add filters based on the query parameters
+    if (equipment && category) {
+      // If both equipment and category are provided, filter by both
+      filters.equipment = equipment;
+      filters.category = category;
+    } else if (equipment) {
+      // If only equipment is provided, filter by equipment
+      filters.equipment = equipment;
+    } else if (category) {
+      // If only category is provided, filter by category
+      filters.category = category;
+    }
+
+    // Fetch exercises from the database based on the dynamic filters
+    const exercises = await prisma.exercise.findMany({
+      where: filters,
+    });
+
+    // Handle no results
+    if (exercises.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: "Failed to fetch exercises from the database.",
-        error: error.message,
+        message: "No exercises found matching the given criteria.",
       });
     }
-  };
 
-const createWorkoutPlan = async (req, res) => {
+    // Send response with count and exercises
+    res.status(200).json({
+      success: true,
+      count: exercises.length,
+      data: exercises,
+    });
+  } catch (error) {
+    console.error("Error reading exercises:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch exercises from the database.",
+      error: error.message,
+    });
+  }
+};
+
+const createUserWorkoutPlan = async (req, res) => {
   try {
     const { name, userId } = req.body;
 
-    // Create the workout plan
+    // Create the workout plan for a specific user
     const workoutPlan = await prisma.workoutPlan.create({
       data: {
         name,
-        userId,
+        createdByAdmin: false, // User-created
+        assignedToUserId: userId, // Specific to the user
       },
     });
 
@@ -78,7 +79,7 @@ const createWorkoutPlan = async (req, res) => {
   }
 };
 
-// Get all workout plans for a user
+
 const getUserWorkoutPlans = async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -90,8 +91,24 @@ const getUserWorkoutPlans = async (req, res) => {
       });
     }
 
+    // Get the count of workout plans (both admin-created and user-specific)
+    const workoutPlanCount = await prisma.workoutPlan.count({
+      where: {
+        OR: [
+          { createdByAdmin: true }, // Global admin plans
+          { assignedToUserId: userId }, // User-specific plans
+        ],
+      },
+    });
+
+    // Fetch the actual workout plans with exercises
     const workoutPlans = await prisma.workoutPlan.findMany({
-      where: { userId },
+      where: {
+        OR: [
+          { createdByAdmin: true }, // Global admin plans
+          { assignedToUserId: userId }, // User-specific plans
+        ],
+      },
       include: {
         exercises: {
           include: {
@@ -105,11 +122,13 @@ const getUserWorkoutPlans = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "No workout plans found for this user.",
+        count: workoutPlanCount, // Return count even if it's 0
       });
     }
 
     res.status(200).json({
       success: true,
+      count: workoutPlanCount, // Include the count in the response
       data: workoutPlans,
     });
   } catch (error) {
@@ -121,7 +140,6 @@ const getUserWorkoutPlans = async (req, res) => {
     });
   }
 };
-
 
 const addExerciseToWorkoutPlan = async (req, res) => {
   try {
@@ -144,7 +162,9 @@ const addExerciseToWorkoutPlan = async (req, res) => {
     const validExerciseIds = validExercises.map((exercise) => exercise.id);
 
     // Check if any invalid IDs exist
-    const invalidIds = exerciseId.filter((id) => !validExerciseIds.includes(id));
+    const invalidIds = exerciseId.filter(
+      (id) => !validExerciseIds.includes(id)
+    );
     if (invalidIds.length > 0) {
       return res.status(400).json({
         error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
@@ -166,7 +186,6 @@ const addExerciseToWorkoutPlan = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Remove an exercise from a workout plan
 // const removeExerciseFromWorkoutPlan = async (req, res) => {
@@ -259,7 +278,7 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
 
 module.exports = {
   readExercise,
-  createWorkoutPlan,
+  createUserWorkoutPlan ,
   getUserWorkoutPlans,
   addExerciseToWorkoutPlan,
   removeExerciseFromWorkoutPlan,
