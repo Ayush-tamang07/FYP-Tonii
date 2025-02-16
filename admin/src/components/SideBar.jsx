@@ -1,5 +1,5 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import { useLocation } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
 import { BiSolidUserDetail } from "react-icons/bi";
 import { GiWeightLiftingUp } from "react-icons/gi";
@@ -13,37 +13,82 @@ function SideBar() {
   const location = useLocation(); // Get current route path
 
   // Function to apply active background color and text color
-  const getLinkClass = (path) => 
-    location.pathname === path 
-      ? "bg-[#E3F2FD] text-[#2D60FF]"  // Active state
-      : "text-[#B1B1B1]";               // Inactive state
+  const getLinkClass = (path) =>
+    location.pathname === path
+      ? "bg-[#E3F2FD] text-[#2D60FF]" // Active state
+      : "text-[#B1B1B1]"; // Inactive state
+  const handleLogout = () => {
+    fetch("http://your-backend.com/api/logout", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then(() => {
+        localStorage.removeItem("token"); // Remove token from storage
+        navigate("/login"); // Redirect to login page
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error);
+      });
+  };
 
   return (
     <aside className="flex flex-col h-full p-4">
       {/* Navigation Links */}
       <nav className="space-y-4 flex-1">
-        <a href="/dashboard" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/dashboard")}`}>
+        <a
+          href="/dashboard"
+          className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
+            "/dashboard"
+          )}`}
+        >
           <MdDashboard className="text-xl" />
           <span>Dashboard</span>
         </a>
-        <a href="/user" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/user")}`}>
+        <a
+          href="/user"
+          className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
+            "/user"
+          )}`}
+        >
           <BiSolidUserDetail className="text-xl" />
           <span>User Details</span>
         </a>
-        <a href="/exercise" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/exercise")}`}>
+        <a
+          href="/exercise"
+          className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
+            "/exercise"
+          )}`}
+        >
           <GiWeightLiftingUp className="text-xl" />
           <span>Exercise</span>
         </a>
-        <a href="/workoutPlans" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/workoutPlans")}`}>
+        <a
+          href="/workoutPlans"
+          className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
+            "/workoutPlans"
+          )}`}
+        >
           {/* <BiClipboardCheck className="text-xl" /> */}
           <LuClipboardList className="text-xl" />
           <span>WorkoutPlans</span>
         </a>
-        <a href="/feedback" className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass("/feedback")}`}>
+        <a
+          href="/feedback"
+          className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
+            "/feedback"
+          )}`}
+        >
           <VscFeedback className="text-xl" />
           <span>Feedback</span>
         </a>
-        <a href="/setting" className={`flex items-center space-x-2 p-2 rounded font-semibold text-sm hover:bg-[#E3F2FD] transition ${getLinkClass("/settings")}`}>
+        <a
+          href="/setting"
+          className={`flex items-center space-x-2 p-2 rounded font-semibold text-sm hover:bg-[#E3F2FD] transition ${getLinkClass(
+            "/settings"
+          )}`}
+        >
           <IoSettings className="text-xl" />
           <span>Settings</span>
         </a>
