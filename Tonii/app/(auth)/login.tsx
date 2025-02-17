@@ -19,7 +19,6 @@ const Login = () => {
         style={styles.image}
       />
       <Text style={styles.title}>WELCOME BACK</Text>
-dad
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
         <TextInput
