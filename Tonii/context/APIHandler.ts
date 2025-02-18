@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiHandler = axios.create({
-  baseURL: "",
+  baseURL: "http://localhost:5500/api",
   responseType: "json",
   withCredentials: true,
 });

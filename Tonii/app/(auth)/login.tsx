@@ -1,21 +1,68 @@
 import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { loginUser } from '@/context/userAPI';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import axios from 'axios';
+
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const router = useRouter();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleLogin = () => {
-    // Logic for handling login
-    console.log('Email:', email);
-    console.log('Password:', password);
+  const loginUser = async () => {
+    try {
+      const response = await axios.post('http://localhost:5500/api/user/login', {
+        email: form.email,
+        password: form.password,
+      });
+      return response.data; // Handle token or user data
+    } catch (error) {
+      Alert.alert(
+        "Login Failed",
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
   };
+
+  // const onSignInPress = async () => {
+  //   // Validate form fields
+  //   if (!form.email || !form.password) {
+  //     Alert.alert("Error", "Please fill in all fields");
+  //     return;
+  //   }
+
+  //   try {
+  //     console.log(form);
+  //     const result = await loginUser(form.email, form.password);
+  //     console.log(result);
+  //     console.log("status code : ", result.status);
+  //     if (result?.status == 200) {
+  //       await SecureStore.setItemAsync("AccessToken", result.token);
+  //       router.replace("../(tabs)/home");
+
+  //     } else {
+  //       Alert.alert("Error", "Invalid credentials");
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     Alert.alert("Error", "Login failed. Please try again.");
+  //   }
+  // };
+  // const handleLogin = () => {
+  //   // Logic for handling login
+  //   console.log('Email:', email);
+  //   console.log('Password:', password);
+  // };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/app_icon.png')} 
+        source={require('../../assets/images/app_icon.png')}
         style={styles.image}
       />
       <Text style={styles.title}>WELCOME BACK</Text>
@@ -24,8 +71,8 @@ const Login = () => {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
+          value={form.email}
+          onChangeText={(value: any) => setForm({ ...form, email: value })}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -36,8 +83,8 @@ const Login = () => {
         <TextInput
           style={styles.input}
           placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
+          value={form.password}
+          onChangeText={(value: any) => setForm({ ...form, password: value })}
           secureTextEntry
         />
       </View>
@@ -46,7 +93,7 @@ const Login = () => {
         <Text style={styles.forgotPassword}>Forget Password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={styles.button} onPress={loginUser}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
@@ -67,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   image: {
-    width:120, // Adjust the width of the image
+    width: 120, // Adjust the width of the image
     marginBottom: 16, // Add spacing between the image and the title
   },
   title: {
