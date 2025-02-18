@@ -257,14 +257,20 @@ const getAdminWorkoutPlans = async (req, res) => {
     const workoutPlans = await prisma.workoutPlan.findMany({
       where: {
         createdByAdmin: true,
+        OR: [
+          { assignedToUserId: null }, // Plans available to all users
+          { assignedToUserId: { not: null } } // Plans assigned to users
+        ]
       },
     });
-    res.status(200).json(workoutPlans);
+    
+    res.status(200).json({ success: true, data: workoutPlans });
   } catch (error) {
     console.error("Error fetching admin workout plans:", error);
     res.status(500).json({ message: "Failed to fetch workout plans" });
-  }
-}
+  }  
+};
+
 
 
 module.exports = {

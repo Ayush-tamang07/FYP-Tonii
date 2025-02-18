@@ -79,7 +79,6 @@ const createUserWorkoutPlan = async (req, res) => {
   }
 };
 
-
 const getUserWorkoutPlans = async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -91,44 +90,42 @@ const getUserWorkoutPlans = async (req, res) => {
       });
     }
 
-    // Get the count of workout plans (both admin-created and user-specific)
-    const workoutPlanCount = await prisma.workoutPlan.count({
-      where: {
-        OR: [
-          { createdByAdmin: true }, // Global admin plans
-          { assignedToUserId: userId }, // User-specific plans
-        ],
-      },
+    // Fetch user role
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
     });
 
-    // Fetch the actual workout plans with exercises
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Fetch ONLY workout plans created by userId
     const workoutPlans = await prisma.workoutPlan.findMany({
-      where: {
-        OR: [
-          { createdByAdmin: true }, // Global admin plans
-          { assignedToUserId: userId }, // User-specific plans
-        ],
-      },
+      where: { assignedToUserId: userId }, // Only fetch plans where the user created them
       include: {
         exercises: {
-          include: {
-            exercise: true,
-          },
+          include: { exercise: true },
         },
       },
     });
 
-    if (workoutPlans.length === 0) {
+    const workoutPlanCount = workoutPlans.length;
+
+    if (workoutPlanCount === 0) {
       return res.status(404).json({
         success: false,
         message: "No workout plans found for this user.",
-        count: workoutPlanCount, // Return count even if it's 0
+        count: workoutPlanCount,
       });
     }
 
     res.status(200).json({
       success: true,
-      count: workoutPlanCount, // Include the count in the response
+      count: workoutPlanCount,
       data: workoutPlans,
     });
   } catch (error) {
@@ -141,43 +138,67 @@ const getUserWorkoutPlans = async (req, res) => {
   }
 };
 
+
 const addExerciseToWorkoutPlan = async (req, res) => {
   try {
-    const { workoutPlanId, exerciseId } = req.body;
+    const { workoutPlanId, exercises } = req.body;
 
-    if (!Array.isArray(exerciseId)) {
+    if (!Array.isArray(exercises)) {
       return res.status(400).json({
-        error: "exerciseId must be an array of integers.",
+        error: "exercises must be an array of objects with exerciseId and sets.",
       });
     }
 
     // Validate all exercise IDs
-    const validExercises = await prisma.exercise.findMany({
-      where: {
-        id: { in: exerciseId },
-      },
+    const validExerciseIds = exercises.map((exercise) => exercise.exerciseId);
+
+    const existingExercises = await prisma.exercise.findMany({
+      where: { id: { in: validExerciseIds } },
       select: { id: true },
     });
 
-    const validExerciseIds = validExercises.map((exercise) => exercise.id);
+    const existingExerciseIds = existingExercises.map((exercise) => exercise.id);
 
-    // Check if any invalid IDs exist
-    const invalidIds = exerciseId.filter(
-      (id) => !validExerciseIds.includes(id)
-    );
+    // Check for invalid exercise IDs
+    const invalidIds = validExerciseIds.filter((id) => !existingExerciseIds.includes(id));
     if (invalidIds.length > 0) {
       return res.status(400).json({
         error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
       });
     }
 
-    // Add valid exercise IDs to the workout plan
+    // Process each exercise
     const workoutPlanExercises = await Promise.all(
-      validExerciseIds.map((id) =>
-        prisma.workoutPlanExercise.create({
-          data: { workoutPlanId, exerciseId: id },
-        })
-      )
+      exercises.map(async ({ exerciseId, sets }) => {
+        // Create WorkoutPlanExercise entry
+        const workoutPlanExercise = await prisma.workoutPlanExercise.create({
+          data: { workoutPlanId, exerciseId },
+        });
+
+        // Default to one set if none provided
+        let setData = [{ reps: null, weight: null }];
+        if (Array.isArray(sets) && sets.length > 0) {
+          setData = sets.map((set) => ({
+            reps: set.reps ?? null,
+            weight: set.weight ?? null,
+          }));
+        }
+
+        // Add sets to the newly created workoutPlanExercise
+        const createdSets = await Promise.all(
+          setData.map((set) =>
+            prisma.workoutSet.create({
+              data: {
+                workoutPlanExerciseId: workoutPlanExercise.id,
+                reps: set.reps,
+                weight: set.weight,
+              },
+            })
+          )
+        );
+
+        return { workoutPlanExercise, sets: createdSets };
+      })
     );
 
     res.status(201).json(workoutPlanExercises);
@@ -186,6 +207,7 @@ const addExerciseToWorkoutPlan = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Remove an exercise from a workout plan
 // const removeExerciseFromWorkoutPlan = async (req, res) => {

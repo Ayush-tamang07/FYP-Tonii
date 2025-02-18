@@ -44,6 +44,15 @@ model WorkoutPlanExercise {
   exerciseId    Int       // Foreign key to Exercise
   workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id])
   exercise      Exercise    @relation(fields: [exerciseId], references: [id])
+  sets          WorkoutSet[] // A workout exercise can have multiple sets
+}
+
+model WorkoutSet {
+  id                 Int      @id @default(autoincrement())
+  workoutPlanExerciseId Int  // Foreign key to WorkoutPlanExercise
+  workoutPlanExercise  WorkoutPlanExercise @relation(fields: [workoutPlanExerciseId], references: [id])
+  reps               Int      // Number of repetitions in the set
+  weight             Float    // Weight used in the set
 }
 
 model Exercise {

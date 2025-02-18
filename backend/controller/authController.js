@@ -47,8 +47,6 @@ const userRegister = async (req, res) => {
   }
 };
 
-module.exports = { userRegister };
-
 
 const loginUser = async (req, res) => {
   try {
@@ -142,10 +140,24 @@ const loginAdmin = async (req, res) => {
     return res.status(500).json({ message: "failed to login" });
   }
 };
+const logout = async (req, res) => {
+    const authorizationHeaderValue = req.headers["authorization"];
+  
+  if (!authorizationHeaderValue || !authorizationHeaderValue.startsWith("Bearer ")) {
+    return res.status(400).json({ error: "No token provided" });
+  }
+
+  const token = authorizationHeaderValue.split("Bearer ")[1];
+
+  blacklistedTokens.push(token); // Blacklist the token
+
+  res.json({ message: "Logged out successfully" });
+}
 
 module.exports = {
   userRegister,
   loginUser,
   resetPassword,
-  loginAdmin
+  loginAdmin,
+  logout
 };
