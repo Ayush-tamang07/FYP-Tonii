@@ -12,6 +12,7 @@ const router = express.Router();
 router.post("/user/register", authController.userRegister)
 router.post("/user/login", authController.loginUser)
 router.post("/logout", authController.logout)
+router.put("/user/:id", authController.updateUserDetails)
 
 // Admin Authentication routes
 // router.post("/admin/register", authController.adminRegister)

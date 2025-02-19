@@ -140,6 +140,64 @@ const loginAdmin = async (req, res) => {
     return res.status(500).json({ message: "failed to login" });
   }
 };
+
+const updateUserDetails = async (req, res) => {
+  try {
+    const { id } = req.params; // Extract ID from request parameters
+    const { username, email, weight, age, height, gender, password } = req.body;
+
+    // ✅ Validate if ID exists and convert it to an integer
+    if (!id) {
+      return res.status(400).json({ error: "User ID is required." });
+    }
+    const userId = parseInt(id, 10); // Convert to integer
+
+    // ✅ Check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId }, // Ensure it's an integer
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // ✅ Check if the email is being updated and already exists
+    if (email && email !== user.email) {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        return res.status(409).json({ error: "Email already exists." });
+      }
+    }
+
+    // ✅ Hash the new password if provided
+    let hashedPassword = user.password; // Keep old password if no new one is provided
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    // ✅ Update user details
+    const updatedUser = await prisma.user.update({
+      where: { id: userId }, // Ensure it's an integer
+      data: {
+        username: username || user.username,
+        email: email || user.email,
+        weight: weight ? parseFloat(weight) : user.weight,
+        age: age ? parseInt(age) : user.age,
+        height: height ? parseFloat(height) : user.height,
+        gender: gender || user.gender,
+        password: hashedPassword,
+      },
+    });
+
+    console.log("User updated:", updatedUser);
+    return res.status(200).json({ message: "User details updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Update error:", error);
+    return res.status(500).json({ error: "Failed to update user details" });
+  }
+};
+
+
 const logout = async (req, res) => {
     const authorizationHeaderValue = req.headers["authorization"];
   
@@ -159,5 +217,6 @@ module.exports = {
   loginUser,
   resetPassword,
   loginAdmin,
+  updateUserDetails,
   logout
 };
