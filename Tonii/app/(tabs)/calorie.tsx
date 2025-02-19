@@ -235,6 +235,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  calorieCard: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    width: width * 0.95, // Responsive width
+    alignSelf: 'center',
+  },
+  calorieTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  calorieValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF6F00',
+    textAlign: 'right',
+    marginBottom: 10,
+  },
+  macrosTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
 });
 
 export default Calorie;
