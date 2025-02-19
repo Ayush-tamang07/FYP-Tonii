@@ -1,7 +1,9 @@
 import React from "react";
+import { Routes, Route } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import SideBar from "../components/SideBar";
 import WorkoutPlansContent from "../components/WorkoutPlansContent";
+import WorkoutPlanDetails from "../components/WorkoutPlanDetails"; // New Component
 
 function WorkoutPlans() {
   return (
@@ -18,9 +20,12 @@ function WorkoutPlans() {
           <PageHeader title="Workout Plans" />
         </div>
 
-        {/* Scrollable Content */}
+        {/* Routes for Main Content */}
         <div className="bg-white p-4 overflow-auto">
-          <WorkoutPlansContent />
+          <Routes>
+            <Route path="/" element={<WorkoutPlansContent />} />
+            <Route path=":id" element={<WorkoutPlanDetails />} /> {/* New Route for Details Page */}
+          </Routes>
         </div>
       </div>
     </div>
