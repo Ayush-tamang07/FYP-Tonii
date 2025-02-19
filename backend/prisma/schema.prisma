@@ -31,29 +31,30 @@ model User {
 model WorkoutPlan {
   id             Int                   @id @default(autoincrement())
   name           String
-  createdByAdmin Boolean               @default(false) // Admin-created flag
-  assignedToUserId Int?                 // If NULL, it's available to all users. If set, it's user-specific.
+  createdByAdmin Boolean               @default(false)
+  assignedToUserId Int?
   user           User?                  @relation(fields: [assignedToUserId], references: [id])
-  exercises      WorkoutPlanExercise[]  // Many-to-many relation with exercises
+  exercises      WorkoutPlanExercise[]  
   createdAt      DateTime               @default(now())
 }
 
 model WorkoutPlanExercise {
   id           Int        @id @default(autoincrement())
-  workoutPlanId Int       // Foreign key to WorkoutPlan
-  exerciseId    Int       // Foreign key to Exercise
-  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id])
+  workoutPlanId Int       
+  exerciseId    Int       
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade) // ✅ Apply cascade here
   exercise      Exercise    @relation(fields: [exerciseId], references: [id])
-  sets          WorkoutSet[] // A workout exercise can have multiple sets
+  sets          WorkoutSet[]  
 }
 
 model WorkoutSet {
   id                 Int      @id @default(autoincrement())
-  workoutPlanExerciseId Int  // Foreign key to WorkoutPlanExercise
-  workoutPlanExercise  WorkoutPlanExercise @relation(fields: [workoutPlanExerciseId], references: [id])
-  reps               Int      // Number of repetitions in the set
-  weight             Float    // Weight used in the set
+  workoutPlanExerciseId Int  
+  workoutPlanExercise  WorkoutPlanExercise @relation(fields: [workoutPlanExerciseId], references: [id], onDelete: Cascade) // ✅ Apply cascade here
+  reps               Int      
+  weight             Float    
 }
+
 
 model Exercise {
   id          Int      @id @default(autoincrement())
