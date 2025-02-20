@@ -1,7 +1,7 @@
 // const { join } = require("@prisma/client/runtime/library");
 const prisma = require("../utils/PrismaClient.js");
 const bcrypt = require("bcrypt");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 const userRegister = async (req, res) => {
   try {
@@ -51,18 +51,18 @@ const userRegister = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    console.log(req.body);
+    
     if (!email || !password) {
       return res.status(400).json({ message: "all field is required" });
     }
-    console.log(email);
-    console.log(password);
+
     const user = await prisma.user.findFirst({
       where: {
         email: email,
       },
     });
-
+    
     // checking user
     if (!user) {
       return res.status(404).json({ message: "user does not exist" });
@@ -71,20 +71,21 @@ const loginUser = async (req, res) => {
     // Compare the provided password with the hashed password stored in the database
     const checkPassword = await bcrypt.compare(password, user.password);
 
+
+    console.log(checkPassword)
     if (!checkPassword) {
       return res.status(401).json({ message: "Incorrect Password" });
     }
-    // const token = jwt.sign(
-    //   { userId: user.id, email: user.email }, // Payload
-    //   process.env.JWT_SECRET, // Secret key
-    //   { expiresIn: "1h" } // Token expiration time
-    // );
+    const token = jwt.sign(
+      { userId: user.id, email: user.email }, // Payload
+      process.env.JWT_SECRET, // Secret key
+      { expiresIn: "1h" } // Token expiration time
+    );
     return res.status(200).json({
       message: "Login Successfully",
       user,
-      // token,
+      token,
     });
-    // return res.status(200).json({ message: "Login Successfully", user });
   } catch (error) {
     console.error("Error logging in user:", error);
     return res.status(500).json({ message: "failed to login" });
@@ -211,12 +212,48 @@ const logout = async (req, res) => {
 
   res.json({ message: "Logged out successfully" });
 }
+const readUser = async (req, res) => {
+  try {
+    const { authorization } = req.headers;
 
+    if (!authorization) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const token = authorization.split(" ")[1]; // Extract token from "Bearer <token>"
+    
+    // Assuming you're using JWT, decode the token to get user ID
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    const userDetails = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        weight: true,
+        age: true,
+        height: true,
+        gender: true,
+      },
+    });
+
+    if (!userDetails) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(userDetails);
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
 module.exports = {
   userRegister,
   loginUser,
   resetPassword,
   loginAdmin,
   updateUserDetails,
-  logout
+  logout,
+  readUser
 };

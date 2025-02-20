@@ -1,5 +1,6 @@
 const prisma = require("../utils/PrismaClient.js");
 
+
 const addExercise = async (req, res) => {
   try {
     const {
@@ -173,27 +174,8 @@ const updateExercise = async (req, res) => {
   }
 };
 
-const readUser = async (req, res) => {
-  try {
-    // Fetch all user details from the database
-    const userDetails = await prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        weight: true,
-        age: true,
-        height: true,
-        gender: true,
-      },
-    });
 
-    return res.status(200).json(userDetails);
-  } catch (error) {
-    console.error("Error fetching user details:", error);
-    return res.status(500).json({ message: "Internal server error." });
-  }
-};
+
 
 const readFeedback = async (req, res) => {
   try {
@@ -276,7 +258,6 @@ const getAdminWorkoutPlans = async (req, res) => {
 module.exports = {
   addExercise,
   deleteExercise,
-  readUser,
   updateExercise,
   readFeedback,
   createAdminWorkoutPlan,

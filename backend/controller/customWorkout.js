@@ -299,77 +299,44 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
 };
 const deleteWorkoutPlan = async (req, res) => {
   try {
-    const { workoutPlanId } = req.params; // Get workoutPlanId from URL params
+    const { workoutPlanId } = req.params;
+    const { userId, userRole } = req.body; // Receive user ID & role from frontend
 
-    if (!workoutPlanId) {
-      return res.status(400).json({
-        success: false,
-        message: "Workout Plan ID is required.",
-      });
+    if (!workoutPlanId || !userId) {
+      return res.status(400).json({ success: false, message: "Workout Plan ID and User ID are required." });
     }
 
     const planId = parseInt(workoutPlanId);
-
     if (isNaN(planId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid Workout Plan ID.",
-      });
+      return res.status(400).json({ success: false, message: "Invalid Workout Plan ID." });
     }
 
-    // Step 1: Check if the workout plan exists
+    // Fetch the workout plan
     const workoutPlan = await prisma.workoutPlan.findUnique({
       where: { id: planId },
-      include: { exercises: true }, // Fetch associated exercises
     });
 
     if (!workoutPlan) {
-      return res.status(404).json({
-        success: false,
-        message: "Workout Plan not found.",
-      });
+      return res.status(404).json({ success: false, message: "Workout Plan not found." });
     }
 
-    // Step 2: Fetch all related WorkoutPlanExercise IDs
-    const workoutPlanExercises = await prisma.workoutPlanExercise.findMany({
-      where: { workoutPlanId: planId },
-      select: { id: true },
-    });
-
-    const workoutPlanExerciseIds = workoutPlanExercises.map((exercise) => exercise.id);
-
-    // Step 3: Delete all related WorkoutSet entries first
-    if (workoutPlanExerciseIds.length > 0) {
-      await prisma.workoutSet.deleteMany({
-        where: {
-          workoutPlanExerciseId: { in: workoutPlanExerciseIds },
-        },
-      });
+    // ✅ Permission Check:
+    if (userRole !== "admin" && workoutPlan.assignedToUserId !== parseInt(userId)) {
+      return res.status(403).json({ success: false, message: "You do not have permission to delete this workout plan." });
     }
 
-    // Step 4: Delete all related WorkoutPlanExercise entries
-    await prisma.workoutPlanExercise.deleteMany({
-      where: { workoutPlanId: planId },
-    });
-
-    // Step 5: Delete the workout plan itself
+    // ✅ Cascade delete handled by Prisma
     await prisma.workoutPlan.delete({
       where: { id: planId },
     });
 
-    res.status(200).json({
-      success: true,
-      message: "Workout Plan deleted successfully.",
-    });
+    res.status(200).json({ success: true, message: "Workout Plan deleted successfully." });
   } catch (error) {
     console.error("Error deleting workout plan:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete workout plan.",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Failed to delete workout plan.", error: error.message });
   }
 };
+
 
 module.exports = {
   readExercise,

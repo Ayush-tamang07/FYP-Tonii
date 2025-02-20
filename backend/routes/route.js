@@ -36,7 +36,7 @@ router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan);
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
-router.get("/admin/readUser",adminController.readUser);
+router.get("/admin/readUser",authController.readUser);
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 router.get("/admin/readFeedback",adminController.readFeedback);
