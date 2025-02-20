@@ -5,14 +5,14 @@ import { RadioButton } from 'react-native-paper';
 
 const Register = () => {
   const [gender, setGender] = useState('male'); // Manage gender state
-
+  // const onRegisterPress = () => {}
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={styles.logo}>🏋️</Text>
       </View>
-      <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
-
+      <Text style={styles.title}>CREATE YOUR ACCOUNT</Text> 
+      
       <Text>User Name</Text>
       <TextInput style={styles.input} placeholder="Enter your username" />
 

@@ -1,173 +1,161 @@
-import { Link } from 'expo-router';
-import React, { useState } from 'react';
-import { loginUser } from '@/context/userAPI';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { Link } from "expo-router";
+import React, { useState } from "react";
+import {
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  Image, Alert, Keyboard, TouchableWithoutFeedback, ActivityIndicator
+} from "react-native";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import axios from 'axios';
+import apiHandler from "@/context/APIHandler";
 
-
-const Login = () => {
+function Login() {
   const router = useRouter();
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false); // Added loading state
 
-  const loginUser = async () => {
+  const onSignInPress = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setLoading(true); // Start loading
+
+    const payload = { email: form.email, password: form.password };
+
     try {
-      const response = await axios.post('http://localhost:5500/api/user/login', {
-        email: form.email,
-        password: form.password,
-      });
-      return response.data; // Handle token or user data
-    } catch (error) {
-      Alert.alert(
-        "Login Failed",
-        error.response?.data?.message || "Something went wrong"
+      const result = await apiHandler.post("/user/login",
+        payload
       );
+
+      if (result?.status === 200) {
+        await SecureStore.setItemAsync("AccessToken", result.data.token);
+        router.replace("../(tabs)/explore");
+      } else {
+        Alert.alert("Error", result.data?.message || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Login failed. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
-  // const onSignInPress = async () => {
-  //   // Validate form fields
-  //   if (!form.email || !form.password) {
-  //     Alert.alert("Error", "Please fill in all fields");
-  //     return;
-  //   }
-
-  //   try {
-  //     console.log(form);
-  //     const result = await loginUser(form.email, form.password);
-  //     console.log(result);
-  //     console.log("status code : ", result.status);
-  //     if (result?.status == 200) {
-  //       await SecureStore.setItemAsync("AccessToken", result.token);
-  //       router.replace("../(tabs)/home");
-
-  //     } else {
-  //       Alert.alert("Error", "Invalid credentials");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     Alert.alert("Error", "Login failed. Please try again.");
-  //   }
-  // };
-  // const handleLogin = () => {
-  //   // Logic for handling login
-  //   console.log('Email:', email);
-  //   console.log('Password:', password);
-  // };
-
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../../assets/images/app_icon.png')}
-        style={styles.image}
-      />
-      <Text style={styles.title}>WELCOME BACK</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={form.email}
-          onChangeText={(value: any) => setForm({ ...form, email: value })}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Image source={require("../../assets/images/app_icon.png")} style={styles.image} />
+        <Text style={styles.title}>WELCOME BACK</Text>
+        <Text className="font-semibold text-3xl text-red-500 px-12 bg-black">Hello</Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={form.email}
+            onChangeText={(value) => setForm({ ...form, email: value })}
+            keyboardType="email-address"
+            autoCapitalize="none" />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={form.password}
+            onChangeText={(value) => setForm({ ...form, password: value })}
+            secureTextEntry />
+        </View>
+
+        <TouchableOpacity>
+          <Text style={styles.forgotPassword}>Forget Password?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, loading && styles.disabledButton]}
+          onPress={onSignInPress}
+          disabled={loading}
+        >
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
+        </TouchableOpacity>
+
+        <Link href="/(auth)/register" style={styles.linkContainer}>
+          <Text>Don't have an account?</Text>
+          <Text style={styles.linkText}> Sign Up</Text>
+        </Link>
       </View>
-
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={form.password}
-          onChangeText={(value: any) => setForm({ ...form, password: value })}
-          secureTextEntry
-        />
-      </View>
-
-      <TouchableOpacity>
-        <Text style={styles.forgotPassword}>Forget Password?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={loginUser}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <Link href="/(auth)/register" style={styles.linkContainer}>
-        <Text>Don't have an account?</Text>
-        <Text style={styles.linkText}> Sign Up</Text>
-      </Link>
-    </View>
+    </TouchableWithoutFeedback>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 30,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
   },
   image: {
-    width: 120, // Adjust the width of the image
-    marginBottom: 16, // Add spacing between the image and the title
+    width: 120,
+    marginBottom: 16,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 90,
-    color: '#FF6909',
+    color: "#FF6909",
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 16,
   },
   label: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
-    color: '#333',
+    color: "#333",
   },
   input: {
-    width: '100%',
+    width: "100%",
     padding: 12,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   forgotPassword: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 16,
-    color: '#FF6909',
+    color: "#FF6909",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   button: {
-    backgroundColor: '#FF6909',
+    backgroundColor: "#FF6909",
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
-    width: '100%', // Matches the width of the input field
+    alignItems: "center",
+    width: "100%",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   linkContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   linkText: {
-    color: '#FF6909',
-    fontWeight: 'bold',
+    color: "#FF6909",
+    fontWeight: "bold",
     marginLeft: 4,
   },
 });

@@ -1,13 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import * as SecureStore from "expo-secure-store";
 
 const Profile = () => {
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = await SecureStore.getItemAsync("AccessToken");
+      setToken(storedToken);
+    };
+
+    fetchToken();
+  }, []);
   return (
     <View style={styles.container}>
+
       {/* Profile Image and Name */}
       <View style={styles.profileHeader}>
         <View style={styles.imageContainer}>
+          <Text>{token}</Text>
           <Image
             source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }} // Replace with actual user image
             style={styles.profileImage}
