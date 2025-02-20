@@ -6,13 +6,14 @@ import { RadioButton } from 'react-native-paper';
 const Register = () => {
   const [gender, setGender] = useState('male'); // Manage gender state
 
- 
-
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Text style={styles.logo}>🏋️</Text>
+      </View>
       <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
 
-      <Text>UserName</Text>
+      <Text>User Name</Text>
       <TextInput style={styles.input} placeholder="Enter your username" />
 
       <Text>Email</Text>
@@ -60,13 +61,21 @@ const Register = () => {
       <Text>Confirm Password</Text>
       <TextInput style={styles.input} placeholder="Confirm password" secureTextEntry />
 
-      <Link href="/(auth)/login">
-        <Text style={styles.link}>Already a member? Login</Text>
-      </Link>
+      {/* Terms and Conditions Checkbox */}
+      <View style={styles.termsContainer}>
+        <TouchableOpacity style={styles.checkbox}></TouchableOpacity>
+        <Text style={styles.termsText}>By checking the box you agree to our <Text style={styles.termsLink}>Terms and Conditions.</Text></Text>
+      </View>
 
+      {/* Register Button */}
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
+
+      {/* Login Link */}
+      <Link href="/(auth)/login">
+        <Text style={styles.link}>Already a member? <Text style={styles.loginText}>Login</Text></Text>
+      </Link>
     </SafeAreaView>
   );
 };
@@ -78,12 +87,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 20,
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  logo: {
+    fontSize: 40,
+    color: '#FF6909',
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 20,
+    color: '#FF6909',
   },
   input: {
     borderWidth: 1,
@@ -92,6 +111,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     width: "100%", // Make inputs responsive
+    backgroundColor: '#F5F5F5',
   },
   row: {
     flexDirection: 'row',
@@ -113,17 +133,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
   },
+  termsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  checkbox: {
+    width: 16,
+    height: 16,
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: 3,
+    marginRight: 10,
+  },
+  termsText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  termsLink: {
+    color: '#FF6909',
+    fontWeight: 'bold',
+  },
   link: {
-    color: "blue",
-    marginTop: 10,
     textAlign: "center",
+    fontSize: 14,
+    color: '#666',
+    marginTop: 10,
+  },
+  loginText: {
+    color: "#FF6909",
+    fontWeight: "bold",
   },
   button: {
     backgroundColor: '#FF6909',
-    paddingVertical: 12,
+    paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
-    width: '100%', // Matches the width of the input field
+    width: '100%',
+    marginTop: 10,
   },
   buttonText: {
     color: '#fff',

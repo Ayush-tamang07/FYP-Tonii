@@ -9,7 +9,7 @@ const Profile = () => {
       <View style={styles.profileHeader}>
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: 'https://via.placeholder.com/100' }} // Replace with actual user image
+            source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }} // Replace with actual user image
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.editIcon}>
