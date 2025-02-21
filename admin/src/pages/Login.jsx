@@ -11,28 +11,53 @@ function Login() {
   const navigate = useNavigate();
 
   // Handle form submission
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError(null);
+
+  //   try {
+  //     const response = await axios.post('http://localhost:5500/api/auth/login', {
+  //       email,
+  //       password,
+  //     });
+
+  //     // Handle success (store token, redirect, etc.)
+  //     console.log('Login successful:', response.data);
+  //     alert('Login Successful!');
+  //     navigate('/dashboard');
+  //   } catch (err) {
+  //     console.error('Login failed:', err.response?.data || err.message);
+  //     setError(err.response?.data?.message || 'Login failed. Try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     try {
-      const response = await axios.post('http://localhost:5500/api/admin/login', {
+      const response = await axios.post("http://localhost:5500/api/auth/login", {
         email,
         password,
       });
-
-      // Handle success (store token, redirect, etc.)
-      console.log('Login successful:', response.data);
-      alert('Login Successful!');
-      navigate('/dashboard');
+      console.log("Login successful:", response.data);
+        localStorage.setItem("token", response.data.token);
+  
+  
+      alert("Login Successful!");
+  
+      navigate("/dashboard"); // Redirect to dashboard after login
     } catch (err) {
-      console.error('Login failed:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 'Login failed. Try again.');
+      console.error("Login failed:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Login failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <>

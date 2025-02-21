@@ -14,7 +14,9 @@ const WorkoutPlansContent = () => {
   // 📌 Function to Fetch Workout Plans from API
   const fetchWorkoutPlans = async () => {
     try {
-      const response = await axios.get("http://localhost:5500/api/admin/workout-plans");
+      const response = await axios.get(
+        "http://localhost:5500/api/admin/workout-plans"
+      );
 
       console.log("Workout Plans API Response:", response.data);
 
@@ -37,9 +39,12 @@ const WorkoutPlansContent = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5500/api/admin/workout-plans", {
-        name: newWorkoutName,
-      });
+      const response = await axios.post(
+        "http://localhost:5500/api/admin/workout-plans",
+        {
+          name: newWorkoutName,
+        }
+      );
 
       if (response.data.success) {
         setWorkoutPlans([...workoutPlans, response.data.data]); // ✅ Append new plan to state
@@ -56,6 +61,39 @@ const WorkoutPlansContent = () => {
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
     setNewWorkoutName(""); // ✅ Clear input field
+  };
+  const handleDeleteWorkoutPlan = async (workoutPlanId) => {
+    if (!window.confirm("Are you sure you want to delete this workout plan?")) {
+      return;
+    }
+
+    const userId = localStorage.getItem("userId"); // Store user ID on login
+    const userRole = localStorage.getItem("userRole"); // Store user role on login
+
+    if (!userId || !userRole) {
+      alert("User information missing. Please log in again.");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:5500/api/admin/deleteExercise/${workoutPlanId}`,
+        {
+          data: { userId, userRole }, // Send user ID & role
+        }
+      );
+
+      if (response.data.success) {
+        setWorkoutPlans(
+          workoutPlans.filter((plan) => plan.id !== workoutPlanId)
+        );
+      } else {
+        alert("Failed to delete workout plan.");
+      }
+    } catch (error) {
+      console.error("Error deleting workout plan:", error);
+      alert("An error occurred while deleting the workout plan.");
+    }
   };
 
   return (
@@ -82,8 +120,15 @@ const WorkoutPlansContent = () => {
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
                 <div className="flex justify-end space-x-4 mt-4">
                   {/* <button className="text-purple-600 hover:underline">View</button> */}
-                  <button className="text-blue-600 hover:underline">Edit</button>
-                  <button className="text-red-600 hover:underline">Delete</button>
+                  <button className="text-blue-600 hover:underline">
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-600 hover:underline"
+                    onClick={() => handleDeleteWorkoutPlan(plan.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))

@@ -1,71 +1,67 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function UserContent() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // Fix: Use an array since backend returns multiple users
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch user data from API
-    fetch("http://localhost:5500/api/admin/readUser")
+    const token = localStorage.getItem("token"); // Get token
+
+    if (!token) {
+      setError("Unauthorized: No token found");
+      setLoading(false);
+      return;
+    }
+
+    // Fetch user data with token
+    axios
+      .get("http://localhost:5500/api/admin/readUser", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }) 
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUsers(data);
+        setUsers(response.data.users); // Fix: Store array of users correctly
         setLoading(false);
       })
-      .catch((error) => {
-        setError(error.message);
+      .catch((err) => {
+        setError(err.response?.data?.message || "Failed to fetch user details");
         setLoading(false);
       });
   }, []);
 
   return (
     <div className="p-4 bg-white">
-      {/* <h2 className="text-xl font-semibold mb-4">User Details</h2> */}
-
-      {/* Show loading state */}
-      {loading && <p>Loading users...</p>}
-      
-      {/* Show error state */}
+      {loading && <p>Loading user details...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* User Table */}
-      {!loading && !error && (
+      {!loading && !error && users.length > 0 ? ( // Fix: Check if users array is not empty
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border p-2">ID</th>
+                {/* <th className="border p-2">ID</th> */}
                 <th className="border p-2">Name</th>
                 <th className="border p-2">Email</th>
-                {/* <th className="border p-2">Role</th> */}
+                <th className="border p-2">Role</th>
               </tr>
             </thead>
             <tbody>
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-100">
-                    <td className="border p-2">{user.id}</td>
-                    <td className="border p-2">{user.username}</td>
-                    <td className="border p-2">{user.email}</td>
-                    {/* <td className="border p-2">{user.role}</td> */}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="border p-2 text-center">
-                    No users found
-                  </td>
+              {users.map((user) => ( // Fix: Iterate over the array properly
+                <tr key={user.id} className="hover:bg-gray-100">
+                  {/* <td className="border p-2">{user.id}</td> */}
+                  <td className="border p-2">{user.username}</td>
+                  <td className="border p-2">{user.email}</td>
+                  <td className="border p-2">{user.role}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
+      ) : (
+        <p className="text-gray-600">No users found.</p> // Fix: Display message when no users
       )}
     </div>
   );
