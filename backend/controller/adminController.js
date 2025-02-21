@@ -27,7 +27,7 @@ const addExercise = async (req, res) => {
         .status(400)
         .json({ success: false, message: "All fields are required." });
     }
-
+s
     // Check if the exercise already exists
     const existingExercise = await prisma.exercise.findFirst({
       where: {
@@ -252,7 +252,28 @@ const getAdminWorkoutPlans = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch workout plans" });
   }  
 };
+const readUserDetailsByAdmin = async (req, res) => {
+  try {
+    // Fetch all users from the database except their passwords
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        weight: true,
+        age: true,
+        height: true,
+        gender: true,
+        role: true, // Include role to verify admin access
+      },
+    });
 
+    return res.status(200).json({ users });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    return res.status(500).json({ message: "Failed to fetch user details" });
+  }
+};
 
 
 module.exports = {
@@ -261,5 +282,6 @@ module.exports = {
   updateExercise,
   readFeedback,
   createAdminWorkoutPlan,
-  getAdminWorkoutPlans
+  getAdminWorkoutPlans,
+  readUserDetailsByAdmin
 };

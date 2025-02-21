@@ -8,7 +8,15 @@ const userRegister = async (req, res) => {
     const { username, email, weight, age, height, gender, password } = req.body;
 
     // ✅ Check if all required fields are provided
-    if (!username || !email || !age || !weight || !height || !gender || !password) {
+    if (
+      !username ||
+      !email ||
+      !age ||
+      !weight ||
+      !height ||
+      !gender ||
+      !password
+    ) {
       return res.status(400).json({ error: "All fields are required." });
     }
 
@@ -39,58 +47,57 @@ const userRegister = async (req, res) => {
     });
 
     console.log("User registered:", newUser);
-    return res.status(201).json({ message: "User registered successfully", user: newUser });
-
+    return res
+      .status(201)
+      .json({ message: "User registered successfully", user: newUser });
   } catch (error) {
     console.error("Registration error:", error);
     return res.status(500).json({ error: "Failed to register user" });
   }
 };
 
+// const loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     console.log(req.body);
 
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    console.log(req.body);
-    
-    if (!email || !password) {
-      return res.status(400).json({ message: "all field is required" });
-    }
+//     if (!email || !password) {
+//       return res.status(400).json({ message: "all field is required" });
+//     }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
-    });
-    
-    // checking user
-    if (!user) {
-      return res.status(404).json({ message: "user does not exist" });
-    }
+//     const user = await prisma.user.findFirst({
+//       where: {
+//         email: email,
+//       },
+//     });
 
-    // Compare the provided password with the hashed password stored in the database
-    const checkPassword = await bcrypt.compare(password, user.password);
+//     // checking user
+//     if (!user) {
+//       return res.status(404).json({ message: "user does not exist" });
+//     }
 
+//     // Compare the provided password with the hashed password stored in the database
+//     const checkPassword = await bcrypt.compare(password, user.password);
 
-    console.log(checkPassword)
-    if (!checkPassword) {
-      return res.status(401).json({ message: "Incorrect Password" });
-    }
-    const token = jwt.sign(
-      { userId: user.id, email: user.email }, // Payload
-      process.env.JWT_SECRET, // Secret key
-      { expiresIn: "1h" } // Token expiration time
-    );
-    return res.status(200).json({
-      message: "Login Successfully",
-      user,
-      token,
-    });
-  } catch (error) {
-    console.error("Error logging in user:", error);
-    return res.status(500).json({ message: "failed to login" });
-  }
-};
+//     console.log(checkPassword)
+//     if (!checkPassword) {
+//       return res.status(401).json({ message: "Incorrect Password" });
+//     }
+//     const token = jwt.sign(
+//       { userId: user.id, email: user.email }, // Payload
+//       process.env.JWT_SECRET, // Secret key
+//       { expiresIn: "1h" } // Token expiration time
+//     );
+//     return res.status(200).json({
+//       message: "Login Successfully",
+//       user,
+//       token,
+//     });
+//   } catch (error) {
+//     console.error("Error logging in user:", error);
+//     return res.status(500).json({ message: "failed to login" });
+//   }
+// };
 
 const showUser = async (req, res) => {
   try {
@@ -104,41 +111,82 @@ const resetPassword = async (req, res) => {
 };
 
 // admin authentication
-const loginAdmin = async (req, res) => {
+// const loginAdmin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     if (!email || !password) {
+//       return res.status(400).json({ message: "all field is required" });
+//     }
+//     console.log(email);
+//     console.log(password);
+//     const user = await prisma.user.findFirst({
+//       where: {
+//         email: email,
+//       },
+//     });
+//     // checking admin
+//     if (!user) {
+//       return res.status(404).json({ message: "user does not exist" });
+//     }
+//     // Checking if user is an admin
+//     if (user.role !== "admin") {
+//       return res.status(403).json({ message: "Access denied. Admins only." });
+//     }
+
+//     // Compare the provided password with the hashed password stored in the database
+//     const checkPassword = await bcrypt.compare(password, user.password);
+//     if (!checkPassword) {
+//       return res.status(401).json({ message: "Incorrect Password" });
+//     }
+//     return res.status(200).json({
+//       message: "Login Successfully",
+//       user,
+//       // token,
+//     });
+//   } catch (error) {
+//     console.error("Error logging in user:", error);
+//     return res.status(500).json({ message: "failed to login" });
+//   }
+// };
+const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ message: "all field is required" });
-    }
-    console.log(email);
-    console.log(password);
-    const user = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
-    });
-    // checking admin
-    if (!user) {
-      return res.status(404).json({ message: "user does not exist" });
-    }
-    // Checking if user is an admin
-    if (user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied. Admins only." });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Compare the provided password with the hashed password stored in the database
+    const user = await prisma.user.findFirst({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User does not exist" });
+    }
+
     const checkPassword = await bcrypt.compare(password, user.password);
     if (!checkPassword) {
       return res.status(401).json({ message: "Incorrect Password" });
     }
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    if (user.role === "admin") {
+      return res.status(200).json({
+        message: "Admin login successful",
+        token,
+      });
+    }
+
     return res.status(200).json({
-      message: "Login Successfully",
-      user,
-      // token,
+      message: "User login successful",
+      token,
     });
   } catch (error) {
     console.error("Error logging in user:", error);
-    return res.status(500).json({ message: "failed to login" });
+    return res.status(500).json({ message: "Failed to login" });
   }
 };
 
@@ -191,18 +239,25 @@ const updateUserDetails = async (req, res) => {
     });
 
     console.log("User updated:", updatedUser);
-    return res.status(200).json({ message: "User details updated successfully", user: updatedUser });
+    return res
+      .status(200)
+      .json({
+        message: "User details updated successfully",
+        user: updatedUser,
+      });
   } catch (error) {
     console.error("Update error:", error);
     return res.status(500).json({ error: "Failed to update user details" });
   }
 };
 
-
 const logout = async (req, res) => {
-    const authorizationHeaderValue = req.headers["authorization"];
-  
-  if (!authorizationHeaderValue || !authorizationHeaderValue.startsWith("Bearer ")) {
+  const authorizationHeaderValue = req.headers["authorization"];
+
+  if (
+    !authorizationHeaderValue ||
+    !authorizationHeaderValue.startsWith("Bearer ")
+  ) {
     return res.status(400).json({ error: "No token provided" });
   }
 
@@ -211,22 +266,13 @@ const logout = async (req, res) => {
   blacklistedTokens.push(token); // Blacklist the token
 
   res.json({ message: "Logged out successfully" });
-}
+};
 const readUser = async (req, res) => {
   try {
-    const { authorization } = req.headers;
+    const userId = req.user.userId;
 
-    if (!authorization) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const token = authorization.split(" ")[1]; // Extract token from "Bearer <token>"
-    
-    // Assuming you're using JWT, decode the token to get user ID
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    const userDetails = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+    const userDetails = await prisma.user.findFirst({
+      where: { id: userId },
       select: {
         id: true,
         username: true,
@@ -252,8 +298,8 @@ module.exports = {
   userRegister,
   loginUser,
   resetPassword,
-  loginAdmin,
+  // loginAdmin,
   updateUserDetails,
   logout,
-  readUser
+  readUser,
 };

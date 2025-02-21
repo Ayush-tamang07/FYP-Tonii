@@ -5,18 +5,19 @@ const customWorkout = require('../controller/customWorkout.js');
 const adminController = require('../controller/adminController.js');
 const resetPassword = require('../controller/resetPassword.js');
 const userController = require('../controller/useController.js');
+const authMiddleware = require('../middleware/authmiddleware.js');
 
 const router = express.Router();
 
 // User Authentication routes
-router.post("/user/register", authController.userRegister)
-router.post("/user/login", authController.loginUser)
+router.post("/auth/register", authController.userRegister)
+router.post("/auth/login", authController.loginUser)
 router.post("/logout", authController.logout)
 router.put("/user/:id", authController.updateUserDetails)
 
 // Admin Authentication routes
 // router.post("/admin/register", authController.adminRegister)
-router.post("/admin/login", authController.loginAdmin)
+// router.post("/admin/login", authController.loginAdmin)
 
 // password reset
 router.post('/requestOtp',resetPassword.reqOTP)
@@ -36,7 +37,8 @@ router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan);
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
-router.get("/admin/readUser",authController.readUser);
+router.get("/readUser", authMiddleware(), authController.readUser);
+router.get("/admin/readUser", authMiddleware(), adminController.readUserDetailsByAdmin);
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 router.get("/admin/readFeedback",adminController.readFeedback);
