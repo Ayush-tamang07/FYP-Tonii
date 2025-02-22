@@ -45,7 +45,8 @@ function UserContent() {
                 {/* <th className="border p-2">ID</th> */}
                 <th className="border p-2">Name</th>
                 <th className="border p-2">Email</th>
-                <th className="border p-2">Role</th>
+                <th className="border p-2">Age</th>
+                <th className="border p-2">Gender</th>
               </tr>
             </thead>
             <tbody>
@@ -54,7 +55,8 @@ function UserContent() {
                   {/* <td className="border p-2">{user.id}</td> */}
                   <td className="border p-2">{user.username}</td>
                   <td className="border p-2">{user.email}</td>
-                  <td className="border p-2">{user.role}</td>
+                  <td className="border p-2">{user.age}</td>
+                  <td className="border p-2">{user.gender}</td>
                 </tr>
               ))}
             </tbody>

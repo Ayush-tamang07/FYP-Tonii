@@ -1,15 +1,19 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation ,useNavigate } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
 import { BiSolidUserDetail } from "react-icons/bi";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { VscFeedback } from "react-icons/vsc";
 import { IoSettings } from "react-icons/io5";
+// import { BiClipboardCheck } from "react-icons/bi";
+// import { BiClipboardCheck } from "react-icons/bi";
 import { LuClipboardList } from "react-icons/lu";
+import { toast } from "react-toastify";
+
 
 function SideBar() {
-  const location = useLocation(); // Get current route path
-  const navigate = useNavigate(); // Get navigation function
+  const location = useLocation(); 
+  const navigate = useNavigate(); 
 
   // Function to apply active background color and text color
   const getLinkClass = (path) =>
@@ -19,8 +23,8 @@ function SideBar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    alert("Logged out successfully!");
-    navigate("/"); // Redirect to login page
+    toast.success("Logged Out!");
+    navigate("/");
   };
 
   return (
@@ -60,8 +64,9 @@ function SideBar() {
             "/workoutPlans"
           )}`}
         >
+          {/* <BiClipboardCheck className="text-xl" /> */}
           <LuClipboardList className="text-xl" />
-          <span>Workout Plans</span>
+          <span>WorkoutPlans</span>
         </a>
         <a
           href="/feedback"
@@ -75,7 +80,7 @@ function SideBar() {
         <a
           href="/setting"
           className={`flex items-center space-x-2 p-2 rounded font-semibold text-sm hover:bg-[#E3F2FD] transition ${getLinkClass(
-            "/setting"
+            "/settings"
           )}`}
         >
           <IoSettings className="text-xl" />

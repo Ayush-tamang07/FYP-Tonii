@@ -5,7 +5,7 @@ import { Login, Dashboard, User, Exercise, Feedback, SideBar } from "./reference
 import React from 'react'
 import Setting from "./pages/Setting.jsx";
 import WorkoutPlans from "./pages/WorkoutPlans.jsx";
-
+import { ToastContainer, toast } from 'react-toastify';
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +21,7 @@ function App() {
       <Route path="/setting" element={<Setting />} />
       {/* <Route path="/*" element={<Navigate to="/" />} /> */}
     </Routes>
+    <ToastContainer />
     </BrowserRouter>
   )
 }

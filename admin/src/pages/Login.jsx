@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 
 function Login() {
   // State for email, password, and loading/error messages
@@ -44,16 +45,22 @@ function Login() {
         password,
       });
       console.log("Login successful:", response.data);
-        localStorage.setItem("token", response.data.token);
-  
-  
-      alert("Login Successful!");
-  
-      navigate("/dashboard"); // Redirect to dashboard after login
-    } catch (err) {
-      console.error("Login failed:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Login failed. Try again.");
-    } finally {
+      localStorage.setItem("token", response.data.token);
+        
+        if(response.data.role === "admin"){
+        toast.success("Login Successful!");
+        navigate("/dashboard"); 
+        
+      }
+      if(response.data.role === "user"){
+          toast.error("Access Denied!");
+        }
+      }catch (err) {
+        const errorMessage = err.response?.data?.message || "Login failed. Try again.";
+        toast.error(errorMessage);
+        console.error("Login failed:", err.response?.data || err.message);
+      }
+       finally {
       setLoading(false);
     }
   };
