@@ -1,75 +1,102 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as SecureStore from "expo-secure-store";
+import { userDetails } from '../../context/userAPI'; // Import the function
 
 const Profile = () => {
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState({
+    username: '',
+    email: '',
+    weight: '',
+    age: '',
+    height: '',
+    gender: '',
+  });
+
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    const fetchToken = async () => {
-      const storedToken = await SecureStore.getItemAsync("AccessToken");
-      setToken(storedToken);
+    const fetchUserData = async () => {
+      setLoading(true);
+      const data = await userDetails(); // Fetch user details
+      if (data && data.username) {
+        setUser({
+          username: data.username || '',
+          email: data.email || '',
+          weight: data.weight ? data.weight.toString() : '',
+          age: data.age ? data.age.toString() : '',
+          height: data.height ? data.height.toString() : '',
+          gender: data.gender || '',
+        });
+      }
+      setLoading(false);
     };
 
-    fetchToken();
+    fetchUserData();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-
       {/* Profile Image and Name */}
       <View style={styles.profileHeader}>
         <View style={styles.imageContainer}>
-          <Text>{token}</Text>
           <Image
-            source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }} // Replace with actual user image
+            source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }}
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.editIcon}>
             <MaterialIcons name="edit" size={18} color="black" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.profileName}>Rabin Rai</Text>
+        <Text style={styles.profileName}>{user.username}</Text>
       </View>
 
       {/* User Details */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Name</Text>
-        <TextInput style={styles.input} value="Rabin Rai" editable={false} />
+        <TextInput style={styles.input} value={user.username} editable={false} />
       </View>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email Address</Text>
-        <TextInput style={styles.input} value="rar0396@gmail.com" editable={false} />
+        <TextInput style={styles.input} value={user.email} editable={false} />
       </View>
 
       <View style={styles.rowContainer}>
         <View style={styles.box}>
           <Text style={styles.label}>Age</Text>
-          <TextInput style={styles.inputBox} value="20" editable={false} />
+          <TextInput style={styles.inputBox} value={user.age} editable={false} />
         </View>
         <View style={styles.box}>
           <Text style={styles.label}>Weight</Text>
-          <TextInput style={styles.inputBox} value="64" editable={false} />
+          <TextInput style={styles.inputBox} value={user.weight} editable={false} />
         </View>
       </View>
 
       <View style={styles.rowContainer}>
         <View style={styles.box}>
           <Text style={styles.label}>Height</Text>
-          <TextInput style={styles.inputBox} value="5'6”" editable={false} />
+          <TextInput style={styles.inputBox} value={user.height} editable={false} />
         </View>
         <View style={styles.box}>
           <Text style={styles.label}>Gender</Text>
-          <TextInput style={styles.inputBox} value="Male" editable={false} />
+          <TextInput style={styles.inputBox} value={user.gender} editable={false} />
         </View>
       </View>
-
-
     </View>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -129,7 +156,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 4,
     textAlign: 'center',
-  }
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default Profile;

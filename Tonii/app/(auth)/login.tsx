@@ -24,13 +24,13 @@ function Login() {
     const payload = { email: form.email, password: form.password };
 
     try {
-      const result = await apiHandler.post("/user/login",
+      const result = await apiHandler.post("/auth/login",
         payload
       );
 
       if (result?.status === 200) {
         await SecureStore.setItemAsync("AccessToken", result.data.token);
-        router.replace("../(tabs)/explore");
+        router.replace("../(tabs)/profile");
       } else {
         Alert.alert("Error", result.data?.message || "Invalid credentials");
       }
@@ -47,7 +47,6 @@ function Login() {
       <View style={styles.container}>
         <Image source={require("../../assets/images/app_icon.png")} style={styles.image} />
         <Text style={styles.title}>WELCOME BACK</Text>
-        <Text className="font-semibold text-3xl text-red-500 px-12 bg-black">Hello</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
           <TextInput

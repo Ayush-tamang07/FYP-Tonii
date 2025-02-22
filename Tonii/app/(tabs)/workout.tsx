@@ -1,15 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Ionicons, Entypo } from '@expo/vector-icons'; // Icons for UI elements
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { Ionicons, Entypo } from "@expo/vector-icons"; // Icons for UI elements
+import { router } from "expo-router";
+import { workoutPlan } from "../../context/userAPI"; // Import API function
 
 const Workout = () => {
-  const [expanded, setExpanded] = useState(true); // State to handle expand/collapse
+  const [expanded, setExpanded] = useState(true);
+  const [workoutPlans, setWorkoutPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const routines = [
-    { name: "Push" },
-    { name: "Pull" },
-    { name: "Leg" },
-  ];
+
+  // Fetch workout plans for logged-in user
+  useEffect(() => {
+    const fetchWorkoutPlans = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await workoutPlan(); // Call API function
+        if (response.status === 401) {
+          setError("Unauthorized: Please log in again.");
+        } else if (response.status === 400) {
+          setError(response.message);
+        } else {
+          setWorkoutPlans(response.data || []); // Ensure data is an array
+        }
+      } catch (err) {
+        setError("Failed to fetch workout plans.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkoutPlans();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -18,7 +51,10 @@ const Workout = () => {
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, styles.newRoutineButton]}>
+        <TouchableOpacity
+          style={[styles.button, styles.newRoutineButton]}
+          onPress={() => router.replace("../(workout)/createRoutine")}
+        >
           <Ionicons name="clipboard-outline" size={18} color="white" />
           <Text style={styles.newRoutineButtonText}> New Routine</Text>
         </TouchableOpacity>
@@ -29,25 +65,27 @@ const Workout = () => {
         </TouchableOpacity>
       </View>
 
-
       {/* My Routine Section */}
-      <TouchableOpacity
-        style={styles.myRoutineHeader}
-        onPress={() => setExpanded(!expanded)}
-      >
+      <TouchableOpacity style={styles.myRoutineHeader} onPress={() => setExpanded(!expanded)}>
         <Ionicons name={expanded ? "chevron-down" : "chevron-forward"} size={18} color="black" />
-        <Text style={styles.myRoutineTitle}>My Routine ({routines.length})</Text>
+        <Text style={styles.myRoutineTitle}>My Routine ({workoutPlans.length})</Text>
       </TouchableOpacity>
 
+      {/* Loading State */}
+      {loading && <ActivityIndicator size="large" color="#FF6F00" />}
+
+      {/* Error State */}
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
       {/* Routine List */}
-      {expanded && (
+      {!loading && !error && expanded && (
         <ScrollView>
           <View style={styles.workoutList}>
-            {routines.map((routine, index) => (
+            {workoutPlans.map((plan, index) => (
               <View key={index} style={styles.workoutItem}>
                 {/* Routine Name & Options */}
                 <View style={styles.workoutRow}>
-                  <Text style={styles.workoutText}>{routine.name}</Text>
+                  <Text style={styles.workoutText}>{plan.name}</Text>
                   <TouchableOpacity>
                     <Entypo name="dots-three-vertical" size={16} color="black" />
                   </TouchableOpacity>
@@ -65,7 +103,6 @@ const Workout = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -147,6 +184,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginVertical: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  
 });
 
 export default Workout;

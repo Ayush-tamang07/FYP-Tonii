@@ -4,8 +4,10 @@ import { Text, TextInput, View, StyleSheet, TouchableOpacity, SafeAreaView, Dime
 import { RadioButton } from 'react-native-paper';
 
 const Register = () => {
+
   const [gender, setGender] = useState('male'); // Manage gender state
   // const onRegisterPress = () => {}
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
