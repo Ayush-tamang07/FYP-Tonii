@@ -254,8 +254,11 @@ const getAdminWorkoutPlans = async (req, res) => {
 };
 const readUserDetailsByAdmin = async (req, res) => {
   try {
-    // Fetch all users from the database except their passwords
+    // Fetch only users where role is 'user'
     const users = await prisma.user.findMany({
+      where: {
+        role: "user", // Filter to fetch only users
+      },
       select: {
         id: true,
         username: true,
@@ -264,7 +267,7 @@ const readUserDetailsByAdmin = async (req, res) => {
         age: true,
         height: true,
         gender: true,
-        role: true, // Include role to verify admin access
+        role: true,
       },
     });
 
@@ -274,6 +277,7 @@ const readUserDetailsByAdmin = async (req, res) => {
     return res.status(500).json({ message: "Failed to fetch user details" });
   }
 };
+
 
 
 module.exports = {

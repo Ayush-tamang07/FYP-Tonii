@@ -5,20 +5,20 @@ const jwt = require("jsonwebtoken");
 
 const userRegister = async (req, res) => {
   try {
-    const { username, email, weight, age, height, gender, password } = req.body;
+    const { username, email, weight, dob, height, gender, password, confirmPassword } = req.body;
 
     // ✅ Check if all required fields are provided
-    if (
-      !username ||
-      !email ||
-      !age ||
-      !weight ||
-      !height ||
-      !gender ||
-      !password
-    ) {
+    if (!username || !email || !dob || !weight || !height || !gender || !password || !confirmPassword) {
       return res.status(400).json({ error: "All fields are required." });
     }
+
+    // ✅ Validate password match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match." });
+    }
+
+    // ✅ Convert DOB to Age
+    const age = new Date().getFullYear() - new Date(dob).getFullYear();
 
     // ✅ Check if email already exists
     const existingUser = await prisma.user.findUnique({
@@ -26,7 +26,7 @@ const userRegister = async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(409).json({ error: "Email already exists." }); // 409 Conflict
+      return res.status(409).json({ error: "Email already exists." });
     }
 
     // ✅ Hash the password
@@ -38,7 +38,7 @@ const userRegister = async (req, res) => {
         username,
         email,
         weight: parseFloat(weight),
-        age: parseInt(age),
+        age: age,
         height: parseFloat(height),
         gender,
         password: hashedPassword,
@@ -47,14 +47,14 @@ const userRegister = async (req, res) => {
     });
 
     console.log("User registered:", newUser);
-    return res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
+    return res.status(201).json({ message: "User registered successfully", user: newUser });
+
   } catch (error) {
     console.error("Registration error:", error);
     return res.status(500).json({ error: "Failed to register user" });
   }
 };
+
 
 // const loginUser = async (req, res) => {
 //   try {
@@ -99,11 +99,6 @@ const userRegister = async (req, res) => {
 //   }
 // };
 
-const showUser = async (req, res) => {
-  try {
-    // const {username, email, }
-  } catch (error) {}
-};
 const resetPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -151,6 +146,7 @@ const resetPassword = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -158,6 +154,8 @@ const loginUser = async (req, res) => {
     const user = await prisma.user.findFirst({
       where: { email },
     });
+
+    const role = user.role;
 
     if (!user) {
       return res.status(404).json({ message: "User does not exist" });
@@ -173,16 +171,22 @@ const loginUser = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    if (user.role === "admin") {
-      return res.status(200).json({
-        message: "Admin login successful",
-        token,
-      });
-    }
+    // if (user.role === "admin") {
+    //   return res.status(200).json({
+    //     message: "Admin login successful",
+    //     token,
+    //   });
+    // }else{
+    //   return res.status(400).json({
+    //     message: "Access Denied. Only admins can access this endpoint."
+    //   });
+      
+    // }
 
     return res.status(200).json({
       message: "User login successful",
       token,
+      role
     });
   } catch (error) {
     console.error("Error logging in user:", error);

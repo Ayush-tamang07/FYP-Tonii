@@ -29,9 +29,9 @@ router.post('/user/addFeedback/:userId', userController.addFeedback)
 router.post("/calculate", calculate)
 
 router.get('/exercise',customWorkout.readExercise)
-router.post('/user/workout-plans', customWorkout.createUserWorkoutPlan);  // Create workout plan
-router.get('/user/:userId/workout-plans', customWorkout.getUserWorkoutPlans);  // Get workout plans for a user
-router.post('/workout-plans/add-exercise', customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
+router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan);  // Create workout plan
+router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  // Get user's workout plans
+router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan); 
 

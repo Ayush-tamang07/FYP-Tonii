@@ -54,19 +54,29 @@ const readExercise = async (req, res) => {
 
 const createUserWorkoutPlan = async (req, res) => {
   try {
-    const { name, userId } = req.body;
+    const { name } = req.body;
+    const userId = req.user.userId; // Get user ID from authentication middleware
 
-    // Create the workout plan for a specific user
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Workout plan name is required.",
+      });
+    }
+
+    // Create the workout plan for the logged-in user
     const workoutPlan = await prisma.workoutPlan.create({
       data: {
         name,
         createdByAdmin: false, // User-created
-        assignedToUserId: userId, // Specific to the user
+        assignedToUserId: userId, // Assigned to logged-in user
       },
     });
 
     res.status(201).json({
       success: true,
+      success: true,
+      message: "Workout plan created successfully.",
       data: workoutPlan,
     });
   } catch (error) {
@@ -79,9 +89,10 @@ const createUserWorkoutPlan = async (req, res) => {
   }
 };
 
+
 const getUserWorkoutPlans = async (req, res) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = req.user.userId;
 
     if (isNaN(userId)) {
       return res.status(400).json({
