@@ -1,86 +1,107 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TextInput, View, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import { Text, TextInput, View, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, Alert } from 'react-native';
+// import { registerUser } from '../../context/userAPI';
+import apiHandler from '@/context/APIHandler';
+import axios from 'axios';
+// import * as SecureStore from "expo-secure-store";
 
 const Register = () => {
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    weight: "",
+    height: "",
+    dob: "",
+    gender: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const [gender, setGender] = useState('male'); // Manage gender state
-  // const onRegisterPress = () => {}
-  
+  const onRegisterPress = async () => {
+    if (!form.email || !form.password || !form.username || !form.weight || !form.dob || !form.height || !form.gender || !form.confirmPassword) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+    const payload = { username: form.username, email: form.email, password: form.password, weight: form.weight, dob: form.dob, height: form.height, gender: form.gender, confirmPassword: form.confirmPassword }
+    console.log(payload)
+    try {
+      const result = await apiHandler.post("/auth/register", payload);
+      if (result?.status === 201) {
+        Alert.alert("Registration Successful", "You have been registered successfully. Please login.");
+        router.push("../(auth)/login");
+      } else if (result?.status === 409) {
+        Alert.alert("Error", "This email is already registered. Please login instead.");
+      } else {
+        Alert.alert("Error", result.data?.message || "Invalid credentials");
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        Alert.alert("Registration Failed", error.response.data?.error || "An unexpected error occurred.");
+      } else if (error instanceof Error) {
+        Alert.alert("Registration Failed", error.message);
+      } else {
+        Alert.alert("Registration Failed", "An unknown error occurred.");
+      }
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={styles.logo}>🏋️</Text>
       </View>
-      <Text style={styles.title}>CREATE YOUR ACCOUNT</Text> 
-      
+      <Text style={styles.title}>CREATE YOUR ACCOUNT</Text>
+
       <Text>User Name</Text>
-      <TextInput style={styles.input} placeholder="Enter your username" />
+      <TextInput style={styles.input} placeholder="Enter your username" value={form.username} onChangeText={(text) => setForm({ ...form, username: text })} />
 
       <Text>Email</Text>
-      <TextInput style={styles.input} placeholder="Enter your email" />
+      <TextInput style={styles.input} placeholder="Enter your email" value={form.email} onChangeText={(text) => setForm({ ...form, email: text })} />
 
-      <Text>Date of Birth</Text>
-      <TextInput style={styles.input} placeholder="DOB" keyboardType="number-pad" />
+      <Text>Age</Text>
+      <TextInput style={styles.input} placeholder="age" keyboardType="number-pad" value={form.dob} onChangeText={(text) => setForm({ ...form, dob: text })} />
 
-      {/* Height & Weight in Two Columns */}
       <View style={styles.row}>
         <View style={styles.column}>
           <Text>Height</Text>
-          <TextInput style={styles.input} placeholder="in cm" keyboardType="number-pad" />
+          <TextInput style={styles.input} placeholder="in cm" keyboardType="number-pad" value={form.height} onChangeText={(text) => setForm({ ...form, height: text })} />
         </View>
         <View style={styles.column}>
           <Text>Weight</Text>
-          <TextInput style={styles.input} placeholder="in kg" keyboardType="number-pad" />
+          <TextInput style={styles.input} placeholder="in kg" keyboardType="number-pad" value={form.weight} onChangeText={(text) => setForm({ ...form, weight: text })} />
         </View>
       </View>
 
-      {/* Gender Selection with Radio Buttons */}
       <Text>Gender</Text>
-      <View style={styles.radioGroup}>
-        <View style={styles.radioOption}>
-          <RadioButton
-            value="male"
-            status={gender === 'male' ? 'checked' : 'unchecked'}
-            onPress={() => setGender('male')}
-          />
-          <Text>Male</Text>
-        </View>
-        <View style={styles.radioOption}>
-          <RadioButton
-            value="female"
-            status={gender === 'female' ? 'checked' : 'unchecked'}
-            onPress={() => setGender('female')}
-          />
-          <Text>Female</Text>
-        </View>
-      </View>
+      <TextInput style={styles.input} placeholder="Enter gender" value={form.gender} onChangeText={(text) => setForm({ ...form, gender: text })} />
 
       <Text>Password</Text>
-      <TextInput style={styles.input} placeholder="Enter password" secureTextEntry />
+      <TextInput style={styles.input} placeholder="Enter password" secureTextEntry value={form.password} onChangeText={(text) => setForm({ ...form, password: text })} />
 
       <Text>Confirm Password</Text>
-      <TextInput style={styles.input} placeholder="Confirm password" secureTextEntry />
+      <TextInput style={styles.input} placeholder="Confirm password" secureTextEntry value={form.confirmPassword} onChangeText={(text) => setForm({ ...form, confirmPassword: text })} />
 
-      {/* Terms and Conditions Checkbox */}
       <View style={styles.termsContainer}>
         <TouchableOpacity style={styles.checkbox}></TouchableOpacity>
         <Text style={styles.termsText}>By checking the box you agree to our <Text style={styles.termsLink}>Terms and Conditions.</Text></Text>
       </View>
 
-      {/* Register Button */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={onRegisterPress}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
 
-      {/* Login Link */}
       <Link href="/(auth)/login">
         <Text style={styles.link}>Already a member? <Text style={styles.loginText}>Login</Text></Text>
       </Link>
     </SafeAreaView>
   );
 };
+
+export default Register;
+
+
+
 
 const { width } = Dimensions.get('window'); // Get screen width
 
@@ -181,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Register;
+

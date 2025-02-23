@@ -1,36 +1,36 @@
 import apiHandler from "./APIHandler";
 import * as SecureStore from "expo-secure-store";
 
-export const loginUser = async (email: string, password: string) => {
-  try {
-    console.log("user_login", email, password);
-    const response = await apiHandler.post("/auth/login", {
-      email,
-      password
-    });
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    return {
-      status: 400,
-      message: "Login failed."
-    };
-  }
-};
+// export const loginUser = async (email: string, password: string) => {
+//   try {
+//     console.log("user_login", email, password);
+//     const response = await apiHandler.post("/auth/login", {
+//       email,
+//       password
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error(error);
+//     return {
+//       status: 400,
+//       message: "Login failed."
+//     };
+//   }
+// };
 
 export const registerUser = async (
-  name: string,
+  username: string,
   email: string,
   dob: number,
-  height: number,
   weight: number,
+  height: number,
   gender: string,
   password: string,
   confirmPassword: string
 ) => {
   try {
     const response = await apiHandler.post("/auth/register", {
-      name,
+      username,
       email,
       dob,
       height,
@@ -89,17 +89,5 @@ export const workoutPlan = async () => {
     return { status: 400, message: "Error fetching user details." };
   }
 };
-export const createRoutine = async(name:string)=>{
-  try {
-    const response = await apiHandler.post("/user/workout-plans", {
-      name
-    });
-    return response.data;
-  } catch (error) {
-    return{
-      status: 500,
-      message:"workout plan creation failed."
-    }
-  }
-}
+
   

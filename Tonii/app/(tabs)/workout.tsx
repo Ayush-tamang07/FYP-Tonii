@@ -59,7 +59,8 @@ const Workout = () => {
           <Text style={styles.newRoutineButtonText}> New Routine</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.exploreButton]}>
+        <TouchableOpacity style={[styles.button, styles.exploreButton]}
+        onPress={() => router.replace("../(workout)/explore")}>
           <Ionicons name="search-outline" size={18} color="black" />
           <Text style={styles.exploreText}> Explore</Text>
         </TouchableOpacity>

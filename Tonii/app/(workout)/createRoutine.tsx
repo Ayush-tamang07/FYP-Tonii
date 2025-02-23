@@ -1,28 +1,49 @@
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import apiHandler from "@/context/APIHandler";
+import * as SecureStore from "expo-secure-store";
 
 const CreateRoutine = () => {
-  const navigation = useNavigation();
   const [title, setTitle] = useState("");
+
+  const handleSave = async () => {
+    if(!title){
+      Alert.alert("Error", "Please enter a routine title");
+    }
+   
+    try {
+      const token = await SecureStore.getItemAsync("AccessToken"); // Replace with your access token
+      const result = await apiHandler.post("/user/workout-plans",
+        {
+          name: title
+        },
+        {
+          headers:{
+            "Authorization":`Bearer ${token}`,
+            "Content-Type":"application/json"
+          }
+        }
+      );
+      if(result.status === 201) {
+        
+      }
+      router.push("../(tabs)/workout");
+    } catch (error) {
+      console.log("error",error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header with Cancel & Save */}
+      {/* Header with Back Icon & Save */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>router.push("../(tabs)/workout")}>
-          <Text style={styles.cancelText}>Cancel</Text>
+        <TouchableOpacity onPress={() => router.push("../(tabs)/workout")}>
+          <Ionicons name="arrow-back" size={24} color="#3498db" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Routine</Text>
-        <TouchableOpacity onPress={() => console.log("Save pressed")}>
+        <TouchableOpacity onPress={handleSave}>
           <Text style={styles.saveText}>Save</Text>
         </TouchableOpacity>
       </View>
