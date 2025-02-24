@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { FaUsers, FaDumbbell, FaComment } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { FaUsers, FaDumbbell, FaComment } from "react-icons/fa";
 
 function DashboardContent() {
   const [userCount, setUserCount] = useState(0);
@@ -8,19 +8,30 @@ function DashboardContent() {
   const [feedbackCount, setFeedbackCount] = useState(0);
 
   useEffect(() => {
+    const token = localStorage.getItem("token"); // Get token
     // Fetch user count
-    axios.get('http://localhost:5500/api/admin/readUser')
-      .then(response => setUserCount(response.data.length))
-      .catch(error => console.error('Error fetching user count:', error));
+    // Fetch user count
+    axios
+      .get("http://localhost:5500/api/admin/readUser", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setUserCount(response.data.users.length); // Corrected from response.data.length
+      })
+      .catch((error) => console.error("Error fetching user count:", error));
 
     // Fetch exercise count
-    axios.get('http://localhost:5500/api/exercise')
-      .then(response => setExerciseCount(response.data.count))
-      .catch(error => console.error('Error fetching exercise count:', error));
+    axios
+      .get("http://localhost:5500/api/exercise")
+      .then((response) => setExerciseCount(response.data.count))
+      .catch((error) => console.error("Error fetching exercise count:", error));
 
-    axios.get('http://localhost:5500/api/admin/readfeedback')
-      .then(response => setFeedbackCount(response.data.length))
-      .catch(error => console.error('Error fetching feedback count:', error));
+    axios
+      .get("http://localhost:5500/api/admin/readfeedback")
+      .then((response) => setFeedbackCount(response.data.length))
+      .catch((error) => console.error("Error fetching feedback count:", error));
   }, []);
 
   return (
