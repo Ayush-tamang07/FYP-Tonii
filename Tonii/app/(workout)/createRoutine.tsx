@@ -69,7 +69,10 @@ const CreateRoutine = () => {
       </View>
 
       {/* Add Exercise Button */}
-      <TouchableOpacity style={styles.addButton} onPress={() => console.log("Add Exercise")}>
+      <TouchableOpacity style={styles.addButton}
+      //  onPress={() => console.log("Add Exercise")}
+      onPress={() => router.push("../(workout)/addExercise")}
+       >
         <Text style={styles.addButtonText}>+ Add exercise</Text>
       </TouchableOpacity>
     </View>

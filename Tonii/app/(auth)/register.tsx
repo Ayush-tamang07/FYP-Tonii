@@ -5,6 +5,7 @@ import { Text, TextInput, View, StyleSheet, TouchableOpacity, SafeAreaView, Dime
 import apiHandler from '@/context/APIHandler';
 import axios from 'axios';
 // import * as SecureStore from "expo-secure-store";
+import Toast from "react-native-toast-message";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -20,15 +21,42 @@ const Register = () => {
 
   const onRegisterPress = async () => {
     if (!form.email || !form.password || !form.username || !form.weight || !form.dob || !form.height || !form.gender || !form.confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields");
+      // Alert.alert("Error", "Please fill in all fields");
+      Toast.show({
+        type: "error",
+        text1: "Validation Error",
+        text2: "Please fill in all fields",
+      });
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const allowedDomains = ["gmail.com"];
+    const emailParts = form.email.split("@");
+    
+    if (
+      emailParts.length !== 2 || 
+      !emailRegex.test(form.email) || 
+      !allowedDomains.includes(emailParts[1].toLowerCase()) // Case insensitive check
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Validation Error",
+        text2: "Please use an email with an allowed domain",
+      });
+      return;
+    }
+    
     const payload = { username: form.username, email: form.email, password: form.password, weight: form.weight, dob: form.dob, height: form.height, gender: form.gender, confirmPassword: form.confirmPassword }
     console.log(payload)
     try {
       const result = await apiHandler.post("/auth/register", payload);
       if (result?.status === 201) {
-        Alert.alert("Registration Successful", "You have been registered successfully. Please login.");
+        Toast.show({
+          type: "success",
+          text1: "Registration Successful",
+          text2: "You have been registered successfully. Please login.",
+        });
+        // Alert.alert("Registration Successful", "You have been registered successfully. Please login.");
         router.push("../(auth)/login");
       } else if (result?.status === 409) {
         Alert.alert("Error", "This email is already registered. Please login instead.");
@@ -99,9 +127,6 @@ const Register = () => {
 };
 
 export default Register;
-
-
-
 
 const { width } = Dimensions.get('window'); // Get screen width
 
