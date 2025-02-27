@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-const exercises = [
+interface Exercise {
+  name: string;
+  muscle: string;
+  image: string;
+}
+
+const exercises: Exercise[] = [
   { 
     name: "Bench Press", 
     muscle: "Chest", 
@@ -36,13 +42,24 @@ const exercises = [
   },
 ];
 
-const AddExercise = () => {
+const AddExercise: React.FC = () => {
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+
+  const toggleSelection = (exerciseName: string) => {
+    setSelectedExercises((prevSelected) => {
+      if (prevSelected.includes(exerciseName)) {
+        return prevSelected.filter((name) => name !== exerciseName);
+      } else {
+        return [...prevSelected, exerciseName];
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
-      {/* Top Navigation */}
       <View style={styles.topButtons}>
-        <TouchableOpacity onPress={() => router.push("/(workout)/createRoutine")}>
-          <Ionicons name="arrow-back" size={24} color="#3498db" />
+        <TouchableOpacity onPress={() => router.push("/(workout)/createRoutine")}> 
+          <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add Exercise</Text>
         <TouchableOpacity>
@@ -50,14 +67,12 @@ const AddExercise = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Search Bar */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search exercise"
         placeholderTextColor="#888"
       />
 
-      {/* Filter Buttons */}
       <View style={styles.filterButtons}>
         <TouchableOpacity style={styles.filterButton}>
           <Text style={styles.filterText}>All Equipment</Text>
@@ -67,100 +82,61 @@ const AddExercise = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Exercise List */}
       <FlatList
         data={exercises}
         keyExtractor={(item) => item.name}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.exerciseItem}>
-            <Image source={{ uri: item.image }} style={styles.exerciseImage} />
-            <View style={styles.exerciseInfo}>
-              <Text style={styles.exerciseName}>{item.name}</Text>
-              <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
-            </View>
-            <Ionicons name="arrow-forward" size={20} color="#888" />
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          const isSelected = selectedExercises.includes(item.name);
+          return (
+            <TouchableOpacity 
+              style={[styles.exerciseItem, isSelected && styles.selectedExercise]} 
+              onPress={() => toggleSelection(item.name)}
+            >
+              <View style={[styles.selectionIndicator, isSelected && styles.selectedIndicator]} />
+              <Image source={{ uri: item.image }} style={styles.exerciseImage} />
+              <View style={styles.exerciseInfo}>
+                <Text style={styles.exerciseName}>{item.name}</Text>
+                <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
+              </View>
+              {isSelected ? (
+                <Ionicons name="checkmark-circle" size={24} color="#FF6909" />
+              ) : (
+                <Ionicons name="arrow-forward" size={20} color="#888" />
+              )}
+            </TouchableOpacity>
+          );
+        }}
       />
+
+      {selectedExercises.length > 0 && (
+        <TouchableOpacity style={styles.addButton}>
+          <Text style={styles.addButtonText}>Add {selectedExercises.length} exercises</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff', 
-    padding: 20,
-  },
-  topButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    paddingVertical: 10,
-  },
-  createText: {
-    color: '#007BFF',
-    fontSize: 18,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  searchInput: {
-    backgroundColor: '#f0f0f0',
-    color: '#333',
-    padding: 10,
-    borderRadius: 8,
-    fontSize: 16,
-    marginVertical: 10,
-  },
-  filterButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  filterButton: {
-    backgroundColor: '#e0e0e0',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-  filterText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  exerciseItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-    borderRadius: 10,
-    marginVertical: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2, // For Android shadow
-  },
-  exerciseImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  exerciseInfo: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  exerciseName: {
-    fontSize: 18,
-    color: '#333',
-  },
-  exerciseMuscle: {
-    fontSize: 14,
-    color: '#666',
-  },
+  container: { flex: 1, backgroundColor: '#fff', padding: 20 },
+  topButtons: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingVertical: 10 },
+  cancelText: { color: '#FF6909', fontSize: 18 },
+  createText: { color: '#FF6909', fontSize: 18 },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#000' },
+  searchInput: { backgroundColor: '#f0f0f0', color: '#000', padding: 10, borderRadius: 8, fontSize: 16, marginVertical: 10 },
+  filterButtons: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  filterButton: { backgroundColor: '#e0e0e0', paddingVertical: 10, paddingHorizontal: 15, borderRadius: 8 },
+  filterText: { fontSize: 16, color: '#000' },
+  exerciseItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9f9f9', padding: 10, borderRadius: 10, marginVertical: 5 },
+  selectedExercise: { backgroundColor: '#FFD8B5' },
+  selectionIndicator: { width: 4, height: '100%', backgroundColor: 'transparent', marginRight: 10 },
+  selectedIndicator: { backgroundColor: '#FF6909' },
+  exerciseImage: { width: 50, height: 50, borderRadius: 25 },
+  exerciseInfo: { flex: 1, marginLeft: 10 },
+  exerciseName: { fontSize: 18, color: '#000' },
+  exerciseMuscle: { fontSize: 14, color: '#666' },
+  addButton: { backgroundColor: '#FF6909', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
+  addButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 });
 
 export default AddExercise;
