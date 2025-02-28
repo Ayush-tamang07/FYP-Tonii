@@ -1,11 +1,13 @@
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
-import { Text, TextInput, View, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, Alert } from 'react-native';
+import { Text, TextInput, View, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions, Alert, Pressable } from 'react-native';
 // import { registerUser } from '../../context/userAPI';
 import apiHandler from '@/context/APIHandler';
 import axios from 'axios';
 // import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
+// import DateTimePicker
+import DateTimePicker from "@react-native-community/datetimepicker"
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -18,6 +20,22 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+  const [date, setDate] = useState<Date>(new Date());
+  const [showPicker, setShowPicker] = useState<boolean>(false); // Initially hidden
+  
+  const toogleDatepicker = () => {
+    setShowPicker(!showPicker);
+  };
+  
+  const onChange = (event: unknown, selectedDate?: Date) => {
+    if (selectedDate) {
+      setDate(selectedDate);
+      setForm({ ...form, dob: selectedDate.toISOString().split("T")[0] }); // Format as YYYY-MM-DD
+    }
+    setShowPicker(false); // Hide picker after selection
+  };
+  
+
 
   const onRegisterPress = async () => {
     if (!form.email || !form.password || !form.username || !form.weight || !form.dob || !form.height || !form.gender || !form.confirmPassword) {
@@ -32,10 +50,10 @@ const Register = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const allowedDomains = ["gmail.com"];
     const emailParts = form.email.split("@");
-    
+
     if (
-      emailParts.length !== 2 || 
-      !emailRegex.test(form.email) || 
+      emailParts.length !== 2 ||
+      !emailRegex.test(form.email) ||
       !allowedDomains.includes(emailParts[1].toLowerCase()) // Case insensitive check
     ) {
       Toast.show({
@@ -45,7 +63,7 @@ const Register = () => {
       });
       return;
     }
-    
+
     const payload = { username: form.username, email: form.email, password: form.password, weight: form.weight, dob: form.dob, height: form.height, gender: form.gender, confirmPassword: form.confirmPassword }
     console.log(payload)
     try {
@@ -87,13 +105,52 @@ const Register = () => {
       <Text>Email</Text>
       <TextInput style={styles.input} placeholder="Enter your email" value={form.email} onChangeText={(text) => setForm({ ...form, email: text })} />
 
-      <Text>Age</Text>
-      <TextInput style={styles.input} placeholder="age" keyboardType="number-pad" value={form.dob} onChangeText={(text) => setForm({ ...form, dob: text })} />
+      {/* <Text>Age</Text>
+      <TextInput style={styles.input} placeholder="age" keyboardType="number-pad" value={form.dob} onChangeText={(text) => setForm({ ...form, dob: text })} /> */}
+
+      {/* {showPicker && (
+        <DateTimePicker
+          mode='date'
+          display='spinner'
+          value={date}
+          onChange={onChange}
+        />
+      )}
+
+      {!showPicker && (
+        <Pressable
+          onPress={toogleDatepicker}>
+          <TextInput style={styles.input} placeholder="Sat Aug 21 2004" keyboardType="number-pad" value={form.dob}
+          // onChangeText={setDateOfBirth} 
+          editable={false}
+          />
+        </Pressable>
+      )} */}
+      <Text>Date of Birth</Text>
+      <Pressable onPress={toogleDatepicker}>
+        <TextInput
+          style={styles.input}
+          placeholder="Select Date of Birth"
+          value={form.dob}
+          editable={false} // Prevent manual typing
+        />
+      </Pressable>
+
+      {showPicker && (
+        <DateTimePicker
+          mode="date"
+          display="spinner"
+          value={date}
+          onChange={onChange}
+          maximumDate={new Date()}
+        />
+      )}
+
 
       <View style={styles.row}>
         <View style={styles.column}>
           <Text>Height</Text>
-          <TextInput style={styles.input} placeholder="in cm" keyboardType="number-pad" value={form.height} onChangeText={(text) => setForm({ ...form, height: text })} />
+          <TextInput style={styles.input} placeholder="in cm"  keyboardType="number-pad" value={form.height} onChangeText={(text) => setForm({ ...form, height: text })} />
         </View>
         <View style={styles.column}>
           <Text>Weight</Text>
