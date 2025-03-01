@@ -5,7 +5,7 @@ import {
   muscleOptions,
   difficultyOptions,
   categoryOptions,
-  equipmentOptions
+  equipmentOptions,
 } from "../data/exerciseOption.js";
 
 function ExerciseContent() {
@@ -430,14 +430,44 @@ function ExerciseContent() {
                 </option>
               ))}
             </select>
-            <input
+
+            {/*  */}
+            {/* <select
+              name="equipment"
+              value={filters.equipment}
+              onChange={handleFilterChange}
+              className="border p-2 mb-2"
+            >
+              <option value="">Equipment</option>
+              {equipmentOptions.map((equipment) => (
+                <option key={equipment} value={equipment}>
+                  {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
+                </option>
+              ))}
+            </select> */}
+            {/*  */}
+            <select
+              name="equipment"
+              value={newExercise.equipment}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-2"
+            >
+              <option value="">Equipment</option>
+              {equipmentOptions.map((equipment) => (
+                <option key={equipment} value={equipment}>
+                  {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
+                </option>
+              ))}
+            </select>
+            {/* <input
               type="text"
               name="equipment"
               placeholder="Equipment"
               value={newExercise.equipment}
               onChange={handleInputChange}
               className="border p-2 w-full mb-2"
-            />
+            /> */}
+
             <textarea
               name="instructions"
               placeholder="Instructions"

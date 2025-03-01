@@ -44,5 +44,11 @@ export const typeOptions = [
     "dumbbell",
     "machine",
     "body_only",
+    "kettlebells",
+    "e-z_curl_bar",
+    "cable",
+    "other",
+    "none",
+    "bands"
   ]
   
