@@ -531,14 +531,19 @@ function ExerciseContent() {
                 </option>
               ))}
             </select>
-            <input
-              type="text"
-              name="equipment"
-              placeholder="Equipment"
-              value={editExercise.equipment}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            />
+            <select
+                name="equipment"
+                value={editExercise.equipment}
+                onChange={handleEditInputChange}
+                className="border p-2 w-full mb-2"
+              >
+                <option value="">Equipment</option>
+                {equipmentOptions.map((equipment) => (
+                  <option key={equipment} value={equipment}>
+                    {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
+                  </option>
+                ))}
+              </select>
             <select
               name="difficulty"
               value={editExercise.difficulty}
