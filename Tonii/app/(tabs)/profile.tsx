@@ -9,7 +9,7 @@ const Profile = () => {
     username: '',
     email: '',
     weight: '',
-    age: '',
+    dob: '',
     height: '',
     gender: '',
   });
@@ -25,16 +25,17 @@ const Profile = () => {
           username: data.username || '',
           email: data.email || '',
           weight: data.weight ? data.weight.toString() : '',
-          age: data.age ? data.age.toString() : '',
+          dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '', // Extracting only the date
           height: data.height ? data.height.toString() : '',
           gender: data.gender || '',
         });
       }
       setLoading(false);
     };
-
+  
     fetchUserData();
   }, []);
+  
 
   if (loading) {
     return (
@@ -74,7 +75,7 @@ const Profile = () => {
       <View style={styles.rowContainer}>
         <View style={styles.box}>
           <Text style={styles.label}>Age</Text>
-          <TextInput style={styles.inputBox} value={user.age} editable={false} />
+          <TextInput style={styles.inputBox} value={user.dob} editable={false} />
         </View>
         <View style={styles.box}>
           <Text style={styles.label}>Weight</Text>

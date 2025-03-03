@@ -149,6 +149,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 10 // Adds spacing between buttons
   },
+    filterButton: {
+    backgroundColor: '#e0e0e0',
+    paddingVertical: 10, paddingHorizontal: 15, borderRadius: 8
+  },
 });
 
 export default AddExercise;
