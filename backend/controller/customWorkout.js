@@ -56,7 +56,7 @@ const createUserWorkoutPlan = async (req, res) => {
   try {
     const { name } = req.body;
     const userId = req.user.userId; // Get user ID from authentication middleware
-
+    console.log(userId);
     if (!name) {
       return res.status(400).json({
         success: false,

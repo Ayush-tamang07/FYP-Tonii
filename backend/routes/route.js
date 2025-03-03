@@ -16,7 +16,6 @@ router.post("/logout", authController.logout)
 router.put("/user/:id", authController.updateUserDetails)
 
 // Admin Authentication routes
-// router.post("/admin/register", authController.adminRegister)
 // router.post("/admin/login", authController.loginAdmin)
 
 // password reset

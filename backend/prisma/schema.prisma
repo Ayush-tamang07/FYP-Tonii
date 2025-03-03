@@ -14,67 +14,64 @@ datasource db {
 }
 
 model User {
-  id        Int          @id @default(autoincrement())
-  username  String       @unique
-  email     String       @unique
-  weight    Int?         // Optional field
-  age       Int?         // Optional field
-  height    Int?         // Optional field
-  gender    String?      // Optional field
-  password  String
-  role      String       @default("user")
+  id       Int      @id @default(autoincrement())
+  username String
+  email    String   @unique
+  weight   Decimal  @db.Decimal(5, 2)
+  dob      DateTime? @db.Date @default("1970-01-01T00:00:00.000Z")
+  height   Int
+  gender   String
+  password String
+  role     String   @default("user")
 
   workoutPlans WorkoutPlan[] // A user can have many workout plans, no foreign key in User
-  feedbacks    Feedback[]    // A user can have many feedback entries
+  feedbacks    Feedback[] // A user can have many feedback entries
 }
 
 model WorkoutPlan {
-  id             Int                   @id @default(autoincrement())
-  name           String
-  createdByAdmin Boolean               @default(false)
+  id               Int                   @id @default(autoincrement())
+  name             String
+  createdByAdmin   Boolean               @default(false)
   assignedToUserId Int?
-  user           User?                  @relation(fields: [assignedToUserId], references: [id])
-  exercises      WorkoutPlanExercise[]  
-  createdAt      DateTime               @default(now())
+  user             User?                 @relation(fields: [assignedToUserId], references: [id])
+  exercises        WorkoutPlanExercise[]
+  createdAt        DateTime              @default(now())
 }
 
 model WorkoutPlanExercise {
-  id           Int        @id @default(autoincrement())
-  workoutPlanId Int       
-  exerciseId    Int       
-  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade) // ✅ Apply cascade here
-  exercise      Exercise    @relation(fields: [exerciseId], references: [id])
-  sets          WorkoutSet[]  
+  id            Int          @id @default(autoincrement())
+  workoutPlanId Int
+  exerciseId    Int
+  workoutPlan   WorkoutPlan  @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade) // ✅ Apply cascade here
+  exercise      Exercise     @relation(fields: [exerciseId], references: [id])
+  sets          WorkoutSet[]
 }
 
 model WorkoutSet {
-  id                 Int      @id @default(autoincrement())
-  workoutPlanExerciseId Int  
-  workoutPlanExercise  WorkoutPlanExercise @relation(fields: [workoutPlanExerciseId], references: [id], onDelete: Cascade) // ✅ Apply cascade here
-  reps               Int      
-  weight             Float    
+  id                    Int                 @id @default(autoincrement())
+  workoutPlanExerciseId Int
+  workoutPlanExercise   WorkoutPlanExercise @relation(fields: [workoutPlanExerciseId], references: [id], onDelete: Cascade) // ✅ Apply cascade here
+  reps                  Int
+  weight                Float
 }
 
-
 model Exercise {
-  id          Int      @id @default(autoincrement())
-  name        String
-  type        String
-  muscle      String
-  equipment   String
-  difficulty  String
-  category    String @default("Uncategorized")
-  instructions String @db.Text
+  id           Int                   @id @default(autoincrement())
+  name         String
+  type         String
+  muscle       String
+  equipment    String
+  difficulty   String
+  category     String                @default("Uncategorized")
+  instructions String                @db.Text
   workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans, no foreign key in Exercise
 }
 
 model Feedback {
-  id           Int      @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   feedback_type String
-  description  String   @db.Text
-  userId       Int
-  user         User     @relation(fields: [userId], references: [id])
-  createdAt    DateTime @default(now())
+  description   String   @db.Text
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
 }
-
-

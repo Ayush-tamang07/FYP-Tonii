@@ -27,7 +27,6 @@ const addExercise = async (req, res) => {
         .status(400)
         .json({ success: false, message: "All fields are required." });
     }
-s
     // Check if the exercise already exists
     const existingExercise = await prisma.exercise.findFirst({
       where: {
