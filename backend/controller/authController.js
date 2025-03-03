@@ -282,7 +282,7 @@ const readUser = async (req, res) => {
         username: true,
         email: true,
         weight: true,
-        age: true,
+        dob: true,
         height: true,
         gender: true,
       },

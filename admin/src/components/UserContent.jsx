@@ -21,7 +21,7 @@ function UserContent() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }) 
+      })
       .then((response) => {
         setUsers(response.data.users); // Fix: Store array of users correctly
         setLoading(false);
@@ -45,17 +45,19 @@ function UserContent() {
                 {/* <th className="border p-2">ID</th> */}
                 <th className="border p-2">Name</th>
                 <th className="border p-2">Email</th>
-                <th className="border p-2">Age</th>
+                <th className="border p-2">DOB</th>
                 <th className="border p-2">Gender</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => ( // Fix: Iterate over the array properly
+              {users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-100">
-                  {/* <td className="border p-2">{user.id}</td> */}
                   <td className="border p-2">{user.username}</td>
                   <td className="border p-2">{user.email}</td>
-                  <td className="border p-2">{user.age}</td>
+                  <td className="border p-2">
+                    {new Date(user.dob).toISOString().split("T")[0]}{" "}
+                    {/* Extract only date */}
+                  </td>
                   <td className="border p-2">{user.gender}</td>
                 </tr>
               ))}

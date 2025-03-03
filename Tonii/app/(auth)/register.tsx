@@ -39,7 +39,6 @@ const Register = () => {
 
   const onRegisterPress = async () => {
     if (!form.email || !form.password || !form.username || !form.weight || !form.dob || !form.height || !form.gender || !form.confirmPassword) {
-      // Alert.alert("Error", "Please fill in all fields");
       Toast.show({
         type: "error",
         text1: "Validation Error",
@@ -47,14 +46,15 @@ const Register = () => {
       });
       return;
     }
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const allowedDomains = ["gmail.com"];
     const emailParts = form.email.split("@");
-
+  
     if (
       emailParts.length !== 2 ||
       !emailRegex.test(form.email) ||
-      !allowedDomains.includes(emailParts[1].toLowerCase()) // Case insensitive check
+      !allowedDomains.includes(emailParts[1].toLowerCase()) 
     ) {
       Toast.show({
         type: "error",
@@ -63,9 +63,23 @@ const Register = () => {
       });
       return;
     }
-
-    const payload = { username: form.username, email: form.email, password: form.password, weight: form.weight, dob: form.dob, height: form.height, gender: form.gender, confirmPassword: form.confirmPassword }
-    console.log(payload)
+  
+    // Convert DOB to a valid JavaScript Date object
+    const formattedDOB = new Date(form.dob).toISOString(); // Ensure ISO format
+  
+    const payload = { 
+      username: form.username, 
+      email: form.email, 
+      password: form.password, 
+      weight: parseFloat(form.weight), // Ensure it's a number
+      dob: formattedDOB, // Properly formatted DOB
+      height: parseInt(form.height), // Ensure integer
+      gender: form.gender, 
+      confirmPassword: form.confirmPassword 
+    };
+  
+    console.log(payload);
+  
     try {
       const result = await apiHandler.post("/auth/register", payload);
       if (result?.status === 201) {
@@ -74,14 +88,13 @@ const Register = () => {
           text1: "Registration Successful",
           text2: "You have been registered successfully. Please login.",
         });
-        // Alert.alert("Registration Successful", "You have been registered successfully. Please login.");
         router.push("../(auth)/login");
       } else if (result?.status === 409) {
         Alert.alert("Error", "This email is already registered. Please login instead.");
       } else {
         Alert.alert("Error", result.data?.message || "Invalid credentials");
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         Alert.alert("Registration Failed", error.response.data?.error || "An unexpected error occurred.");
       } else if (error instanceof Error) {
@@ -90,8 +103,8 @@ const Register = () => {
         Alert.alert("Registration Failed", "An unknown error occurred.");
       }
     }
-  }
-
+  };
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
@@ -143,6 +156,9 @@ const Register = () => {
           value={date}
           onChange={onChange}
           maximumDate={new Date()}
+          textColor="#000"
+          themeVariant="light"
+          style={styles.picker}
         />
       )}
 
@@ -215,8 +231,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
-    width: "100%", // Make inputs responsive
-    backgroundColor: '#F5F5F5',
+    width: "100%",
+    backgroundColor: 'white',
   },
   row: {
     flexDirection: 'row',
@@ -282,6 +298,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  picker:{
+    backgroundColor:"white"
+  }
 });
 
 
