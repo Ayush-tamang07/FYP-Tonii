@@ -38,7 +38,7 @@ const userRegister = async (req, res) => {
         username,
         email,
         weight: parseFloat(weight),
-        age: age,
+        dob: dob,
         height: parseFloat(height),
         gender,
         password: hashedPassword,

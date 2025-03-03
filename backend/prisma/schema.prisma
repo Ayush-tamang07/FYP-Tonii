@@ -18,7 +18,7 @@ model User {
   username String
   email    String   @unique
   weight   Decimal  @db.Decimal(5, 2)
-  dob      DateTime? @db.Date @default("1970-01-01T00:00:00.000Z")
+  dob      DateTime @default(now())
   height   Int
   gender   String
   password String
