@@ -1,41 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import * as SecureStore from "expo-secure-store";
-import { userDetails } from '../../context/userAPI'; // Import the function
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
+import { fetchUserDetails } from '../../context/userAPI';
+import { router } from 'expo-router';
 
 const Profile = () => {
   const [user, setUser] = useState({
     username: '',
     email: '',
-    weight: '',
-    dob: '',
-    height: '',
-    gender: '',
   });
-
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
-      const data = await userDetails(); // Fetch user details
-      if (data && data.username) {
+      const data = await fetchUserDetails();
+      if (data) {
         setUser({
           username: data.username || '',
           email: data.email || '',
-          weight: data.weight ? data.weight.toString() : '',
-          dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '', // Extracting only the date
-          height: data.height ? data.height.toString() : '',
-          gender: data.gender || '',
         });
       }
       setLoading(false);
     };
-  
     fetchUserData();
   }, []);
-  
 
   if (loading) {
     return (
@@ -47,57 +36,35 @@ const Profile = () => {
 
   return (
     <View style={styles.container}>
-      {/* Profile Image and Name */}
       <View style={styles.profileHeader}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }}
-            style={styles.profileImage}
-          />
-          <TouchableOpacity style={styles.editIcon}>
-            <MaterialIcons name="edit" size={18} color="black" />
-          </TouchableOpacity>
-        </View>
+        <Image
+          source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }}
+          style={styles.profileImage}
+        />
         <Text style={styles.profileName}>{user.username}</Text>
+        <Text style={styles.profileEmail}>{user.email}</Text>
       </View>
-
-      {/* User Details */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Name</Text>
-        <TextInput style={styles.input} value={user.username} editable={false} />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput style={styles.input} value={user.email} editable={false} />
-      </View>
-
-      <View style={styles.rowContainer}>
-        <View style={styles.box}>
-          <Text style={styles.label}>Age</Text>
-          <TextInput style={styles.inputBox} value={user.dob} editable={false} />
-        </View>
-        <View style={styles.box}>
-          <Text style={styles.label}>Weight</Text>
-          <TextInput style={styles.inputBox} value={user.weight} editable={false} />
-        </View>
-      </View>
-
-      <View style={styles.rowContainer}>
-        <View style={styles.box}>
-          <Text style={styles.label}>Height</Text>
-          <TextInput style={styles.inputBox} value={user.height} editable={false} />
-        </View>
-        <View style={styles.box}>
-          <Text style={styles.label}>Gender</Text>
-          <TextInput style={styles.inputBox} value={user.gender} editable={false} />
-        </View>
-      </View>
+      
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/(profile)/userDetails")}>
+        <MaterialIcons name="edit" size={24} color="black" />
+        <Text style={styles.menuText}>Edit Profile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem}>
+        <Feather name="settings" size={24} color="black" />
+        <Text style={styles.menuText}>Settings</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem}>
+        <Feather name="message-square" size={24} color="black" />
+        <Text style={styles.menuText}>Feedback</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem}>
+        <MaterialIcons name="logout" size={24} color="red" />
+        <Text style={[styles.menuText, { color: "red" }]}>Log out</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -109,54 +76,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  imageContainer: {
-    position: 'relative',
-  },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
-  },
-  editIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 4,
-    elevation: 3,
   },
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 10,
   },
-  inputContainer: {
-    marginBottom: 10,
-  },
-  label: {
+  profileEmail: {
     fontSize: 14,
-    color: '#666',
+    color: "gray",
   },
-  input: {
-    backgroundColor: '#f5f5f5',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 4,
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "90%",
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
-  rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  box: {
-    width: '48%',
-  },
-  inputBox: {
-    backgroundColor: '#f5f5f5',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 4,
-    textAlign: 'center',
+  menuText: {
+    fontSize: 16,
+    marginLeft: 15,
   },
   loaderContainer: {
     flex: 1,

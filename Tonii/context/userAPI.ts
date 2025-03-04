@@ -49,7 +49,7 @@ export const registerUser = async (
   }
 };
 
-export const userDetails = async () => {
+export const fetchUserDetails = async () => {
   try {
     const token = await SecureStore.getItemAsync("AccessToken"); // Retrieve token
 

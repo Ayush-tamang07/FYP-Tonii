@@ -93,7 +93,7 @@ const Workout = () => {
                 </View>
 
                 {/* Start Routine Button */}
-                <TouchableOpacity style={styles.startButton}>
+                <TouchableOpacity style={styles.startButton} onPress={() => router.push("/(workout)/startWorkout")}>
                   <Text style={styles.startButtonText}>Start Routine</Text>
                 </TouchableOpacity>
               </View>
