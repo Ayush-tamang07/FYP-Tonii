@@ -52,11 +52,47 @@ const readExercise = async (req, res) => {
   }
 };
 
+// const createUserWorkoutPlan = async (req, res) => {
+//   try {
+//     const { name } = req.body;
+//     const userId = req.user.userId; // Get user ID from authentication middleware
+//     console.log(userId);
+//     if (!name) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Workout plan name is required.",
+//       });
+//     }
+
+//     // Create the workout plan for the logged-in user
+//     const workoutPlan = await prisma.workoutPlan.create({
+//       data: {
+//         name,
+//         createdByAdmin: false, // User-created
+//         assignedToUserId: userId, // Assigned to logged-in user
+//       },
+//     });
+
+//     res.status(201).json({
+//       success: true,
+//       success: true,
+//       message: "Workout plan created successfully.",
+//       data: workoutPlan,
+//     });
+//   } catch (error) {
+//     console.error("Error creating workout plan:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to create workout plan.",
+//       error: error.message,
+//     });
+//   }
+// };
 const createUserWorkoutPlan = async (req, res) => {
   try {
     const { name } = req.body;
     const userId = req.user.userId; // Get user ID from authentication middleware
-    console.log(userId);
+
     if (!name) {
       return res.status(400).json({
         success: false,
@@ -75,7 +111,6 @@ const createUserWorkoutPlan = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      success: true,
       message: "Workout plan created successfully.",
       data: workoutPlan,
     });
@@ -88,6 +123,8 @@ const createUserWorkoutPlan = async (req, res) => {
     });
   }
 };
+
+// module.exports = { createUserWorkoutPlan };
 
 
 const getUserWorkoutPlans = async (req, res) => {
@@ -144,6 +181,55 @@ const getUserWorkoutPlans = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch workout plans.",
+      error: error.message,
+    });
+  }
+};
+const getWorkoutPlanExercises = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const workoutPlanId = parseInt(req.params.planId);
+
+    if (isNaN(userId) || isNaN(workoutPlanId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID or workout plan ID.",
+      });
+    }
+
+    // Verify the workout plan belongs to the user
+    const workoutPlan = await prisma.workoutPlan.findUnique({
+      where: {
+        id: workoutPlanId,
+        assignedToUserId: userId,
+      },
+      include: {
+        exercises: {
+          include: {
+            exercise: true, // Include detailed exercise information
+          },
+        },
+      },
+    });
+
+    if (!workoutPlan) {
+      return res.status(404).json({
+        success: false,
+        message: "Workout plan not found or does not belong to user.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      workoutPlanId: workoutPlan.id,
+      workoutPlanName: workoutPlan.name,
+      exercises: workoutPlan.exercises,
+    });
+  } catch (error) {
+    console.error("Error fetching exercises for workout plan:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch exercises for workout plan.",
       error: error.message,
     });
   }
@@ -213,6 +299,56 @@ const getUserWorkoutPlans = async (req, res) => {
 //     );
 
 //     res.status(201).json(workoutPlanExercises);
+//   } catch (error) {
+//     console.error("Error adding exercises to workout plan:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+// const addExercisesToWorkoutPlan = async (req, res) => {
+//   try {
+//     const { workoutPlanId, exercises } = req.body;
+
+//     if (!workoutPlanId || !Array.isArray(exercises) || exercises.length === 0) {
+//       return res.status(400).json({
+//         error: "workoutPlanId is required, and exercises must be a non-empty array of exerciseId.",
+//       });
+//     }
+
+//     // Validate if workoutPlanId exists
+//     const workoutPlanExists = await prisma.workoutPlan.findUnique({
+//       where: { id: workoutPlanId },
+//     });
+
+//     if (!workoutPlanExists) {
+//       return res.status(404).json({ error: "Workout Plan not found" });
+//     }
+
+//     // Validate exercise IDs
+//     const validExerciseIds = exercises;
+//     const existingExercises = await prisma.exercise.findMany({
+//       where: { id: { in: validExerciseIds } },
+//       select: { id: true },
+//     });
+
+//     const existingExerciseIds = existingExercises.map((exercise) => exercise.id);
+
+//     // Check for invalid exercise IDs
+//     const invalidIds = validExerciseIds.filter((id) => !existingExerciseIds.includes(id));
+//     if (invalidIds.length > 0) {
+//       return res.status(400).json({
+//         error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
+//       });
+//     }
+
+//     // Add exercises to the workout plan
+//     const addedExercises = await prisma.workoutPlanExercise.createMany({
+//       data: exercises.map((exerciseId) => ({
+//         workoutPlanId,
+//         exerciseId,
+//       })),
+//     });
+
+//     res.status(201).json({ message: "Exercises added successfully", addedExercises });
 //   } catch (error) {
 //     console.error("Error adding exercises to workout plan:", error);
 //     res.status(500).json({ error: error.message });
@@ -433,5 +569,6 @@ module.exports = {
   removeExerciseFromWorkoutPlan,
   deleteWorkoutPlan,
   createWorkoutPlanWithExercises,
-  addExercisesToWorkoutPlan
+  addExercisesToWorkoutPlan,
+  getWorkoutPlanExercises
 };

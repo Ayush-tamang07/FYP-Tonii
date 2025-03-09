@@ -30,6 +30,8 @@ router.post("/calculate", calculate)
 router.get('/exercise',customWorkout.readExercise)
 router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan);  // Create workout plan
 router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  // Get user's workout plans
+router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorkout.getWorkoutPlanExercises);
+// router.get('/user/workout-plans',authMiddleware(), customWorkout.getWorkoutPlanExercises);  // Get user's workout plans
 // router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
