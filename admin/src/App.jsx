@@ -1,9 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Login, Dashboard, User, Exercise, Feedback, SideBar } from "./reference.js";
+import {
+  Login,
+  Dashboard,
+  User,
+  Exercise,
+  Feedback,
+  SideBar,
+} from "./reference.js";
 import Setting from "./pages/Setting.jsx";
 import WorkoutPlans from "./pages/WorkoutPlans.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
