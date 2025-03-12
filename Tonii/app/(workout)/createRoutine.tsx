@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { 
   View, Text, TextInput, TouchableOpacity, StyleSheet, 
-  Image, Alert, FlatList, ActivityIndicator 
+  Image, Alert, FlatList, ActivityIndicator, 
+  SafeAreaView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router"; // Restored Navigation
+import { router } from "expo-router";
 import apiHandler from "@/context/APIHandler";
 import * as SecureStore from "expo-secure-store";
 
@@ -20,8 +21,8 @@ const CreateRoutine: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [saving, setSaving] = useState<boolean>(false);
 
-  // Fetch exercises from API
   useEffect(() => {
     const fetchExercises = async () => {
       try {
@@ -36,7 +37,7 @@ const CreateRoutine: React.FC = () => {
     fetchExercises();
   }, []);
 
-  // Toggle exercise selection
+  // Toggle Exercise Selection
   const toggleSelection = (exerciseId: number) => {
     setSelectedExercises((prevSelected) =>
       prevSelected.includes(exerciseId)
@@ -45,7 +46,7 @@ const CreateRoutine: React.FC = () => {
     );
   };
 
-  // Handle Save Routine & Exercises Together
+  // Handle Routine Creation
   const handleSave = async () => {
     if (!title) {
       Alert.alert("Error", "Please enter a routine title");
@@ -56,47 +57,66 @@ const CreateRoutine: React.FC = () => {
       return;
     }
 
+    setSaving(true);
     try {
       const token = await SecureStore.getItemAsync("AccessToken");
-      const result = await apiHandler.post(
+
+      // Create workout plan
+      const response = await apiHandler.post(
         "/user/workout-plans",
-        {
-          name: title,
-          exercises: selectedExercises, // Send exercises with routine
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { name: title },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
 
-      if (result.status === 201) {
-        Alert.alert("Success", "Workout routine created successfully!");
+      const workoutPlanId = response.data?.data?.id;
+      if (!workoutPlanId) throw new Error("Workout Plan ID missing");
+
+      await addExercisesToWorkout(workoutPlanId);
+    } catch (error: any) {
+      Alert.alert("Error", error.response?.data?.message || "Failed to create workout plan.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Add Exercises to Workout Plan
+  const addExercisesToWorkout = async (workoutPlanId: number) => {
+    try {
+      const token = await SecureStore.getItemAsync("AccessToken");
+
+      const response = await apiHandler.post(
+        "/workout-plans/add-exercise",
+        { workoutPlanId, exercises: selectedExercises },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+
+      if (response.status === 201) {
+        Alert.alert("Success", "Workout routine and exercises saved!");
         setTitle("");
         setSelectedExercises([]);
-        router.push("../(tabs)/workout"); // Navigate back after saving
+        router.push("../(tabs)/workout");
+      } else {
+        Alert.alert("Error", "Failed to add exercises.");
       }
-    } catch (error) {
-      console.log("Error saving routine:", error);
+    } catch (error: any) {
+      Alert.alert("Error", "Could not add exercises to workout plan.");
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header with Back Icon & Save */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("../(tabs)/workout")}>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/workout")}>
           <Ionicons name="arrow-back" size={24} color="#3498db" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Routine</Text>
-        <TouchableOpacity onPress={handleSave}>
-          <Text style={styles.saveText}>Save ({selectedExercises.length})</Text>
+        <TouchableOpacity onPress={handleSave} disabled={saving}>
+          <Text style={styles.saveText}>
+            {saving ? "Saving..." : `Save (${selectedExercises.length})`}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Routine Title Input */}
       <TextInput
         style={styles.input}
         placeholder="Routine title"
@@ -105,19 +125,8 @@ const CreateRoutine: React.FC = () => {
         onChangeText={setTitle}
       />
 
-      {/* Filter Buttons */}
-      <View style={styles.filterButtons}>
-        <TouchableOpacity style={[styles.filterButton, { flex: 1 }]}>
-          <Text style={styles.filterText}>All Equipment</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.filterButton, { flex: 1 }]}>
-          <Text style={styles.filterText}>All Muscles</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Exercise List */}
       {loading ? (
-        <ActivityIndicator size="large" color="#FF6909" style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color="#3498db" />
       ) : (
         <FlatList
           data={exercises}
@@ -129,32 +138,21 @@ const CreateRoutine: React.FC = () => {
                 style={[styles.exerciseItem, isSelected && styles.selectedExercise]}
                 onPress={() => toggleSelection(item.id)}
               >
-                <View style={[styles.selectionIndicator, isSelected && styles.selectedIndicator]} />
                 <Image source={{ uri: item.image }} style={styles.exerciseImage} />
                 <View style={styles.exerciseInfo}>
                   <Text style={styles.exerciseName}>{item.name}</Text>
                   <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
                 </View>
-                {isSelected ? (
-                  <Ionicons name="checkmark-circle" size={24} color="#FF6909" />
-                ) : (
-                  <Ionicons name="arrow-forward" size={20} color="#888" />
-                )}
               </TouchableOpacity>
             );
           }}
         />
       )}
 
-      {/* {selectedExercises.length > 0 && (
-        <Text style={styles.selectedText}>
-          Selected Exercises: {selectedExercises.length}
+      <TouchableOpacity style={styles.addButton} onPress={handleSave} disabled={saving}>
+        <Text style={styles.addButtonText}>
+          {saving ? "Saving..." : `Save Routine (${selectedExercises.length})`}
         </Text>
-      )} */}
-
-      {/* Save Routine Button */}
-      <TouchableOpacity style={styles.addButton} onPress={handleSave}>
-        <Text style={styles.addButtonText}>Save Routine ({selectedExercises.length})</Text>
       </TouchableOpacity>
     </View>
   );
@@ -162,6 +160,7 @@ const CreateRoutine: React.FC = () => {
 
 export default CreateRoutine;
 
+// ✅ Styles
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 15 },
@@ -170,16 +169,10 @@ const styles = StyleSheet.create({
   input: { backgroundColor: "#F5F5F5", color: "#000", fontSize: 16, padding: 15, borderRadius: 8, marginVertical: 10 },
   exerciseItem: { flexDirection: "row", alignItems: "center", backgroundColor: "#f9f9f9", padding: 10, borderRadius: 10, marginVertical: 5 },
   selectedExercise: { backgroundColor: "#FFD8B5" },
-  selectionIndicator: { width: 4, height: "100%", backgroundColor: "transparent", marginRight: 10 },
-  selectedIndicator: { backgroundColor: "#FF6909" },
   exerciseImage: { width: 50, height: 50, borderRadius: 25 },
   exerciseInfo: { flex: 1, marginLeft: 10 },
-  exerciseName: { fontSize: 18, color: "#000" },
-  exerciseMuscle: { fontSize: 14, color: "#666" },
   addButton: { backgroundColor: "#FF6909", padding: 15, borderRadius: 10, alignItems: "center", marginTop: 10 },
   addButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  selectedText: { fontSize: 16, fontWeight: "bold", color: "#FF6909", textAlign: "center", marginVertical: 10 },
-  filterButtons: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10, gap: 10 },
-  filterButton: { backgroundColor: "#e0e0e0", paddingVertical: 10, paddingHorizontal: 15, borderRadius: 8 },
-  filterText: { fontSize: 16, color: "#000", textAlign: "center" },
+  exerciseName: { fontSize: 18, fontWeight: "bold", color: "#000" }, 
+  exerciseMuscle: { fontSize: 14, color: "#666" },
 });

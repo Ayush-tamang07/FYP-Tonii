@@ -89,5 +89,25 @@ export const workoutPlan = async () => {
     return { status: 400, message: "Error fetching user details." };
   }
 };
+export const getWorkoutById = async (id: string) => {
+  const token = await SecureStore.getItemAsync("AccessToken"); // Retrieve token
+
+  if (!token) {
+    return { status: 401, message: "Unauthorized: No token found" };
+  }
+  try {
+    const response = await fetch(`/user/workout-plans${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`, // Send token in headers
+      },
+    });
+    const data = await response.json();
+    return { status: response.status, data };
+  } catch (error) {
+    return { status: 500, error };
+  }
+};
+
 
   
