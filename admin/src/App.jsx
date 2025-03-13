@@ -11,6 +11,7 @@ import Setting from "./pages/Setting.jsx";
 import WorkoutPlans from "./pages/WorkoutPlans.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
+import WorkoutPlanDetails from "./components/WorkoutPlanDetails.jsx";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/workoutPlans" element={<WorkoutPlans />} />
           <Route path="/Sidebar" element={<SideBar />} />
           <Route path="/setting" element={<Setting />} />
+          <Route path="/workout-plans/:id" element={<WorkoutPlanDetails />} />
         </Route>
 
         {/* Redirect unmatched routes */}

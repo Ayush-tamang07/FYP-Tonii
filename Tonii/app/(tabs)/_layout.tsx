@@ -7,18 +7,18 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons"; // Import icons
 
 export default function TabLayout() {
-  const colorScheme = "light"; // Force light mode
+  const colorScheme = "light";
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#FF6909", // Orange active color
-        tabBarInactiveTintColor: "#000", // Black inactive color
+        // tabBarInactiveTintColor: "#000", // Black inactive color
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: "#fff", // Light background
-          borderTopWidth: 1,
+          // borderTopWidth: 1,
           borderTopColor: "#ddd", // Light gray border
           position: Platform.OS === "ios" ? "absolute" : "relative",
         },

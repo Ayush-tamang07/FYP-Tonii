@@ -26,6 +26,7 @@ model User {
 
   workoutPlans WorkoutPlan[] // A user can have many workout plans, no foreign key in User
   feedbacks    Feedback[] // A user can have many feedback entries
+  workoutProgress WorkoutProgress[]
 }
 
 model WorkoutPlan {
@@ -36,6 +37,7 @@ model WorkoutPlan {
   user             User?                 @relation(fields: [assignedToUserId], references: [id])
   exercises        WorkoutPlanExercise[]
   createdAt        DateTime              @default(now())
+  workoutProgress WorkoutProgress[]
 }
 
 model WorkoutPlanExercise {
@@ -75,3 +77,12 @@ model Feedback {
   user          User     @relation(fields: [userId], references: [id])
   createdAt     DateTime @default(now())
 }
+model WorkoutProgress {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Each progress belongs to a user
+  workoutPlanId Int
+  workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade) // Reference the workout plan
+  completedAt DateTime @default(now()) // Stores the date when the workout was completed
+}
+

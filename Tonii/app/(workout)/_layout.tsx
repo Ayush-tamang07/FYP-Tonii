@@ -18,7 +18,7 @@ const Layout = () => {
         <Stack.Screen  name="createRoutine" options={{ headerShown: false }}/>
         <Stack.Screen  name="explore" options={{ headerShown: false }}/>
         <Stack.Screen  name="addExercise" options={{ headerShown: false }}/>
-        {/* <Stack.Screen  name="startWorkout" options={{ headerShown: false }}/> */}
+        <Stack.Screen  name="startWorkout" options={{ headerShown: false }}/>
       </Stack>
       {/* <Toast /> */}
     </GestureHandlerRootView>

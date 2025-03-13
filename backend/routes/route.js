@@ -36,6 +36,7 @@ router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorko
 router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan); 
+router.post("/user/finish-workout", customWorkout.finishWorkout);
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
@@ -44,7 +45,7 @@ router.get("/admin/readUser", authMiddleware(), adminController.readUserDetailsB
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 router.get("/admin/readFeedback",adminController.readFeedback);
-
+ 
 // workout plan created by admin
 router.post("/admin/workout-plans",adminController.createAdminWorkoutPlan);
 router.get("/admin/workout-plans",adminController.getAdminWorkoutPlans);

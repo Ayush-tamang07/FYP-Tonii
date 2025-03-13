@@ -559,6 +559,40 @@ const createWorkoutPlanWithExercises = async (req, res) => {
   }
 };
 
+const finishWorkout = async (req, res) => {
+  try {
+    const { userId, workoutPlanId } = req.body; // Get userId and workoutPlanId from request
+
+    // Check if user already completed a workout today
+    const existingProgress = await prisma.workoutProgress.findFirst({
+      where: {
+        userId,
+        workoutPlanId,
+        completedAt: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0)), // Filter for today
+        },
+      },
+    });
+
+    if (existingProgress) {
+      return res.status(400).json({ success: false, message: "Workout already logged today" });
+    }
+
+    // Insert new workout progress record
+    const progress = await prisma.workoutProgress.create({
+      data: {
+        userId,
+        workoutPlanId,
+      },
+    });
+
+    res.status(200).json({ success: true, message: "Workout logged successfully!", progress });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 
 module.exports = {
@@ -570,5 +604,6 @@ module.exports = {
   deleteWorkoutPlan,
   createWorkoutPlanWithExercises,
   addExercisesToWorkoutPlan,
-  getWorkoutPlanExercises
+  getWorkoutPlanExercises,
+  finishWorkout
 };

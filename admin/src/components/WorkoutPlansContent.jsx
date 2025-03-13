@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const WorkoutPlansContent = () => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
@@ -7,6 +8,7 @@ const WorkoutPlansContent = () => {
   const [newWorkoutName, setNewWorkoutName] = useState("");
   const [exercises, setExercises] = useState([]);
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     fetchWorkoutPlans();
@@ -107,7 +109,8 @@ const WorkoutPlansContent = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 cursor-pointer">
           {workoutPlans.length > 0 ? (
             workoutPlans.map((plan) => (
-              <div key={plan.id} className="bg-white shadow-md rounded-lg p-6 flex flex-col space-y-2">
+              <div key={plan.id} className="bg-white shadow-md rounded-lg p-6 flex flex-col space-y-2"
+              onClick={() => navigate(`/workout-plans/${plan.id}`)} >
                 <h3 className="text-xl font-semibold">{plan.name}</h3>
                 <div className="flex justify-end space-x-4 mt-4">
                   <button className="text-blue-600 hover:underline">Edit</button>
