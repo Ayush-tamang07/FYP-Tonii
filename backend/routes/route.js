@@ -37,6 +37,7 @@ router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutP
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan); 
 router.post("/user/finish-workout", customWorkout.finishWorkout);
+router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise

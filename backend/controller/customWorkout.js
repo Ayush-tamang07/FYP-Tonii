@@ -126,7 +126,6 @@ const createUserWorkoutPlan = async (req, res) => {
 
 // module.exports = { createUserWorkoutPlan };
 
-
 const getUserWorkoutPlans = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -235,7 +234,6 @@ const getWorkoutPlanExercises = async (req, res) => {
   }
 };
 
- 
 // const addExerciseToWorkoutPlan = async (req, res) => {
 //   try {
 //     const { workoutPlanId, exercises } = req.body;
@@ -360,7 +358,8 @@ const addExercisesToWorkoutPlan = async (req, res) => {
 
     if (!workoutPlanId || !Array.isArray(exercises) || exercises.length === 0) {
       return res.status(400).json({
-        error: "workoutPlanId is required, and exercises must be a non-empty array of exerciseId.",
+        error:
+          "workoutPlanId is required, and exercises must be a non-empty array of exerciseId.",
       });
     }
 
@@ -380,10 +379,14 @@ const addExercisesToWorkoutPlan = async (req, res) => {
       select: { id: true },
     });
 
-    const existingExerciseIds = existingExercises.map((exercise) => exercise.id);
+    const existingExerciseIds = existingExercises.map(
+      (exercise) => exercise.id
+    );
 
     // Check for invalid exercise IDs
-    const invalidIds = validExerciseIds.filter((id) => !existingExerciseIds.includes(id));
+    const invalidIds = validExerciseIds.filter(
+      (id) => !existingExerciseIds.includes(id)
+    );
     if (invalidIds.length > 0) {
       return res.status(400).json({
         error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
@@ -398,14 +401,14 @@ const addExercisesToWorkoutPlan = async (req, res) => {
       })),
     });
 
-    res.status(201).json({ message: "Exercises added successfully", addedExercises });
+    res
+      .status(201)
+      .json({ message: "Exercises added successfully", addedExercises });
   } catch (error) {
     console.error("Error adding exercises to workout plan:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 // Remove an exercise from a workout plan
 // const removeExerciseFromWorkoutPlan = async (req, res) => {
@@ -501,12 +504,19 @@ const deleteWorkoutPlan = async (req, res) => {
     const { userId, userRole } = req.body; // Receive user ID & role from frontend
 
     if (!workoutPlanId || !userId) {
-      return res.status(400).json({ success: false, message: "Workout Plan ID and User ID are required." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Workout Plan ID and User ID are required.",
+        });
     }
 
     const planId = parseInt(workoutPlanId);
     if (isNaN(planId)) {
-      return res.status(400).json({ success: false, message: "Invalid Workout Plan ID." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Workout Plan ID." });
     }
 
     // Fetch the workout plan
@@ -515,12 +525,22 @@ const deleteWorkoutPlan = async (req, res) => {
     });
 
     if (!workoutPlan) {
-      return res.status(404).json({ success: false, message: "Workout Plan not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Workout Plan not found." });
     }
 
     // ✅ Permission Check:
-    if (userRole !== "admin" && workoutPlan.assignedToUserId !== parseInt(userId)) {
-      return res.status(403).json({ success: false, message: "You do not have permission to delete this workout plan." });
+    if (
+      userRole !== "admin" &&
+      workoutPlan.assignedToUserId !== parseInt(userId)
+    ) {
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "You do not have permission to delete this workout plan.",
+        });
     }
 
     // ✅ Cascade delete handled by Prisma
@@ -528,10 +548,18 @@ const deleteWorkoutPlan = async (req, res) => {
       where: { id: planId },
     });
 
-    res.status(200).json({ success: true, message: "Workout Plan deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Workout Plan deleted successfully." });
   } catch (error) {
     console.error("Error deleting workout plan:", error);
-    res.status(500).json({ success: false, message: "Failed to delete workout plan.", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to delete workout plan.",
+        error: error.message,
+      });
   }
 };
 
@@ -575,7 +603,9 @@ const finishWorkout = async (req, res) => {
     });
 
     if (existingProgress) {
-      return res.status(400).json({ success: false, message: "Workout already logged today" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Workout already logged today" });
     }
 
     // Insert new workout progress record
@@ -586,18 +616,47 @@ const finishWorkout = async (req, res) => {
       },
     });
 
-    res.status(200).json({ success: true, message: "Workout logged successfully!", progress });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Workout logged successfully!",
+        progress,
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+const exerciseDetails = async (req, res) => {
+  try {
+    const { id } = req.params; // Get exercise ID from request parameters
 
+    const exerciseDetailsData = await prisma.exercise.findUnique({
+      where: { id: Number(id) }, // Ensure ID is a number if it's stored as an integer
+    });
+
+    if (!exerciseDetailsData) {
+      return res.status(404).json({ success: false, message: "Exercise not found." });
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Exercise details fetched successfully.", 
+      data: exerciseDetailsData 
+    });
+  } catch (error) {
+    console.error("Error fetching exercise details:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = { exerciseDetails };
 
 
 module.exports = {
   readExercise,
-  createUserWorkoutPlan ,
+  createUserWorkoutPlan,
   getUserWorkoutPlans,
   // addExerciseToWorkoutPlan,
   removeExerciseFromWorkoutPlan,
@@ -605,5 +664,6 @@ module.exports = {
   createWorkoutPlanWithExercises,
   addExercisesToWorkoutPlan,
   getWorkoutPlanExercises,
-  finishWorkout
+  finishWorkout,
+  exerciseDetails,
 };
