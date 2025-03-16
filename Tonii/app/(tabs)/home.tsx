@@ -1,30 +1,90 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  StyleSheet, 
+  SafeAreaView, 
+  ActivityIndicator 
+} from "react-native";
+import { fetchUserDetails, workoutPlan } from "../../context/userAPI";
+
+interface WorkoutPlan {
+  id: number;
+  name: string;
+}
 
 const home = () => {
+  const [user, setUser] = useState({ username: "" });
+  const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [workoutLoading, setWorkoutLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      const data = await fetchUserDetails();
+      if (data) {
+        setUser({ username: data.username || "User" });
+      }
+      setLoading(false);
+    };
+
+    const fetchWorkoutPlans = async () => {
+      setWorkoutLoading(true);
+      setError(null);
+      try {
+        const response = await workoutPlan();
+        if (response.status === 401) {
+          setError("Unauthorized: Please log in again.");
+        } else if (response.status === 400) {
+          setError(response.message);
+        } else {
+          setWorkoutPlans(response.data || []);
+        }
+      } catch (err) {
+        setError("Failed to fetch workout plans.");
+      } finally {
+        setWorkoutLoading(false);
+      }
+    };
+
+    fetchUserData();
+    fetchWorkoutPlans();
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Greeting */}
-        <Text style={styles.greeting}>Hi, [User's Name]!{"\n"}Ready to crush your goals today?</Text>
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={true} 
+      >
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <Text style={styles.greeting}>Hi, {user.username}!{"\n"}Ready to crush your goals today?</Text>
+        )}
 
-        {/* Pinned Workout */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pin Workout</Text>
-          <View style={styles.placeholderBox} />
+          <Text style={styles.sectionTitle}>Your Workout Plans</Text>
+          {workoutLoading && <ActivityIndicator size="large" color="#FF6F00" />}
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          
+          <View style={styles.scrollContainer}>
+            <ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={true}>
+              {!workoutLoading && !error && workoutPlans.length === 0 && (
+                <Text style={styles.noWorkoutsText}>No workout plans available.</Text>
+              )}
+              {!workoutLoading && !error && workoutPlans.map((plan) => (
+                <View key={plan.id} style={styles.workoutItem}>
+                  <Text style={styles.workoutText}>{plan.name}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
         </View>
-
-        {/* Calorie Calculator */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Calculate Calorie</Text>
-          <View style={styles.placeholderBox} />
-        </View>
-
-        {/* Progress */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Streak</Text>
-          <View style={styles.placeholderBox} />
-        </View>        
       </ScrollView>
     </SafeAreaView>
   );
@@ -38,11 +98,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // marginTop:50
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 80, // Prevents bottom overflow due to navbar
+    paddingBottom: 80,
   },
   greeting: {
     fontSize: 18,
@@ -57,28 +116,35 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
-  placeholderBox: {
-    width: "100%",
-    height: 120,
-    backgroundColor: "#ddd",
+  scrollContainer: {
+    maxHeight: 200,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 5,
   },
-  quickActionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-  quickActionButton: {
-    flex: 1,
+  workoutItem: {
+    backgroundColor: "#E0E0E0",
     padding: 15,
-    backgroundColor: "#007BFF",
-    marginHorizontal: 5,
-    borderRadius: 8,
-    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  quickActionText: {
-    color: "#fff",
+  workoutText: {
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginVertical: 10,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  noWorkoutsText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "gray",
+    fontStyle: "italic",
   },
 });
 
