@@ -11,14 +11,14 @@ const Layout = () => {
   const router = useRouter();
 
   return (
-        <GestureHandlerRootView className="flex-1">
+    <GestureHandlerRootView className="flex-1">
       <StatusBar barStyle="light-content" backgroundColor="white" translucent={false} />
 
       <Stack>
-        <Stack.Screen  name="createRoutine" options={{ headerShown: false }}/>
-        <Stack.Screen  name="explore" options={{ headerShown: false }}/>
-        <Stack.Screen  name="addExercise" options={{ headerShown: false }}/>
-        <Stack.Screen  name="startWorkout" options={{ headerShown: false }}/>
+        <Stack.Screen name="createRoutine" options={{ headerShown: false }} />
+        <Stack.Screen name="explore" options={{ headerShown: false }} />
+        <Stack.Screen name="addExercise" options={{ headerShown: false }} />
+        <Stack.Screen name="startWorkout" options={{ headerShown: false }} />
       </Stack>
       {/* <Toast /> */}
     </GestureHandlerRootView>

@@ -5,9 +5,11 @@ import {
   ScrollView, 
   StyleSheet, 
   SafeAreaView, 
-  ActivityIndicator 
+  ActivityIndicator, 
+  TouchableOpacity
 } from "react-native";
 import { fetchUserDetails, workoutPlan } from "../../context/userAPI";
+import { router } from "expo-router";
 
 interface WorkoutPlan {
   id: number;
@@ -86,6 +88,15 @@ const home = () => {
           </View>
         </View>
       </ScrollView>
+      
+      <TouchableOpacity
+          // style={[styles.button, styles.newRoutineButton]}
+          onPress={() => router.push("/(workout)/singleExercise")}
+        >
+          {/* <Ionicons name="clipboard-outline" size={18} color="white" /> */}
+          {/* <Text style={styles.newRoutineButtonText}> New Routine</Text> */}
+          <Text style={{backgroundColor:'blue'}}>Exercise details</Text>
+        </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -94,6 +105,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop:20
   },
   container: {
     flex: 1,

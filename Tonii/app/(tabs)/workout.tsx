@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -47,7 +48,7 @@ const Workout = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Workout</Text>
 
       <View style={styles.buttonContainer}>
@@ -114,7 +115,7 @@ const Workout = () => {
           </View>
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 20,
     backgroundColor: "white",
   },
   header: {

@@ -97,12 +97,12 @@ const StartWorkout = () => {
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push("../(tabs)/workout")}>
-        <MaterialIcons name="arrow-back-ios" size={24} color="white" />
-      </TouchableOpacity>
-
-      <Text style={styles.title}>Start Workout</Text>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => router.push("/(tabs)/workout")}>
+                <Ionicons name="arrow-back" size={24} color="#3498db" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Start Routine</Text>
+            </View>
 
       {loading && <ActivityIndicator size="large" color="#FF6F00" />}
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -124,7 +124,6 @@ const StartWorkout = () => {
                 />
                 <View style={styles.exerciseDetails}>
                   <Text style={styles.exerciseName}>{exercise.name}</Text>
-                  <Text>{exercise.description}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -160,7 +159,7 @@ const StartWorkout = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
+    // paddingTop: 50,
     paddingHorizontal: 20,
     backgroundColor: '#f4f4f4',
   },
@@ -240,6 +239,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "center", // Center content horizontally
+    alignItems: "center",
+    paddingVertical: 15,
+    width: "100%", // Ensure it takes full width of the screen
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center", // Align text in the center
+    flexGrow: 1, // Takes up available space
   },
 });
 

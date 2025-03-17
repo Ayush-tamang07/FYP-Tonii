@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { 
-  View, Text, TextInput, TouchableOpacity, StyleSheet, 
-  Image, Alert, FlatList, ActivityIndicator, 
+import {
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  Image, Alert, FlatList, ActivityIndicator,
   SafeAreaView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,6 +14,7 @@ interface Exercise {
   name: string;
   muscle: string;
   image: string;
+  exercise: string
 }
 
 const CreateRoutine: React.FC = () => {
@@ -110,11 +111,11 @@ const CreateRoutine: React.FC = () => {
           <Ionicons name="arrow-back" size={24} color="#3498db" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Routine</Text>
-        <TouchableOpacity onPress={handleSave} disabled={saving}>
+        {/* <TouchableOpacity onPress={handleSave} disabled={saving}>
           <Text style={styles.saveText}>
             {saving ? "Saving..." : `Save (${selectedExercises.length})`}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <TextInput
@@ -143,7 +144,19 @@ const CreateRoutine: React.FC = () => {
                   <Text style={styles.exerciseName}>{item.name}</Text>
                   <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
                 </View>
+                <TouchableOpacity
+                  // style={}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/(workout)/singleExercise",
+                      // params: { id: exercise.id },
+                      params: { id: item.id.toString() },
+                    })
+                  }>
+                  <Text>More</Text>
+                </TouchableOpacity>
               </TouchableOpacity>
+
             );
           }}
         />
@@ -163,8 +176,8 @@ export default CreateRoutine;
 // ✅ Styles
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 15 },
-  headerTitle: { fontSize: 18, fontWeight: "bold", color: "#000" },
+  header: { flexDirection: "row", justifyContent: "flex-start", alignItems: "center", paddingVertical: 15, width: "100%" },
+  headerTitle: { fontSize: 18, fontWeight: "bold", color: "#000", textAlign: "center", flexGrow: 1 },
   saveText: { color: "#3498db", fontSize: 16, fontWeight: "bold" },
   input: { backgroundColor: "#F5F5F5", color: "#000", fontSize: 16, padding: 15, borderRadius: 8, marginVertical: 10 },
   exerciseItem: { flexDirection: "row", alignItems: "center", backgroundColor: "#f9f9f9", padding: 10, borderRadius: 10, marginVertical: 5 },
@@ -173,6 +186,6 @@ const styles = StyleSheet.create({
   exerciseInfo: { flex: 1, marginLeft: 10 },
   addButton: { backgroundColor: "#FF6909", padding: 15, borderRadius: 10, alignItems: "center", marginTop: 10 },
   addButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  exerciseName: { fontSize: 18, fontWeight: "bold", color: "#000" }, 
+  exerciseName: { fontSize: 18, fontWeight: "bold", color: "#000" },
   exerciseMuscle: { fontSize: 14, color: "#666" },
 });
