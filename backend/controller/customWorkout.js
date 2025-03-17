@@ -651,7 +651,6 @@ const exerciseDetails = async (req, res) => {
   }
 };
 
-module.exports = { exerciseDetails };
 
 
 module.exports = {
