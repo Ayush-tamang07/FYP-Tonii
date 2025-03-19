@@ -1,26 +1,44 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons"; // Import icons
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = "light";
+  // Use a consistent color palette
+  const colors = {
+    primary: "#FF6909",
+    inactive: "#8E8E93",
+    background: "#FFFFFF",
+    border: "#F2F2F7",
+  };
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#FF6909", // Orange active color
-        // tabBarInactiveTintColor: "#000", // Black inactive color
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.inactive,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: "#fff", // Light background
-          // borderTopWidth: 1,
-          borderTopColor: "#ddd", // Light gray border
+          backgroundColor: colors.background,
+          borderTopWidth: 0,
+          height: Platform.OS === "ios" ? 88 : 64,
+          paddingTop: 6,
+          paddingBottom: Platform.OS === "ios" ? 28 : 8,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0,
+          shadowRadius: 0,
+          elevation: 0,
           position: Platform.OS === "ios" ? "absolute" : "relative",
+        },
+        tabBarIconStyle: {
+          marginBottom: 3,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "500",
         },
       }}
     >
@@ -34,16 +52,19 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* New Tab */}
       <Tabs.Screen
         name="new"
         options={{
-          title: "new",
+          title: "New",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" size={size} color={color} />
+            <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
           ),
         }}
       />
-    
+
+      {/* Calorie Tab */}
       <Tabs.Screen
         name="calorie"
         options={{
@@ -53,6 +74,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       {/* Workout Tab */}
       <Tabs.Screen
         name="workout"
@@ -63,26 +85,28 @@ export default function TabLayout() {
           ),
         }}
       />
+
       {/* Form Correction Tab */}
       <Tabs.Screen
         name="formCorrection"
         options={{
-          title: "Correction",
+          title: "Form",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkmark-done-circle-outline" size={size} color={color} />
           ),
         }}
       />
-          {/* Profile Tab */}
-          <Tabs.Screen
-            name="profile"
-            options={{
-              title: "Profile",
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="person-circle-outline" size={size} color={color} />
-              ),
-            }}
-          />
+
+      {/* Profile Tab */}
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

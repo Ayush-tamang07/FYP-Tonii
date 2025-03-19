@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 const Streak = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   // Example of days with workouts completed - replace with your actual data

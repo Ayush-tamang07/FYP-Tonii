@@ -6,8 +6,7 @@ import {
   StyleSheet, 
   SafeAreaView, 
   ActivityIndicator, 
-  TouchableOpacity,
-  Dimensions
+  TouchableOpacity
 } from "react-native";
 import { fetchUserDetails, workoutPlan } from "../../context/userAPI";
 import { router } from "expo-router";
@@ -23,13 +22,10 @@ const home = () => {
   const [loading, setLoading] = useState(true);
   const [workoutLoading, setWorkoutLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [streak, setStreak] = useState(7); // Example streak count
-  const [currentMonth, setCurrentMonth] = useState(new Date().toLocaleString('default', { month: 'long' }));
   
-  // Example data for calendar
-  const [workoutDays, setWorkoutDays] = useState([
-    2, 3, 5, 6, 9, 12, 13, 16, 17, 19, 20, 23, 24, 26, 27, 30
-  ]);
+  // For the history section
+  const [currentDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState(18); // Default to day 18 as shown in the image
   
   useEffect(() => {
     const fetchUserData = async () => {
@@ -67,73 +63,41 @@ const home = () => {
   const navigateToWorkout = (id: number) => {
     router.push(`/workout/${id}`);
   };
-
-  // Generate calendar days in a grid format
-  const renderCalendar = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    
-    // Get the first day of the month
-    const firstDay = new Date(year, month, 1).getDay();
-    // Get the number of days in the month
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    // Day names for the header
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    // Create calendar header with day names
-    const header = dayNames.map(day => (
-      <View key={`header-${day}`} style={styles.calendarHeaderDay}>
-        <Text style={styles.calendarHeaderText}>{day}</Text>
-      </View>
-    ));
-    
-    // Create calendar days
-    const days = [];
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
-      days.push(
-        <View key={`empty-${i}`} style={styles.calendarDay}>
-          <View style={styles.emptyDay}></View>
-        </View>
-      );
-    }
-    
-    // Add actual days of the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      const isWorkoutDay = workoutDays.includes(i);
-      const isToday = i === today.getDate();
-      
-      days.push(
-        <View key={i} style={styles.calendarDay}>
-          <View 
-            style={[
-              styles.dayCircle,
-              isToday && styles.todayCircle, 
-              isWorkoutDay && styles.workoutDayCircle
-            ]}
-          >
-            <Text style={[
-              styles.dayText,
-              isToday && styles.todayText, 
-              isWorkoutDay && styles.workoutDayText
-            ]}>
-              {i}
-            </Text>
-          </View>
-        </View>
-      );
-    }
+  
+  const navigateToAllRecords = () => {
+    router.push("/(streak)/streak");
+  };
+  
+  // Generate week days for history section
+  const renderWeekDays = () => {
+    const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const days = [16, 17, 18, 19, 20, 21, 22]; // Days shown in screenshot
     
     return (
-      <View style={styles.calendarContainer}>
-        <View style={styles.calendarHeader}>
-          {header}
+      <View style={styles.weekDaysContainer}>
+        <View style={styles.weekDayLabels}>
+          {dayNames.map((day, index) => (
+            <Text key={`day-label-${index}`} style={styles.dayLabel}>{day}</Text>
+          ))}
         </View>
-        <View style={styles.calendarGrid}>
-          {days}
+        <View style={styles.weekDays}>
+          {days.map((day, index) => (
+            <TouchableOpacity 
+              key={`day-${index}`} 
+              onPress={() => setSelectedDay(day)}
+              style={[
+                styles.dayButton,
+                day === selectedDay && styles.selectedDayButton
+              ]}
+            >
+              <Text style={[
+                styles.dayNumber,
+                day === selectedDay && styles.selectedDayNumber
+              ]}>
+                {day}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
     );
@@ -156,18 +120,8 @@ const home = () => {
             </Text>
           )}
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Streak</Text>
-          <View style={styles.streakContainer}>
-            <View style={styles.streakHeader}>
-              <Text style={styles.streakCount}>{streak} days</Text>
-              <Text style={styles.streakMonth}>{currentMonth}</Text>
-            </View>
-            {renderCalendar()}
-          </View>
-        </View>
-
+        
+        {/* Workout Plans Section - Moved to top */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Your Workout Plans</Text>
           
@@ -188,7 +142,10 @@ const home = () => {
               {workoutPlans.length === 0 ? (
                 <View style={styles.emptyStateContainer}>
                   <Text style={styles.noWorkoutsText}>No workout plans available.</Text>
-                  <TouchableOpacity style={styles.createButton}>
+                  <TouchableOpacity 
+                    style={styles.createButton}
+                    onPress={() => router.push("/(workout)/createRoutine")}
+                  >
                     <Text style={styles.createButtonText}>Create Your First Plan</Text>
                   </TouchableOpacity>
                 </View>
@@ -216,12 +173,30 @@ const home = () => {
             </View>
           )}
         </View>
+        
+        {/* History Section */}
+        <View style={styles.section}>
+          <View style={styles.historyHeader}>
+            <Text style={styles.sectionTitle}>History</Text>
+            <TouchableOpacity onPress={navigateToAllRecords}>
+              <Text style={styles.allRecordsText}>All records</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {renderWeekDays()}
+          
+          <View style={styles.streakContainer}>
+            <Text style={styles.streakLabel}>Day Streak</Text>
+            <View style={styles.streakValueContainer}>
+              <Text style={styles.fireIcon}>🔥</Text>
+              <Text style={styles.streakValue}>0</Text>
+            </View>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -270,9 +245,83 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: "#333",
   },
+  // History styles
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  allRecordsText: {
+    color: '#FF6F00',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  weekDaysContainer: {
+    marginBottom: 20,
+  },
+  weekDayLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  dayLabel: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 15,
+    color: '#777',
+  },
+  weekDays: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  dayButton: {
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 3,
+  },
+  selectedDayButton: {
+    backgroundColor: '#FF6F00',
+  },
+  dayNumber: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  selectedDayNumber: {
+    color: '#FFFFFF',
+  },
+  streakContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  streakLabel: {
+    fontSize: 16,
+    color: '#555',
+  },
+  streakValueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  fireIcon: {
+    fontSize: 18,
+    marginRight: 5,
+    color: '#FF6F00',
+  },
+  streakValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  // Workout Plans styles
   workoutListContainer: {
     borderRadius: 10,
-    height: 250,
+    maxHeight: 250,
   },
   workoutScrollView: {
     maxHeight: 250,
@@ -341,91 +390,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "600",
     fontSize: 15,
-  },
-  // Calendar styles
-  streakContainer: {
-    borderRadius: 10,
-    backgroundColor: "#F5F7FA",
-    padding: 15,
-  },
-  streakHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  streakCount: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FF6F00",
-  },
-  streakMonth: {
-    fontSize: 16,
-    color: "#666",
-  },
-  calendarContainer: {
-    marginBottom: 10,
-  },
-  calendarHeader: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-    paddingBottom: 8,
-  },
-  calendarHeaderDay: {
-    width: width / 7 - 10,
-    alignItems: "center",
-  },
-  calendarHeaderText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#666",
-  },
-  calendarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-  },
-  calendarDay: {
-    width: width / 7 - 10,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  dayCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  emptyDay: {
-    width: 30,
-    height: 30,
-  },
-  workoutDayCircle: {
-    backgroundColor: "#FF6F00",
-  },
-  todayCircle: {
-    borderWidth: 1,
-    borderColor: "#FF6F00",
-  },
-  dayText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  workoutDayText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-  },
-  todayText: {
-    fontWeight: "bold",
-    color: "#FF6F00",
-  },
+  }
 });
 
 export default home;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, SafeAreaView } from 'react-native';
+import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from "expo-secure-store";
 import apiHandler from "../../context/APIHandler";
@@ -85,6 +85,13 @@ const StartWorkout = () => {
     }));
   };
 
+  // Calculate workout progress percentage
+  const calculateProgress = () => {
+    if (exercises.length === 0) return 0;
+    const completedCount = exercises.filter(ex => completedExercises[ex.id]).length;
+    return (completedCount / exercises.length) * 100;
+  };
+
   // Check if all exercises are completed
   const allExercisesCompleted = exercises.length > 0 && exercises.every(exercise => completedExercises[exercise.id]);
 
@@ -96,163 +103,353 @@ const StartWorkout = () => {
   };
 
   return (
-    <View style={styles.container}>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => router.push("/(tabs)/workout")}>
-                <Ionicons name="arrow-back" size={24} color="#3498db" />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Start Routine</Text>
-            </View>
-
-      {loading && <ActivityIndicator size="large" color="#FF6F00" />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
-
-      {!loading && !error && (
-        <>
-          <ScrollView style={styles.exerciseContainer}>
-            {exercises.map((exercise) => (
-              <TouchableOpacity
-                key={exercise.id}
-                style={styles.exerciseCard}
-                onPress={() => toggleExerciseCompletion(exercise.id)}
-              >
-                {/* Checkbox */}
-                <Ionicons
-                  name={completedExercises[exercise.id] ? "checkbox-outline" : "square-outline"}
-                  size={24}
-                  color={completedExercises[exercise.id] ? "#28a745" : "#888"}
-                />
-                <View style={styles.exerciseDetails}>
-                  <Text style={styles.exerciseName}>{exercise.name}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Timer Display */}
-          {isWorkoutActive && (
-            <View style={styles.timerContainer}>
-              <Text style={styles.timerText}>Workout Time: {formatTime(elapsedTime)}</Text>
-            </View>
-          )}
-
-          {/* Start/Stop Workout Button */}
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
           <TouchableOpacity 
-            style={isWorkoutActive ? styles.stopButton : styles.startButton} 
-            onPress={isWorkoutActive ? stopWorkout : startWorkout}
+            style={styles.backButton} 
+            onPress={() => router.push("/(tabs)/workout")}
           >
-            <Text style={styles.buttonText}>{isWorkoutActive ? "Stop Workout" : "Start Workout"}</Text>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Workout Routine</Text>
+        </View>
 
-          {/* Finish Workout Button (Visible only when all exercises are completed) */}
-          {allExercisesCompleted && (
-            <TouchableOpacity style={styles.finishButton} onPress={stopWorkout}>
-              <Text style={styles.buttonText}>Finish Workout</Text>
+        {loading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#FF6F00" />
+            <Text style={styles.loadingText}>Loading exercises...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <MaterialIcons name="error-outline" size={40} color="#dc3545" />
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity 
+              style={styles.retryButton} 
+              onPress={() => router.push("/(tabs)/workout")}
+            >
+              <Text style={styles.retryButtonText}>Go Back</Text>
             </TouchableOpacity>
-          )}
-        </>
-      )}
-    </View>
+          </View>
+        ) : (
+          <>
+            {/* Progress bar */}
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBarBackground}>
+                <View 
+                  style={[
+                    styles.progressBarFill, 
+                    { width: `${calculateProgress()}%` }
+                  ]} 
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {Math.round(calculateProgress())}% Complete
+              </Text>
+            </View>
+
+            {/* Timer Display */}
+            {isWorkoutActive && (
+              <View style={styles.timerContainer}>
+                <FontAwesome5 name="stopwatch" size={24} color="#FF6F00" />
+                <Text style={styles.timerText}>{formatTime(elapsedTime)}</Text>
+              </View>
+            )}
+
+            <Text style={styles.sectionTitle}>
+              Exercises ({exercises.filter(ex => completedExercises[ex.id]).length}/{exercises.length})
+            </Text>
+
+            <ScrollView 
+              style={styles.exerciseContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              {exercises.map((exercise) => (
+                <TouchableOpacity
+                  key={exercise.id}
+                  style={[
+                    styles.exerciseCard,
+                    completedExercises[exercise.id] && styles.completedExerciseCard
+                  ]}
+                  onPress={() => toggleExerciseCompletion(exercise.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.checkboxContainer}>
+                    <View style={[
+                      styles.checkbox, 
+                      completedExercises[exercise.id] && styles.checkboxChecked
+                    ]}>
+                      {completedExercises[exercise.id] && (
+                        <Ionicons name="checkmark" size={18} color="#fff" />
+                      )}
+                    </View>
+                  </View>
+                  <View style={styles.exerciseDetails}>
+                    <Text style={[
+                      styles.exerciseName,
+                      completedExercises[exercise.id] && styles.completedExerciseName
+                    ]}>
+                      {exercise.name}
+                    </Text>
+                    {exercise.description && (
+                      <Text style={styles.exerciseDescription} numberOfLines={2}>
+                        {exercise.description}
+                      </Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+              <View style={styles.spacer} />
+            </ScrollView>
+
+            <View style={styles.buttonContainer}>
+              {/* Start/Stop Workout Button */}
+              <TouchableOpacity 
+                style={[
+                  styles.actionButton, 
+                  isWorkoutActive ? styles.stopButton : styles.startButton
+                ]} 
+                onPress={isWorkoutActive ? stopWorkout : startWorkout}
+              >
+                <FontAwesome5 
+                  name={isWorkoutActive ? "stop-circle" : "play-circle"} 
+                  size={20} 
+                  color="#fff" 
+                  style={styles.buttonIcon}
+                />
+                <Text style={styles.buttonText}>
+                  {isWorkoutActive ? "Pause Workout" : "Start Workout"}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Finish Workout Button */}
+              {allExercisesCompleted && (
+                <TouchableOpacity 
+                  style={[styles.actionButton, styles.finishButton]} 
+                  onPress={() => {
+                    stopWorkout();
+                    // Navigate back or to a completion screen
+                    router.push("/(tabs)/workout");
+                  }}
+                >
+                  <MaterialIcons 
+                    name="done-all" 
+                    size={20} 
+                    color="#fff" 
+                    style={styles.buttonIcon}
+                  />
+                  <Text style={styles.buttonText}>Complete Workout</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f8f9fa', // Light background color
+  },
   container: {
     flex: 1,
-    // paddingTop: 50,
     paddingHorizontal: 20,
-    backgroundColor: '#f4f4f4',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 15,
-    color: '#333',
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    padding: 10,
-    backgroundColor: '#007bff',
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#3498db',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    flexGrow: 1,
+    marginRight: 40, // Offset for the back button to center the title
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginVertical: 15,
+    color: '#444',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#555',
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#dc3545',
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: '#6c757d',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  progressContainer: {
+    marginVertical: 10,
+  },
+  progressBarBackground: {
+    height: 10,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
     borderRadius: 5,
   },
+  progressText: {
+    textAlign: 'center',
+    marginTop: 5,
+    color: '#555',
+    fontSize: 14,
+  },
+  timerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginVertical: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  timerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 10,
+  },
   exerciseContainer: {
-    marginTop: 20,
+    flex: 1,
   },
   exerciseCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: '#fff',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    borderRadius: 12,
+    marginBottom: 12,
     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  completedExerciseCard: {
+    backgroundColor: '#f8fff8',
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  checkboxContainer: {
+    marginRight: 15,
+  },
+  checkbox: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#aaa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
   },
   exerciseDetails: {
-    marginLeft: 10,
     flex: 1,
   },
   exerciseName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 10,
     fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: '#333',
   },
-  timerContainer: {
-    marginTop: 20,
+  completedExerciseName: {
+    textDecorationLine: 'line-through',
+    color: '#4CAF50',
+  },
+  exerciseDescription: {
+    fontSize: 14,
+    color: '#666',
+  },
+  buttonContainer: {
+    paddingVertical: 20,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  timerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FF6F00',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   startButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
+    backgroundColor: '#4CAF50',
   },
   stopButton: {
-    backgroundColor: '#dc3545',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
+    backgroundColor: '#FF9800',
   },
   finishButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
+    backgroundColor: '#3498db',
+  },
+  buttonIcon: {
+    marginRight: 8,
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "center", // Center content horizontally
-    alignItems: "center",
-    paddingVertical: 15,
-    width: "100%", // Ensure it takes full width of the screen
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center", // Align text in the center
-    flexGrow: 1, // Takes up available space
+  spacer: {
+    height: 80, // Add extra space at the bottom of the ScrollView
   },
 });
 

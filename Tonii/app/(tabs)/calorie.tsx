@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,24 +10,99 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
+  Modal,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { PieChart } from 'react-native-chart-kit';
-import { Picker } from '@react-native-picker/picker';
 
-const { width } = Dimensions.get('window'); // Get device width for responsiveness
+const { width } = Dimensions.get('window');
 
-const Calorie = () => {
-  const [selectedGender, setSelectedGender] = useState(null);
-  const [goal, setGoal] = useState('gain_muscle'); // Default Goal
-  const [activity, setActivity] = useState('sedentary'); // Default Activity
+// Define TypeScript interfaces
+interface MacroData {
+  name: string;
+  grams: number;
+  percentage: string;
+  color: string;
+}
 
-  // Mock data for Pie Chart
-  const data = [
-    { name: 'Carbs', grams: 506, color: '#2196F3' },
-    { name: 'Protein', grams: 128, color: '#4CAF50' },
-    { name: 'Fats', grams: 58, color: '#FF9800' },
+interface Option {
+  label: string;
+  value: string;
+}
+
+const Calorie: React.FC = () => {
+  // State management
+  const [height, setHeight] = useState<string>('');
+  const [weight, setWeight] = useState<string>('');
+  const [age, setAge] = useState<string>('');
+  const [selectedGender, setSelectedGender] = useState<string>('Male');
+  const [goal, setGoal] = useState<string>('gain_muscle');
+  const [goalText, setGoalText] = useState<string>('Gain Muscle');
+  const [activity, setActivity] = useState<string>('moderately_active');
+  const [activityText, setActivityText] = useState<string>('Moderately Active (3-5 days/week)');
+  
+  // Bottom sheet states
+  const [bottomSheetOpen, setBottomSheetOpen] = useState<string | null>(null); // 'goal', 'activity', or 'gender'
+
+  // Data for the pie chart
+  const data: MacroData[] = [
+    { name: 'Carbs', grams: 306, percentage: '50%', color: '#4361EE' },
+    { name: 'Protein', grams: 153, percentage: '25%', color: '#3A0CA3' },
+    { name: 'Fats', grams: 68, percentage: '25%', color: '#F72585' },
   ];
+
+  // Goal options
+  const goalOptions: Option[] = [
+    { label: 'Gain Muscle', value: 'gain_muscle' },
+    { label: 'Lose Weight', value: 'lose_weight' },
+    { label: 'Maintain Weight', value: 'maintain_weight' },
+    { label: 'Extreme Weight Loss', value: 'extreme_weight_loss' },
+  ];
+
+  // Activity level options
+  const activityOptions: Option[] = [
+    { label: 'Sedentary (Little to no exercise)', value: 'sedentary' },
+    { label: 'Lightly Active (1-3 days/week)', value: 'lightly_active' },
+    { label: 'Moderately Active (3-5 days/week)', value: 'moderately_active' },
+    { label: 'Very Active (6-7 days/week)', value: 'very_active' },
+    { label: 'Super Active (Intense exercise/physical job)', value: 'super_active' },
+  ];
+
+  // Gender options
+  const genderOptions: Option[] = [
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
+  ];
+
+  // Function to open bottom sheet
+  const openBottomSheet = (type: string): void => {
+    setBottomSheetOpen(type);
+  };
+
+  // Function to close bottom sheet
+  const closeBottomSheet = (): void => {
+    setBottomSheetOpen(null);
+  };
+
+  // Function to handle goal selection
+  const handleGoalSelect = (value: string, label: string): void => {
+    setGoal(value);
+    setGoalText(label);
+    closeBottomSheet();
+  };
+
+  // Function to handle activity selection
+  const handleActivitySelect = (value: string, label: string): void => {
+    setActivity(value);
+    setActivityText(label);
+    closeBottomSheet();
+  };
+
+  // Function to handle gender selection
+  const handleGenderSelect = (value: string): void => {
+    setSelectedGender(value);
+    closeBottomSheet();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -38,117 +113,287 @@ const Calorie = () => {
         <ScrollView 
           contentContainerStyle={styles.scrollViewContent} 
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {/* Title */}
-          <Text style={styles.header}>Nutrition Guidance</Text>
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerTitle}>Nutrition Guidance</Text>
+            <Text style={styles.headerSubtitle}>Calculate your daily calories and macros</Text>
+          </View>
 
-          {/* Input Fields */}
-          <View style={styles.inputContainer}>
-            {/* Height Input */}
-            <View style={styles.inputWrapper}>
-              <TextInput placeholder="Height" style={styles.input} keyboardType="number-pad" />
-              <Text style={styles.unitText}>.ft</Text>
-            </View>
+          {/* Input Form Card */}
+          <View style={styles.formCard}>
+            {/* Height and Weight in same row */}
+            <View style={styles.rowContainer}>
+              {/* Height Input */}
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <Text style={styles.inputLabel}>Height</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput 
+                    placeholder="Enter height" 
+                    style={styles.input} 
+                    keyboardType="number-pad" 
+                    value={height}
+                    onChangeText={setHeight}
+                  />
+                  <Text style={styles.unitText}>ft</Text>
+                </View>
+              </View>
 
-            {/* Weight Input */}
-            <View style={styles.inputWrapper}>
-              <TextInput placeholder="Weight" style={styles.input} keyboardType="number-pad" />
-              <Text style={styles.unitText}>kg</Text>
-            </View>
-
-            {/* Age Input */}
-            <View style={styles.inputWrapper}>
-              <TextInput placeholder="Age" style={styles.input} keyboardType="number-pad" />
-              <Text style={styles.unitText}>.ft</Text>
-            </View>
-
-            {/* Goal Dropdown (With Proper Spacing & Height) */}
-            <View style={styles.dropdownContainer}>
-              <Text style={styles.dropdownLabel}>Goal</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={goal}
-                  onValueChange={(itemValue) => setGoal(itemValue)}
-                  style={styles.picker}
-                  mode="dropdown"
-                >
-                  <Picker.Item label="Gain Muscle" value="gain_muscle" />
-                  <Picker.Item label="Lose Weight" value="lose_weight" />
-                  <Picker.Item label="Maintain Weight" value="maintain_weight" />
-                  <Picker.Item label="Extreme Weight Loss" value="extreme_weight_loss" />
-                </Picker>
+              {/* Weight Input */}
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <Text style={styles.inputLabel}>Weight</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput 
+                    placeholder="Enter weight" 
+                    style={styles.input} 
+                    keyboardType="number-pad" 
+                    value={weight}
+                    onChangeText={setWeight}
+                  />
+                  <Text style={styles.unitText}>kg</Text>
+                </View>
               </View>
             </View>
 
-            {/* Activity Level Dropdown (With Proper Spacing & Height) */}
-            <View style={styles.dropdownContainer}>
-              <Text style={styles.dropdownLabel}>Activity Level</Text>
-              <View style={styles.pickerWrapper}>
-                <Picker
-                  selectedValue={activity}
-                  onValueChange={(itemValue) => setActivity(itemValue)}
-                  style={styles.picker}
-                  mode="dropdown"
+            {/* Age and Gender in same row */}
+            <View style={styles.rowContainer}>
+              {/* Age Input */}
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <Text style={styles.inputLabel}>Age</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput 
+                    placeholder="Enter age" 
+                    style={styles.input} 
+                    keyboardType="number-pad" 
+                    value={age}
+                    onChangeText={setAge}
+                  />
+                  <Text style={styles.unitText}>years</Text>
+                </View>
+              </View>
+
+              {/* Gender Selection */}
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <Text style={styles.inputLabel}>Gender</Text>
+                <TouchableOpacity 
+                  style={styles.selectionButton}
+                  onPress={() => openBottomSheet('gender')}
                 >
-                  <Picker.Item label="Sedentary (Little to no exercise)" value="sedentary" />
-                  <Picker.Item label="Lightly Active (1-3 days/week)" value="lightly_active" />
-                  <Picker.Item label="Moderately Active (3-5 days/week)" value="moderately_active" />
-                  <Picker.Item label="Very Active (6-7 days/week)" value="very_active" />
-                  <Picker.Item label="Super Active (Intense exercise/physical job)" value="super_active" />
-                </Picker>
+                  <Text style={styles.selectionText}>{selectedGender}</Text>
+                  <Feather name="chevron-down" size={16} color="#666" />
+                </TouchableOpacity>
               </View>
             </View>
+
+            {/* Goal Selection */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Goal</Text>
+              <TouchableOpacity 
+                style={styles.selectionButton}
+                onPress={() => openBottomSheet('goal')}
+              >
+                <Text style={styles.selectionText}>{goalText}</Text>
+                <Feather name="chevron-down" size={16} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Activity Level Selection */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Activity Level</Text>
+              <TouchableOpacity 
+                style={styles.selectionButton}
+                onPress={() => openBottomSheet('activity')}
+              >
+                <Text style={styles.selectionText} numberOfLines={1}>{activityText}</Text>
+                <Feather name="chevron-down" size={16} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
+            {/* Calculate Button (now inside form card) */}
+            <TouchableOpacity style={styles.generateButton}>
+              <Text style={styles.generateButtonText}>Calculate Calories</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Gender Selection */}
-          <View style={styles.genderContainer}>
-            <Text style={styles.genderLabel}>Gender</Text>
-            <TouchableOpacity style={styles.genderOption} onPress={() => setSelectedGender('Male')}>
-              <Ionicons name={selectedGender === 'Male' ? 'radio-button-on' : 'radio-button-off'} size={20} color="black" />
-              <Text style={styles.genderText}> Male</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.genderOption} onPress={() => setSelectedGender('Female')}>
-              <Ionicons name={selectedGender === 'Female' ? 'radio-button-on' : 'radio-button-off'} size={20} color="black" />
-              <Text style={styles.genderText}> Female</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Results Card */}
+          <View style={styles.resultsCard}>
+            <View style={styles.calorieHeader}>
+              <View>
+                <Text style={styles.calorieLabel}>Daily Calorie Goal</Text>
+                <Text style={styles.calorieValue}>2,560 <Text style={styles.calorieUnit}>kcal</Text></Text>
+              </View>
+              <View style={styles.goalBadge}>
+                <Text style={styles.goalBadgeText}>{goalText}</Text>
+              </View>
+            </View>
 
-          {/* Generate Plan Button */}
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Generate Plan</Text>
-          </TouchableOpacity>
+            <View style={styles.separator} />
 
-          {/* Total Calories & Macros Section */}
-          <View style={styles.calorieCard}>
-            <Text style={styles.calorieTitle}>Total Calories</Text>
-            <Text style={styles.calorieValue}>3060 kcal/day</Text>
+            <Text style={styles.macrosTitle}>Recommended Macros</Text>
+            
+            <View style={styles.chartContainer}>
+              <PieChart
+                data={data.map((item) => ({
+                  name: item.name,
+                  population: item.grams,
+                  color: item.color,
+                  legendFontColor: '#333',
+                  legendFontSize: 12,
+                }))}
+                width={width * 0.85}
+                height={180}
+                chartConfig={{
+                  backgroundColor: 'transparent',
+                  backgroundGradientFrom: 'transparent',
+                  backgroundGradientTo: 'transparent',
+                  color: () => 'black',
+                }}
+                accessor={'population'}
+                backgroundColor={'transparent'}
+                paddingLeft={'15'}
+                center={[10, 0]}
+                absolute
+              />
+            </View>
 
-            <Text style={styles.macrosTitle}>Macros</Text>
-            <PieChart
-              data={data.map((item) => ({
-                name: item.name,
-                population: item.grams,
-                color: item.color,
-                legendFontColor: '#333',
-                legendFontSize: 12,
-              }))}
-              width={width * 0.9} // Responsive width
-              height={150}
-              chartConfig={{
-                backgroundColor: 'transparent',
-                backgroundGradientFrom: 'transparent',
-                backgroundGradientTo: 'transparent',
-                color: () => 'black',
-              }}
-              accessor={'population'}
-              backgroundColor={'transparent'}
-              paddingLeft={'15'}
-              hasLegend={true}
-              absolute
-            />
+            <View style={styles.macrosDetailContainer}>
+              {data.map((item, index) => (
+                <View key={index} style={styles.macroItem}>
+                  <View style={styles.macroLabelContainer}>
+                    <View style={[styles.macroColorIndicator, { backgroundColor: item.color }]} />
+                    <Text style={styles.macroLabel}>{item.name}</Text>
+                  </View>
+                  <Text style={styles.macroValue}>{item.grams}g <Text style={styles.macroPercentage}>({item.percentage})</Text></Text>
+                </View>
+              ))}
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Goal Bottom Sheet Modal */}
+      <Modal
+        visible={bottomSheetOpen === 'goal'}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeBottomSheet}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.bottomSheetContainer}>
+            <View style={styles.bottomSheetHeader}>
+              <Text style={styles.bottomSheetTitle}>Select Goal</Text>
+              <TouchableOpacity onPress={closeBottomSheet}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.optionsContainer}>
+              {goalOptions.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionItem,
+                    goal === option.value && styles.selectedOption
+                  ]}
+                  onPress={() => handleGoalSelect(option.value, option.label)}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    goal === option.value && styles.selectedOptionText
+                  ]}>
+                    {option.label}
+                  </Text>
+                  {goal === option.value && (
+                    <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Activity Level Bottom Sheet Modal */}
+      <Modal
+        visible={bottomSheetOpen === 'activity'}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeBottomSheet}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.bottomSheetContainer}>
+            <View style={styles.bottomSheetHeader}>
+              <Text style={styles.bottomSheetTitle}>Select Activity Level</Text>
+              <TouchableOpacity onPress={closeBottomSheet}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.optionsContainer}>
+              {activityOptions.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionItem,
+                    activity === option.value && styles.selectedOption
+                  ]}
+                  onPress={() => handleActivitySelect(option.value, option.label)}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    activity === option.value && styles.selectedOptionText
+                  ]}>
+                    {option.label}
+                  </Text>
+                  {activity === option.value && (
+                    <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Gender Bottom Sheet Modal */}
+      <Modal
+        visible={bottomSheetOpen === 'gender'}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeBottomSheet}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.bottomSheetContainer}>
+            <View style={styles.bottomSheetHeader}>
+              <Text style={styles.bottomSheetTitle}>Select Gender</Text>
+              <TouchableOpacity onPress={closeBottomSheet}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.optionsContainer}>
+              {genderOptions.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionItem,
+                    selectedGender === option.value && styles.selectedOption
+                  ]}
+                  onPress={() => handleGenderSelect(option.value)}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    selectedGender === option.value && styles.selectedOptionText
+                  ]}>
+                    {option.label}
+                  </Text>
+                  {selectedGender === option.value && (
+                    <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -156,112 +401,241 @@ const Calorie = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    // marginTop:50
+    backgroundColor: '#f8f9fa',
+    // marginTop: Platform.OS === 'ios' ? 50 : 0,
+    marginTop:20
   },
   scrollViewContent: {
-    padding: 20,
+    padding: 14,
+    paddingBottom: 30,
   },
-  header: {
+  headerContainer: {
+    marginBottom: 14,
+  },
+  headerTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 2,
   },
-  inputContainer: {
-    marginBottom: 20,
+  headerSubtitle: {
+    fontSize: 13,
+    color: '#666',
+  },
+  formCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  halfWidth: {
+    width: '48%',
+  },
+  inputGroup: {
+    marginBottom: 12,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#444',
+    marginBottom: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 10,
-    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 44,
+    backgroundColor: '#fafafa',
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
+    color: '#333',
   },
   unitText: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#666',
-    marginLeft: 10,
+    marginLeft: 6,
   },
-  dropdownContainer: {
-    marginBottom: 15, // Added spacing between dropdowns
-  },
-  dropdownLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  pickerWrapper: {
+  selectionButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#e0e0e0',
     borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#f9f9f9',
+    paddingHorizontal: 10,
+    height: 44,
+    backgroundColor: '#fafafa',
   },
-  picker: {
-    height: 50,
+  selectionText: {
+    fontSize: 15,
+    color: '#333',
   },
-  genderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  genderLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-  genderOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  genderText: {
-    fontSize: 16,
-  },
-  button: {
+  generateButton: {
     backgroundColor: '#FF6F00',
-    paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 8,
+    height: 48,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 4,
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  generateButtonText: {
     color: 'white',
+    fontSize: 15,
+    fontWeight: '600',
   },
-  calorieCard: {
+  resultsCard: {
     backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
+    padding: 14,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    width: width * 0.95, // Responsive width
-    alignSelf: 'center',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+    marginBottom: 60,
   },
-  calorieTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  calorieHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  calorieLabel: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 2,
   },
   calorieValue: {
-    fontSize: 16,
+    fontSize: 26,
     fontWeight: 'bold',
+    color: '#333',
+  },
+  calorieUnit: {
+    fontSize: 15,
+    fontWeight: 'normal',
+    color: '#666',
+  },
+  goalBadge: {
+    backgroundColor: '#FFF4E6',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+  },
+  goalBadgeText: {
     color: '#FF6F00',
-    textAlign: 'right',
-    marginBottom: 10,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 14,
   },
   macrosTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 14,
+  },
+  chartContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  macrosDetailContainer: {
+    marginTop: 8,
+  },
+  macroItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  macroLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  macroColorIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  macroLabel: {
+    fontSize: 15,
+    color: '#333',
+  },
+  macroValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+  },
+  macroPercentage: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: 'normal',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  bottomSheetContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingBottom: Platform.OS === 'ios' ? 30 : 16,
+    maxHeight: '70%',
+  },
+  bottomSheetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  bottomSheetTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  optionsContainer: {
+    padding: 8,
+  },
+  optionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginVertical: 4,
+  },
+  selectedOption: {
+    backgroundColor: '#FFF4E6',
+  },
+  optionText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#333',
+  },
+  selectedOptionText: {
+    color: '#FF6F00',
+    fontWeight: '500',
   },
 });
 
