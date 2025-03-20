@@ -10,14 +10,23 @@ import {
 } from "react-native";
 import { fetchUserDetails, workoutPlan } from "../../context/userAPI";
 import { router } from "expo-router";
+import BMIChart from "../../components/BMIChart"; // Import the BMI Chart component
 
 interface WorkoutPlan {
   id: number;
   name: string;
 }
 
+interface UserData {
+  username: string;
+  weight?: string | number;
+  height?: string | number;
+  dob?: string;
+  gender?: string;
+}
+
 const home = () => {
-  const [user, setUser] = useState({ username: "" });
+  const [user, setUser] = useState<UserData>({ username: "" });
   const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [workoutLoading, setWorkoutLoading] = useState(true);
@@ -32,7 +41,13 @@ const home = () => {
       setLoading(true);
       const data = await fetchUserDetails();
       if (data) {
-        setUser({ username: data.username || "User" });
+        setUser({ 
+          username: data.username || "User",
+          weight: data.weight || "",
+          height: data.height || "",
+          dob: data.dob || "",
+          gender: data.gender || "",
+        });
       }
       setLoading(false);
     };
@@ -121,7 +136,7 @@ const home = () => {
           )}
         </View>
         
-        {/* Workout Plans Section - Moved to top */}
+        {/* Workout Plans Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Your Workout Plans</Text>
           
@@ -193,6 +208,11 @@ const home = () => {
             </View>
           </View>
         </View>
+        
+        {/* BMI Chart - Moved to the end as requested */}
+        {!loading && user.height && user.weight && (
+          <BMIChart height={user.height} weight={user.weight} />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
