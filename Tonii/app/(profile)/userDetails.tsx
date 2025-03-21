@@ -16,8 +16,17 @@ import { MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
 import * as SecureStore from "expo-secure-store";
 import { fetchUserDetails } from '../../context/userAPI';
 
+interface UserData {
+  username: string;
+  email: string;
+  weight: string;
+  dob: string;
+  height: string;
+  gender: string;
+}
+
 const userDetails = () => {
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<UserData>({
     username: '', 
     email: '',
     weight: '',
@@ -49,7 +58,7 @@ const userDetails = () => {
   }, []);
   
   // Calculate age from DOB if available
-  const calculateAge = (dob) => {
+  const calculateAge = (dob: string): string => {
     if (!dob) return '';
     
     const birthDate = new Date(dob);

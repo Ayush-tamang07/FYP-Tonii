@@ -1,5 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ActivityIndicator, 
+  ScrollView, 
+  Dimensions, 
+  SafeAreaView,
+  Image,
+  Animated 
+} from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from "expo-secure-store";
@@ -9,6 +20,8 @@ interface Exercise {
   id: number;
   name: string;
   description: string;
+  category: string;
+  image?: string;
 }
 
 const StartWorkout = () => {
@@ -22,8 +35,21 @@ const StartWorkout = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   
+  // Countdown state
+  const [countdown, setCountdown] = useState(0);
+  const [isCountingDown, setIsCountingDown] = useState(false);
+  const countdownAnim = useRef(new Animated.Value(1)).current;
+  
   // Checkbox states
   const [completedExercises, setCompletedExercises] = useState<{ [key: number]: boolean }>({});
+
+  // Category image URLs
+  const chest = "https://i.pinimg.com/474x/c9/b4/54/c9b4541a7a7caba5ef28d8e2bc7d8442.jpg"
+  const back = "https://i.pinimg.com/474x/de/e7/41/dee741a33bf48089d71ffe5b4355e3ef.jpg"
+  const shoulders = "https://i.pinimg.com/474x/9e/c1/04/9ec1042e907e606428e9b08785882fde.jpg"
+  const leg = "https://i.pinimg.com/474x/fa/13/dd/fa13dddb484b4a9d6585c46647ab70d6.jpg"
+  const arms = "https://i.pinimg.com/736x/1c/07/e7/1c07e752bc6f56bc7e3df79c1980efea.jpg"
+  const core = "https://i.pinimg.com/474x/a5/5f/d1/a55fd1efb160ad91b420113794d478c6.jpg"
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -56,10 +82,57 @@ const StartWorkout = () => {
     fetchExercises();
   }, [id]);
 
+  // Get appropriate image based on category
+  const getCategoryImage = (category: string, fallbackImage?: string): string => {
+    if (!category) return chest; // Default fallback
+    
+    const lowerCategory = category.toLowerCase();
+    if (lowerCategory.includes('chest')) return chest;
+    if (lowerCategory.includes('back')) return back;
+    if (lowerCategory.includes('shoulder')) return shoulders;
+    if (lowerCategory.includes('leg') || lowerCategory.includes('quad') || lowerCategory.includes('hamstring') || lowerCategory.includes('calf')) return leg;
+    if (lowerCategory.includes('arm') || lowerCategory.includes('bicep') || lowerCategory.includes('tricep')) return arms;
+    if (lowerCategory.includes('core') || lowerCategory.includes('ab') || lowerCategory.includes('abdominal')) return core;
+    return fallbackImage || chest;
+  };
+
+  // Function to start the countdown
+  const startCountdown = () => {
+    setIsCountingDown(true);
+    setCountdown(3);
+    
+    // Animate countdown number
+    Animated.timing(countdownAnim, {
+      toValue: 2,
+      duration: 1000,
+      useNativeDriver: true
+    }).start();
+    
+    const intervalId = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          setIsCountingDown(false);
+          startWorkout();
+          return 0;
+        }
+        
+        // Reset and restart animation for each count
+        countdownAnim.setValue(1);
+        Animated.timing(countdownAnim, {
+          toValue: 2,
+          duration: 500,
+          useNativeDriver: true
+        }).start();
+        
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   // Function to start the workout
   const startWorkout = () => {
     setIsWorkoutActive(true);
-    setElapsedTime(0);
     
     const newTimer = setInterval(() => {
       setElapsedTime(prevTime => prevTime + 1);
@@ -68,8 +141,8 @@ const StartWorkout = () => {
     setTimer(newTimer);
   };
 
-  // Function to stop the workout
-  const stopWorkout = () => {
+  // Function to pause the workout
+  const pauseWorkout = () => {
     if (timer) {
       clearInterval(timer);
       setTimer(null);
@@ -149,10 +222,36 @@ const StartWorkout = () => {
             </View>
 
             {/* Timer Display */}
-            {isWorkoutActive && (
+            {(isWorkoutActive || elapsedTime > 0) && (
               <View style={styles.timerContainer}>
                 <FontAwesome5 name="stopwatch" size={24} color="#FF6F00" />
                 <Text style={styles.timerText}>{formatTime(elapsedTime)}</Text>
+              </View>
+            )}
+
+            {/* Countdown Overlay */}
+            {isCountingDown && (
+              <View style={styles.countdownOverlay}>
+                <Animated.Text 
+                  style={[
+                    styles.countdownText,
+                    { 
+                      transform: [
+                        { scale: countdownAnim },
+                        { translateY: countdownAnim.interpolate({
+                          inputRange: [1, 2],
+                          outputRange: [0, -20]
+                        })}
+                      ],
+                      opacity: countdownAnim.interpolate({
+                        inputRange: [1, 1.5, 2],
+                        outputRange: [0, 1, 0]
+                      })
+                    }
+                  ]}
+                >
+                  {countdown}
+                </Animated.Text>
               </View>
             )}
 
@@ -168,13 +267,47 @@ const StartWorkout = () => {
                 <TouchableOpacity
                   key={exercise.id}
                   style={[
-                    styles.exerciseCard,
-                    completedExercises[exercise.id] && styles.completedExerciseCard
+                    styles.exerciseItem,
+                    completedExercises[exercise.id] && styles.selectedExercise
                   ]}
                   onPress={() => toggleExerciseCompletion(exercise.id)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.checkboxContainer}>
+                  <Image 
+                    source={{ uri: getCategoryImage(exercise.category, exercise.image) }} 
+                    style={styles.exerciseImage} 
+                  />
+                  <View style={styles.exerciseInfo}>
+                    <Text 
+                      style={[
+                        styles.exerciseName,
+                        completedExercises[exercise.id] && styles.completedExerciseName
+                      ]}
+                    >
+                      {exercise.name}
+                    </Text>
+                    {exercise.category && (
+                      <Text style={styles.exerciseMuscle}>{exercise.category}</Text>
+                    )}
+                    {exercise.description && (
+                      <Text style={styles.exerciseDescription} numberOfLines={2}>
+                        {exercise.description}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={styles.actionContainer}>
+                    <TouchableOpacity
+                      style={styles.moreButton}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/(workout)/singleExercise",
+                          params: { id: exercise.id.toString() },
+                        })
+                      }
+                    >
+                      <Text style={styles.moreButtonText}>More</Text>
+                    </TouchableOpacity>
+                    
                     <View style={[
                       styles.checkbox, 
                       completedExercises[exercise.id] && styles.checkboxChecked
@@ -183,19 +316,6 @@ const StartWorkout = () => {
                         <Ionicons name="checkmark" size={18} color="#fff" />
                       )}
                     </View>
-                  </View>
-                  <View style={styles.exerciseDetails}>
-                    <Text style={[
-                      styles.exerciseName,
-                      completedExercises[exercise.id] && styles.completedExerciseName
-                    ]}>
-                      {exercise.name}
-                    </Text>
-                    {exercise.description && (
-                      <Text style={styles.exerciseDescription} numberOfLines={2}>
-                        {exercise.description}
-                      </Text>
-                    )}
                   </View>
                 </TouchableOpacity>
               ))}
@@ -209,16 +329,16 @@ const StartWorkout = () => {
                   styles.actionButton, 
                   isWorkoutActive ? styles.stopButton : styles.startButton
                 ]} 
-                onPress={isWorkoutActive ? stopWorkout : startWorkout}
+                onPress={isWorkoutActive ? pauseWorkout : (elapsedTime > 0 ? startWorkout : startCountdown)}
               >
                 <FontAwesome5 
-                  name={isWorkoutActive ? "stop-circle" : "play-circle"} 
+                  name={isWorkoutActive ? "pause-circle" : "play-circle"} 
                   size={20} 
                   color="#fff" 
                   style={styles.buttonIcon}
                 />
                 <Text style={styles.buttonText}>
-                  {isWorkoutActive ? "Pause Workout" : "Start Workout"}
+                  {isWorkoutActive ? "Pause Workout" : elapsedTime > 0 ? "Resume Workout" : "Start Workout"}
                 </Text>
               </TouchableOpacity>
 
@@ -227,7 +347,7 @@ const StartWorkout = () => {
                 <TouchableOpacity 
                   style={[styles.actionButton, styles.finishButton]} 
                   onPress={() => {
-                    stopWorkout();
+                    pauseWorkout();
                     // Navigate back or to a completion screen
                     router.push("/(tabs)/workout");
                   }}
@@ -254,7 +374,7 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fa', // Light background color
+    backgroundColor: '#f8f9fa',
   },
   container: {
     flex: 1,
@@ -279,7 +399,7 @@ const styles = StyleSheet.create({
     color: "#333",
     textAlign: "center",
     flexGrow: 1,
-    marginRight: 40, // Offset for the back button to center the title
+    marginRight: 40,
   },
   sectionTitle: {
     fontSize: 18,
@@ -361,29 +481,89 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 10,
   },
+  countdownOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  countdownText: {
+    fontSize: 100,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
   exerciseContainer: {
     flex: 1,
   },
-  exerciseCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+  exerciseItem: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    backgroundColor: "#ffffff", 
+    padding: 15, 
+    borderRadius: 12, 
+    marginVertical: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
+    elevation: 1
   },
-  completedExerciseCard: {
-    backgroundColor: '#f8fff8',
+  selectedExercise: { 
+    backgroundColor: "#FFF5EE",
     borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    borderLeftColor: "#4CAF50",
   },
-  checkboxContainer: {
-    marginRight: 15,
+  exerciseImage: { 
+    width: 60, 
+    height: 60, 
+    borderRadius: 30 
+  },
+  exerciseInfo: { 
+    flex: 1, 
+    marginLeft: 15 
+  },
+  exerciseName: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    color: "#000",
+    marginBottom: 3
+  },
+  completedExerciseName: {
+    textDecorationLine: 'line-through',
+    color: '#4CAF50',
+  },
+  exerciseMuscle: { 
+    fontSize: 14, 
+    color: "#666",
+    marginBottom: 2
+  },
+  exerciseDescription: {
+    fontSize: 13,
+    color: '#888',
+  },
+  actionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 10,
+    gap: 10,
+  },
+  moreButton: {
+    backgroundColor: "#F0F0F0",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moreButtonText: {
+    color: "#555",
+    fontSize: 14,
+    fontWeight: '500',
   },
   checkbox: {
     height: 24,
@@ -397,23 +577,6 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     backgroundColor: '#4CAF50',
     borderColor: '#4CAF50',
-  },
-  exerciseDetails: {
-    flex: 1,
-  },
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-    color: '#333',
-  },
-  completedExerciseName: {
-    textDecorationLine: 'line-through',
-    color: '#4CAF50',
-  },
-  exerciseDescription: {
-    fontSize: 14,
-    color: '#666',
   },
   buttonContainer: {
     paddingVertical: 20,
@@ -449,8 +612,8 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   spacer: {
-    height: 80, // Add extra space at the bottom of the ScrollView
+    height: 80,
   },
-});
+}); 
 
 export default StartWorkout;

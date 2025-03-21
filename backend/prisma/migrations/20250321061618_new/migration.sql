@@ -4,7 +4,7 @@ CREATE TABLE `User` (
     `username` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `weight` DECIMAL(5, 2) NOT NULL,
-    `dob` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `dob` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `height` INTEGER NOT NULL,
     `gender` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
@@ -54,6 +54,7 @@ CREATE TABLE `Exercise` (
     `difficulty` VARCHAR(191) NOT NULL,
     `category` VARCHAR(191) NOT NULL DEFAULT 'Uncategorized',
     `instructions` TEXT NOT NULL,
+    `videoUrl` VARCHAR(191) NOT NULL DEFAULT 'https://v1.pinimg.com/videos/mc/expMp4/74/92/98/74929875361f0f599fe039ea0fcf344b_t3.mp4',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -65,6 +66,16 @@ CREATE TABLE `Feedback` (
     `description` TEXT NOT NULL,
     `userId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `WorkoutProgress` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `workoutPlanId` INTEGER NOT NULL,
+    `completedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -83,3 +94,9 @@ ALTER TABLE `WorkoutSet` ADD CONSTRAINT `WorkoutSet_workoutPlanExerciseId_fkey` 
 
 -- AddForeignKey
 ALTER TABLE `Feedback` ADD CONSTRAINT `Feedback_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `WorkoutProgress` ADD CONSTRAINT `WorkoutProgress_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `WorkoutProgress` ADD CONSTRAINT `WorkoutProgress_workoutPlanId_fkey` FOREIGN KEY (`workoutPlanId`) REFERENCES `WorkoutPlan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

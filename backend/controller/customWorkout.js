@@ -565,7 +565,7 @@ const deleteWorkoutPlan = async (req, res) => {
 
 const createWorkoutPlanWithExercises = async (req, res) => {
   try {
-    const { name, exercises } = req.body;
+    const { name, exercises } = req.body ;
 
     // Create Workout Plan
     const workoutPlan = await prisma.workoutPlan.create({
@@ -651,7 +651,15 @@ const exerciseDetails = async (req, res) => {
   }
 };
 
-
+const readExercises = async (req, res) => {
+  try {
+    const exercises = await prisma.exercise.findMany(); // Fetch all exercises
+    res.status(200).json(exercises);
+  } catch (error) {
+    console.error("Error reading exercises:", error);
+    res.status(500).json({ message: "Failed to fetch exercises" });
+  }
+};
 
 module.exports = {
   readExercise,
@@ -665,4 +673,5 @@ module.exports = {
   getWorkoutPlanExercises,
   finishWorkout,
   exerciseDetails,
+  readExercises,
 };

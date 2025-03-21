@@ -56,7 +56,6 @@ model WorkoutSet {
   reps                  Int
   weight                Float
 }
-
 model Exercise {
   id           Int                   @id @default(autoincrement())
   name         String
@@ -66,8 +65,11 @@ model Exercise {
   difficulty   String
   category     String                @default("Uncategorized")
   instructions String                @db.Text
-  workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans, no foreign key in Exercise
+  videoUrl     String                @default("https://v1.pinimg.com/videos/mc/expMp4/74/92/98/74929875361f0f599fe039ea0fcf344b_t3.mp4")
+  workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans
 }
+
+
 
 model Feedback {
   id            Int      @id @default(autoincrement())

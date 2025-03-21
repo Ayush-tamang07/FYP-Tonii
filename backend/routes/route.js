@@ -5,6 +5,7 @@ const customWorkout = require('../controller/customWorkout.js');
 const adminController = require('../controller/adminController.js');
 const resetPassword = require('../controller/resetPassword.js');
 const userController = require('../controller/useController.js');
+const suggestionController = require('../controller/suggestionController.js');
 const authMiddleware = require('../middleware/authmiddleware.js');
 
 const router = express.Router();
@@ -28,6 +29,7 @@ router.post('/user/addFeedback/:userId', userController.addFeedback)
 router.post("/calculate", calculate)
 
 router.get('/exercise',customWorkout.readExercise)
+router.get('/exercises',customWorkout.readExercises)
 router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan);  // Create workout plan
 router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  // Get user's workout plans
 router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorkout.getWorkoutPlanExercises);
@@ -38,6 +40,7 @@ router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFrom
 router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan); 
 router.post("/user/finish-workout", customWorkout.finishWorkout);
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
+// router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
@@ -51,4 +54,6 @@ router.get("/admin/readFeedback",adminController.readFeedback);
 router.post("/admin/workout-plans",adminController.createAdminWorkoutPlan);
 router.get("/admin/workout-plans",adminController.getAdminWorkoutPlans);
 
+
+router.post("/suggestion",suggestionController.suggestion)
 module.exports = router;

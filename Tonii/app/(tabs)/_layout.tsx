@@ -3,6 +3,7 @@ import React from "react";
 import { Platform, StyleSheet } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import '../../global.css'
 
 export default function TabLayout() {
   // Use a consistent color palette
