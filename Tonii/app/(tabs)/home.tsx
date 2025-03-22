@@ -3,7 +3,6 @@ import {
   View, 
   Text, 
   ScrollView, 
-  StyleSheet, 
   SafeAreaView, 
   ActivityIndicator, 
   TouchableOpacity
@@ -32,9 +31,8 @@ const home = () => {
   const [workoutLoading, setWorkoutLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // For the history section
   const [currentDate] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState(18); // Default to day 18 as shown in the image
+  const [selectedDay, setSelectedDay] = useState(18);
   
   useEffect(() => {
     const fetchUserData = async () => {
@@ -89,26 +87,20 @@ const home = () => {
     const days = [16, 17, 18, 19, 20, 21, 22]; // Days shown in screenshot
     
     return (
-      <View style={styles.weekDaysContainer}>
-        <View style={styles.weekDayLabels}>
+      <View className="mb-5">
+        <View className="flex-row justify-between mb-2.5">
           {dayNames.map((day, index) => (
-            <Text key={`day-label-${index}`} style={styles.dayLabel}>{day}</Text>
+            <Text key={`day-label-${index}`} className="flex-1 text-center text-base text-gray-500">{day}</Text>
           ))}
         </View>
-        <View style={styles.weekDays}>
+        <View className="flex-row justify-between">
           {days.map((day, index) => (
             <TouchableOpacity 
               key={`day-${index}`} 
               onPress={() => setSelectedDay(day)}
-              style={[
-                styles.dayButton,
-                day === selectedDay && styles.selectedDayButton
-              ]}
+              className={`w-9 h-9 rounded-full justify-center items-center mx-0.5 ${day === selectedDay ? 'bg-orange-600' : ''}`}
             >
-              <Text style={[
-                styles.dayNumber,
-                day === selectedDay && styles.selectedDayNumber
-              ]}>
+              <Text className={`text-base font-medium ${day === selectedDay ? 'text-white' : 'text-black'}`}>
                 {day}
               </Text>
             </TouchableOpacity>
@@ -119,67 +111,67 @@ const home = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView 
-        style={styles.container} 
-        contentContainerStyle={styles.scrollContent} 
+        className="flex-1" 
+        contentContainerClassName="p-5 pb-20" 
         showsVerticalScrollIndicator={false} 
       >
-        <View style={styles.header}>
+        <View className="mb-8 pt-2.5">
           {loading ? (
             <ActivityIndicator size="large" color="#FF6F00" />
           ) : (
-            <Text style={styles.greeting}>
-              Hi, <Text style={styles.username}>{user.username}!</Text>{"\n"}
-              <Text style={styles.motivationalText}>Ready to crush your goals today?</Text>
+            <Text className="text-2xl leading-8">
+              Hi, <Text className="text-2xl font-bold text-orange-600">{user.username}!</Text>{"\n"}
+              <Text className="text-lg text-gray-600 mt-1">Ready to crush your goals today?</Text>
             </Text>
           )}
         </View>
         
         {/* Workout Plans Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Workout Plans</Text>
+        <View className="mb-8 bg-white rounded-2xl p-5 shadow-md">
+          <Text className="text-lg font-bold mb-4 text-gray-800">Pin Workout Plans</Text>
           
           {workoutLoading && (
-            <View style={styles.loadingContainer}>
+            <View className="p-5 items-center">
               <ActivityIndicator size="large" color="#FF6F00" />
             </View>
           )}
           
           {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+            <View className="bg-red-50 rounded-lg p-4 my-2.5 border-l-4 border-red-600">
+              <Text className="text-red-700 text-base font-medium">{error}</Text>
             </View>
           )}
           
           {!workoutLoading && !error && (
-            <View style={styles.workoutListContainer}>
+            <View className="rounded-lg max-h-64">
               {workoutPlans.length === 0 ? (
-                <View style={styles.emptyStateContainer}>
-                  <Text style={styles.noWorkoutsText}>No workout plans available.</Text>
+                <View className="items-center p-8 bg-gray-50 rounded-lg">
+                  <Text className="text-base text-gray-500 mb-5">No workout plans available.</Text>
                   <TouchableOpacity 
-                    style={styles.createButton}
+                    className="bg-orange-600 py-3 px-6 rounded-full"
                     onPress={() => router.push("/(workout)/createRoutine")}
                   >
-                    <Text style={styles.createButtonText}>Create Your First Plan</Text>
+                    <Text className="text-white font-semibold text-base">Create Your First Plan</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <ScrollView 
-                  style={styles.workoutScrollView}
+                  className="max-h-64 rounded-lg"
                   showsVerticalScrollIndicator={true}
                   nestedScrollEnabled={true}
                 >
                   {workoutPlans.map((plan) => (
                     <TouchableOpacity 
                       key={plan.id} 
-                      style={styles.workoutItem}
+                      className="bg-gray-50 p-4.5 rounded-lg mb-2.5 flex-row items-center justify-between border-l-4 border-orange-600"
                       onPress={() => navigateToWorkout(plan.id)}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.workoutText}>{plan.name}</Text>
-                      <View style={styles.arrowContainer}>
-                        <Text style={styles.arrow}>›</Text>
+                      <Text className="text-base font-semibold text-gray-800">{plan.name}</Text>
+                      <View className="justify-center items-center">
+                        <Text className="text-2xl text-orange-600 font-bold">›</Text>
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -190,21 +182,21 @@ const home = () => {
         </View>
         
         {/* History Section */}
-        <View style={styles.section}>
-          <View style={styles.historyHeader}>
-            <Text style={styles.sectionTitle}>History</Text>
+        <View className="mb-8 bg-white rounded-2xl p-5 shadow-md">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold text-gray-800">History</Text>
             <TouchableOpacity onPress={navigateToAllRecords}>
-              <Text style={styles.allRecordsText}>All records</Text>
+              <Text className="text-orange-600 text-base font-medium">All records</Text>
             </TouchableOpacity>
           </View>
           
           {renderWeekDays()}
           
-          <View style={styles.streakContainer}>
-            <Text style={styles.streakLabel}>Day Streak</Text>
-            <View style={styles.streakValueContainer}>
-              <Text style={styles.fireIcon}>🔥</Text>
-              <Text style={styles.streakValue}>0</Text>
+          <View className="flex-row items-center justify-between pt-4 border-t border-gray-100">
+            <Text className="text-base text-gray-600">Day Streak</Text>
+            <View className="flex-row items-center">
+              <Text className="text-lg mr-1 text-orange-600">🔥</Text>
+              <Text className="text-xl font-bold">0</Text>
             </View>
           </View>
         </View>
@@ -217,200 +209,5 @@ const home = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
-  },
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 80,
-  },
-  header: {
-    marginBottom: 30,
-    paddingTop: 10,
-  },
-  greeting: {
-    fontSize: 22,
-    lineHeight: 32,
-  },
-  username: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#FF6F00",
-  },
-  motivationalText: {
-    fontSize: 18,
-    color: "#666",
-    marginTop: 5,
-  },
-  section: {
-    marginBottom: 30,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 15,
-    color: "#333",
-  },
-  // History styles
-  historyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  allRecordsText: {
-    color: '#FF6F00',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  weekDaysContainer: {
-    marginBottom: 20,
-  },
-  weekDayLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  dayLabel: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 15,
-    color: '#777',
-  },
-  weekDays: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  dayButton: {
-    width: 35,
-    height: 35,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 3,
-  },
-  selectedDayButton: {
-    backgroundColor: '#FF6F00',
-  },
-  dayNumber: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  selectedDayNumber: {
-    color: '#FFFFFF',
-  },
-  streakContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-  },
-  streakLabel: {
-    fontSize: 16,
-    color: '#555',
-  },
-  streakValueContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  fireIcon: {
-    fontSize: 18,
-    marginRight: 5,
-    color: '#FF6F00',
-  },
-  streakValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  // Workout Plans styles
-  workoutListContainer: {
-    borderRadius: 10,
-    maxHeight: 250,
-  },
-  workoutScrollView: {
-    maxHeight: 250,
-    borderRadius: 10,
-  },
-  workoutItem: {
-    backgroundColor: "#F5F7FA",
-    padding: 18,
-    borderRadius: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderLeftWidth: 4,
-    borderLeftColor: "#FF6F00",
-  },
-  workoutText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  arrowContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  arrow: {
-    fontSize: 22,
-    color: "#FF6F00",
-    fontWeight: "bold",
-  },
-  errorContainer: {
-    backgroundColor: "#FFEBEE",
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: "#D32F2F",
-  },
-  errorText: {
-    color: "#D32F2F",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  loadingContainer: {
-    padding: 20,
-    alignItems: "center",
-  },
-  emptyStateContainer: {
-    alignItems: "center",
-    padding: 30,
-    backgroundColor: "#F5F7FA",
-    borderRadius: 10,
-  },
-  noWorkoutsText: {
-    fontSize: 16,
-    color: "#757575",
-    marginBottom: 20,
-  },
-  createButton: {
-    backgroundColor: "#FF6F00",
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 30,
-  },
-  createButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: 15,
-  }
-});
 
 export default home;

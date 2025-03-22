@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import apiHandler from '@/context/APIHandler';
@@ -64,27 +64,28 @@ const AddExercise: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topButtons}>
+    <View className="flex-1 bg-white p-5">
+      <View className="flex-row justify-between items-center py-2.5">
         <TouchableOpacity onPress={() => router.push("/(workout)/createRoutine")}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text className="text-[#FF6909] text-lg">Cancel</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Exercise</Text>
+        <Text className="text-xl font-bold text-black">Add Exercise</Text>
         <TouchableOpacity onPress={addToWorkoutPlan}>
-          <Text style={styles.createText}>Create</Text>
+          <Text className="text-[#FF6909] text-lg">Create</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.filterButtons}>
-        <TouchableOpacity style={[styles.filterButton, { flex: 1 }]}>
-          <Text style={styles.filterText}>All Equipment</Text>
+      
+      <View className="flex-row justify-between mb-2.5 gap-2.5">
+        <TouchableOpacity className="flex-1 bg-gray-200 py-2.5 px-4 rounded-lg">
+          <Text className="text-base text-black text-center">All Equipment</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.filterButton, { flex: 1 }]}>
-          <Text style={styles.filterText}>All Muscles</Text>
+        <TouchableOpacity className="flex-1 bg-gray-200 py-2.5 px-4 rounded-lg">
+          <Text className="text-base text-black text-center">All Muscles</Text>
         </TouchableOpacity>
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#FF6909" style={{ marginTop: 20 }} />
+        <ActivityIndicator size="large" color="#FF6909" className="mt-5" />
       ) : (
         <FlatList
           data={exercises}
@@ -93,14 +94,14 @@ const AddExercise: React.FC = () => {
             const isSelected = selectedExercises.includes(item.id);
             return (
               <TouchableOpacity
-                style={[styles.exerciseItem, isSelected && styles.selectedExercise]}
+                className={`flex-row items-center ${isSelected ? 'bg-[#FFD8B5]' : 'bg-gray-50'} p-2.5 rounded-lg my-1.5`}
                 onPress={() => toggleSelection(item.id)}
               >
-                <View style={[styles.selectionIndicator, isSelected && styles.selectedIndicator]} />
-                <Image source={{ uri: item.image }} style={styles.exerciseImage} />
-                <View style={styles.exerciseInfo}>
-                  <Text style={styles.exerciseName}>{item.name}</Text>
-                  <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
+                <View className={`w-1 h-full ${isSelected ? 'bg-[#FF6909]' : 'bg-transparent'} mr-2.5`} />
+                <Image source={{ uri: item.image }} className="w-12 h-12 rounded-full" />
+                <View className="flex-1 ml-2.5">
+                  <Text className="text-lg text-black">{item.name}</Text>
+                  <Text className="text-sm text-gray-500">{item.muscle}</Text>
                 </View>
                 {isSelected ? (
                   <Ionicons name="checkmark-circle" size={24} color="#FF6909" />
@@ -114,45 +115,12 @@ const AddExercise: React.FC = () => {
       )}
 
       {selectedExercises.length > 0 && (
-        <TouchableOpacity style={styles.addButton} onPress={addToWorkoutPlan}>
-          <Text style={styles.addButtonText}>Add {selectedExercises.length} exercises</Text>
+        <TouchableOpacity className="bg-[#FF6909] p-4 rounded-lg items-center mt-2.5" onPress={addToWorkoutPlan}>
+          <Text className="text-white text-lg font-bold">Add {selectedExercises.length} exercises</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 20 },
-  topButtons: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 },
-  cancelText: { color: '#FF6909', fontSize: 18 },
-  createText: { color: '#FF6909', fontSize: 18 },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#000' },
-  exerciseItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9f9f9', padding: 10, borderRadius: 10, marginVertical: 5 },
-  selectedExercise: { backgroundColor: '#FFD8B5' },
-  selectionIndicator: { width: 4, height: '100%', backgroundColor: 'transparent', marginRight: 10 },
-  selectedIndicator: { backgroundColor: '#FF6909' },
-  exerciseImage: { width: 50, height: 50, borderRadius: 25 },
-  exerciseInfo: { flex: 1, marginLeft: 10 },
-  exerciseName: { fontSize: 18, color: '#000' },
-  exerciseMuscle: { fontSize: 14, color: '#666' },
-  addButton: { backgroundColor: '#FF6909', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
-  addButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  filterText: {
-    fontSize: 16,
-    color: '#000', 
-    alignSelf: 'center'
-  },
-  filterButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    gap: 10 // Adds spacing between buttons
-  },
-    filterButton: {
-    backgroundColor: '#e0e0e0',
-    paddingVertical: 10, paddingHorizontal: 15, borderRadius: 8
-  },
-});
 
 export default AddExercise;

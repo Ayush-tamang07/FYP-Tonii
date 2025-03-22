@@ -2,16 +2,15 @@ import React, { useState } from "react";
 import { 
   View, 
   TextInput, 
-  Button, 
   Text, 
   FlatList, 
-  StyleSheet, 
   ScrollView, 
   TouchableOpacity,
   ActivityIndicator,
   SafeAreaView
 } from "react-native";
 import apiHandler from "@/context/APIHandler";
+import { Ionicons } from "@expo/vector-icons";
 
 interface UserDetails {
   age: number | "";
@@ -133,17 +132,23 @@ const Explore: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Workout Planner</Text>
+    <SafeAreaView className="flex-1 bg-gray-100">
+      {/* Header */}
+      <View className="bg-white py-4 px-5 flex-row items-center border-b border-gray-200">
+        <Ionicons name="fitness-outline" size={24} color="#4a90e2" />
+        <Text className="text-xl font-bold text-gray-800 ml-2">Explore Workouts</Text>
+      </View>
+      
+      <ScrollView className="flex-1" contentContainerClassName="p-5">
+        <Text className="text-2xl font-bold mb-5 text-center text-gray-800">Workout Planner</Text>
         
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Details</Text>
+        <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-bold mb-4 text-gray-800">Your Details</Text>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Age</Text>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Age</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-lg px-3 py-2.5 text-base bg-gray-50"
               placeholder="Enter your age"
               keyboardType="numeric"
               value={userDetails.age.toString()}
@@ -151,22 +156,24 @@ const Explore: React.FC = () => {
             />
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Gender</Text>
-            <View style={styles.optionsRow}>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Gender</Text>
+            <View className="flex-row flex-wrap">
               {["male", "female", "other"].map(option => (
                 <TouchableOpacity
                   key={`gender-${option}`}
-                  style={[
-                    styles.optionButton,
-                    userDetails.gender === option && styles.selectedOption
-                  ]}
+                  className={`border rounded-lg px-3 py-2 mr-2 mb-2 ${
+                    userDetails.gender === option 
+                      ? 'bg-[#4a90e2] border-[#4a90e2]' 
+                      : 'bg-gray-50 border-gray-300'
+                  }`}
                   onPress={() => handleChange("gender", option, "details")}
                 >
-                  <Text style={[
-                    styles.optionText,
-                    userDetails.gender === option && styles.selectedOptionText
-                  ]}>
+                  <Text className={`${
+                    userDetails.gender === option 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-600'
+                  }`}>
                     {option}
                   </Text>
                 </TouchableOpacity>
@@ -174,10 +181,10 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Height (cm)</Text>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Height (cm)</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-lg px-3 py-2.5 text-base bg-gray-50"
               placeholder="Enter your height"
               keyboardType="numeric"
               value={userDetails.height.toString()}
@@ -185,10 +192,10 @@ const Explore: React.FC = () => {
             />
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Weight (kg)</Text>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Weight (kg)</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-lg px-3 py-2.5 text-base bg-gray-50"
               placeholder="Enter your weight"
               keyboardType="numeric"
               value={userDetails.weight.toString()}
@@ -197,25 +204,27 @@ const Explore: React.FC = () => {
           </View>
         </View>
         
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Workout Preferences</Text>
+        <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+          <Text className="text-lg font-bold mb-4 text-gray-800">Workout Preferences</Text>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Goal</Text>
-            <View style={styles.optionsRow}>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Goal</Text>
+            <View className="flex-row flex-wrap">
               {goalOptions.map(option => (
                 <TouchableOpacity
                   key={`goal-${option}`}
-                  style={[
-                    styles.optionButton,
-                    userPreferences.goal === option && styles.selectedOption
-                  ]}
+                  className={`border rounded-lg px-3 py-2 mr-2 mb-2 ${
+                    userPreferences.goal === option 
+                      ? 'bg-[#4a90e2] border-[#4a90e2]' 
+                      : 'bg-gray-50 border-gray-300'
+                  }`}
                   onPress={() => handleChange("goal", option, "preferences")}
                 >
-                  <Text style={[
-                    styles.optionText,
-                    userPreferences.goal === option && styles.selectedOptionText
-                  ]}>
+                  <Text className={`${
+                    userPreferences.goal === option 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-600'
+                  }`}>
                     {option}
                   </Text>
                 </TouchableOpacity>
@@ -223,22 +232,24 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Experience Level</Text>
-            <View style={styles.optionsRow}>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Experience Level</Text>
+            <View className="flex-row flex-wrap">
               {experienceOptions.map(option => (
                 <TouchableOpacity
                   key={`experience-${option}`}
-                  style={[
-                    styles.optionButton,
-                    userPreferences.experience === option && styles.selectedOption
-                  ]}
+                  className={`border rounded-lg px-3 py-2 mr-2 mb-2 ${
+                    userPreferences.experience === option 
+                      ? 'bg-[#4a90e2] border-[#4a90e2]' 
+                      : 'bg-gray-50 border-gray-300'
+                  }`}
                   onPress={() => handleChange("experience", option, "preferences")}
                 >
-                  <Text style={[
-                    styles.optionText,
-                    userPreferences.experience === option && styles.selectedOptionText
-                  ]}>
+                  <Text className={`${
+                    userPreferences.experience === option 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-600'
+                  }`}>
                     {option}
                   </Text>
                 </TouchableOpacity>
@@ -246,22 +257,24 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Equipment</Text>
-            <View style={styles.optionsWrap}>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Equipment</Text>
+            <View className="flex-row flex-wrap">
               {equipmentOptions.map(option => (
                 <TouchableOpacity
                   key={`equipment-${option}`}
-                  style={[
-                    styles.optionButton,
-                    userPreferences.equipment === option && styles.selectedOption
-                  ]}
+                  className={`border rounded-lg px-3 py-2 mr-2 mb-2 ${
+                    userPreferences.equipment === option 
+                      ? 'bg-[#4a90e2] border-[#4a90e2]' 
+                      : 'bg-gray-50 border-gray-300'
+                  }`}
                   onPress={() => handleChange("equipment", option, "preferences")}
                 >
-                  <Text style={[
-                    styles.optionText,
-                    userPreferences.equipment === option && styles.selectedOptionText
-                  ]}>
+                  <Text className={`${
+                    userPreferences.equipment === option 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-600'
+                  }`}>
                     {option}
                   </Text>
                 </TouchableOpacity>
@@ -269,65 +282,69 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Target Muscles</Text>
-            <View style={styles.optionsWrap}>
+          <View className="mb-3">
+            <Text className="text-sm font-semibold mb-1.5 text-gray-600">Target Muscles</Text>
+            <View className="flex-row flex-wrap">
               {muscleOptions.map(muscle => (
                 <TouchableOpacity
                   key={`muscle-${muscle}`}
-                  style={[
-                    styles.optionButton,
-                    userPreferences.muscle.includes(muscle) && styles.selectedOption
-                  ]}
+                  className={`border rounded-lg px-3 py-2 mr-2 mb-2 ${
+                    userPreferences.muscle.includes(muscle) 
+                      ? 'bg-[#4a90e2] border-[#4a90e2]' 
+                      : 'bg-gray-50 border-gray-300'
+                  }`}
                   onPress={() => handleMuscleSelection(muscle)}
                 >
-                  <Text style={[
-                    styles.optionText,
-                    userPreferences.muscle.includes(muscle) && styles.selectedOptionText
-                  ]}>
+                  <Text className={`${
+                    userPreferences.muscle.includes(muscle) 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-600'
+                  }`}>
                     {muscle}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
             {userPreferences.muscle ? (
-              <Text style={styles.selectionSummary}>
+              <Text className="mt-2 text-sm text-[#4a90e2] font-medium">
                 Selected: {userPreferences.muscle}
               </Text>
             ) : (
-              <Text style={styles.selectionHint}>Select one or more muscle groups</Text>
+              <Text className="mt-2 text-sm text-gray-400 italic">
+                Select one or more muscle groups
+              </Text>
             )}
           </View>
         </View>
         
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error ? <Text className="text-red-500 mb-4 text-sm text-center">{error}</Text> : null}
         
         <TouchableOpacity 
-          style={styles.submitButton}
+          className="bg-[#4a90e2] rounded-lg py-3.5 items-center mt-2 mb-6"
           onPress={getSuggestions}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>Generate Workout Plan</Text>
+            <Text className="text-white text-base font-semibold">Generate Workout Plan</Text>
           )}
         </TouchableOpacity>
         
         {exercises.length > 0 ? (
-          <View style={styles.resultsSection}>
-            <Text style={styles.sectionTitle}>Your Personalized Workout</Text>
+          <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+            <Text className="text-lg font-bold mb-4 text-gray-800">Your Personalized Workout</Text>
             <FlatList
               data={exercises}
               keyExtractor={(item, index) => `exercise-${index}`}
               scrollEnabled={false}
               renderItem={({ item }) => (
-                <View style={styles.exerciseCard}>
-                  <Text style={styles.exerciseName}>{item.name}</Text>
-                  <View style={styles.exerciseDetails}>
-                    <Text style={styles.exerciseDetail}>Muscle: {item.muscle}</Text>
-                    <Text style={styles.exerciseDetail}>Equipment: {item.equipment}</Text>
-                    <Text style={styles.exerciseDetail}>Difficulty: {item.difficulty}</Text>
+                <View className="border border-gray-200 rounded-lg p-3 mb-2.5 bg-gray-50">
+                  <Text className="text-base font-bold mb-2 text-gray-800">{item.name}</Text>
+                  <View className="gap-1">
+                    <Text className="text-sm text-gray-600">Muscle: {item.muscle}</Text>
+                    <Text className="text-sm text-gray-600">Equipment: {item.equipment}</Text>
+                    <Text className="text-sm text-gray-600">Difficulty: {item.difficulty}</Text>
                   </View>
                 </View>
               )}
@@ -335,8 +352,8 @@ const Explore: React.FC = () => {
           </View>
         ) : (
           loading ? null : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>
+            <View className="bg-white rounded-xl p-8 items-center mb-4 shadow-sm">
+              <Text className="text-gray-400 text-base text-center">
                 Your workout recommendations will appear here
               </Text>
             </View>
@@ -346,166 +363,5 @@ const Explore: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f7fa",
-  },
-  scrollContainer: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
-  },
-  section: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#333",
-  },
-  inputGroup: {
-    marginBottom: 12,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-    color: "#555",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: "#f9f9f9",
-  },
-  optionsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  optionsWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  optionButton: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginRight: 8,
-    marginBottom: 8,
-    backgroundColor: "#f9f9f9",
-  },
-  selectedOption: {
-    backgroundColor: "#4a90e2",
-    borderColor: "#4a90e2",
-  },
-  optionText: {
-    color: "#555",
-  },
-  selectedOptionText: {
-    color: "#fff",
-    fontWeight: "500",
-  },
-  submitButton: {
-    backgroundColor: "#4a90e2",
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  submitButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  errorText: {
-    color: "#e74c3c",
-    marginBottom: 16,
-    fontSize: 14,
-    textAlign: "center",
-  },
-  resultsSection: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  exerciseCard: {
-    borderWidth: 1,
-    borderColor: "#eee",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-    backgroundColor: "#f9f9f9",
-  },
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: "#333",
-  },
-  exerciseDetails: {
-    gap: 4,
-  },
-  exerciseDetail: {
-    fontSize: 14,
-    color: "#666",
-  },
-  selectionSummary: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#4a90e2",
-    fontWeight: "500",
-  },
-  selectionHint: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#999",
-    fontStyle: "italic",
-  },
-  emptyState: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 30,
-    alignItems: "center",
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  emptyStateText: {
-    color: "#999",
-    fontSize: 16,
-    textAlign: "center",
-  }
-});
 
 export default Explore;

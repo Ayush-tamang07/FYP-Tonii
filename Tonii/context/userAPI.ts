@@ -1,23 +1,6 @@
 import apiHandler from "./APIHandler";
 import * as SecureStore from "expo-secure-store";
 
-// export const loginUser = async (email: string, password: string) => {
-//   try {
-//     console.log("user_login", email, password);
-//     const response = await apiHandler.post("/auth/login", {
-//       email,
-//       password
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error(error);
-//     return {
-//       status: 400,
-//       message: "Login failed."
-//     };
-//   }
-// };
-
 export const registerUser = async (
   username: string,
   email: string,
@@ -76,7 +59,6 @@ export const workoutPlan = async () => {
     if (!token) {
       return { status: 401, message: "Unauthorized: No token found" };
     }
-
     const response = await apiHandler.get("/user/workout-plans", {
       headers: {
         Authorization: `Bearer ${token}`, // Send token in headers
@@ -89,6 +71,7 @@ export const workoutPlan = async () => {
     return { status: 400, message: "Error fetching user details." };
   }
 };
+
 export const getWorkoutById = async (id: string) => {
   const token = await SecureStore.getItemAsync("AccessToken"); // Retrieve token
 

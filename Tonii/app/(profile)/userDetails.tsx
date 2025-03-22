@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { 
   View, 
   Text, 
-  StyleSheet, 
   TextInput, 
   Image, 
   TouchableOpacity, 
@@ -75,94 +74,94 @@ const userDetails = () => {
 
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
+      <View className="flex-1 justify-center items-center bg-[#F8F9FA]">
         <ActivityIndicator size="large" color="#FF6F00" />
-        <Text style={styles.loadingText}>Loading profile...</Text>
+        <Text className="mt-2.5 text-[#666666] text-base">Loading profile...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-[#F8F9FA]">
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       
       <ScrollView 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName="pt-5 pb-8 relative"
       >
         {/* Edit Profile Button - Positioned at the top right */}
-        <TouchableOpacity style={styles.editProfileButton}>
+        <TouchableOpacity className="flex-row items-center self-end bg-white py-2 px-4 rounded-full mr-4 mb-2 shadow">
           <MaterialIcons name="edit" size={20} color="#FF6F00" />
-          <Text style={styles.editProfileText}>Edit Profile</Text>
+          <Text className="ml-1.5 text-sm font-medium text-[#FF6F00]">Edit Profile</Text>
         </TouchableOpacity>
 
         {/* Profile Image and Name */}
-        <View style={styles.profileHeader}>
-          <View style={styles.imageContainer}>
+        <View className="items-center py-6 bg-white mb-4 rounded-xl mx-4 shadow">
+          <View className="relative mb-3">
             <Image
               source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }}
-              style={styles.profileImage}
+              className="w-[100px] h-[100px] rounded-full border-3 border-white shadow"
             />
-            <TouchableOpacity style={styles.editImageButton}>
+            <TouchableOpacity className="absolute bottom-0 right-0 bg-[#FF6F00] rounded-full w-[30px] h-[30px] justify-center items-center border-2 border-white">
               <MaterialIcons name="photo-camera" size={20} color="#FFF" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.profileName}>{user.username}</Text>
+          <Text className="text-2xl font-bold text-[#333333]">{user.username}</Text>
         </View>
 
         {/* Personal Information Card */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Personal Information</Text>
+        <View className="bg-white rounded-xl mx-4 mt-4 shadow overflow-hidden">
+          <View className="flex-row justify-between items-center px-4 py-3.5 border-b border-[#F0F0F0]">
+            <Text className="text-base font-semibold text-[#333333]">Personal Information</Text>
           </View>
           
-          <View style={styles.cardContent}>
-            <View style={styles.inputGroup}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="person-outline" size={18} color="#666" style={styles.inputIcon} />
-                <Text style={styles.label}>Full Name</Text>
+          <View className="p-4">
+            <View className="mb-4">
+              <View className="flex-row items-center mb-1.5">
+                <Ionicons name="person-outline" size={18} color="#666" className="mr-1.5" />
+                <Text className="text-sm text-[#666666] font-medium">Full Name</Text>
               </View>
               <TextInput 
-                style={styles.input} 
+                className="bg-[#F5F5F5] px-3 py-2.5 rounded-lg text-[15px] text-[#333333] border border-[#EEEEEE]" 
                 value={user.username} 
                 editable={false}
                 placeholder="Not provided"
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <View style={styles.labelContainer}>
-                <MaterialIcons name="email" size={18} color="#666" style={styles.inputIcon} />
-                <Text style={styles.label}>Email Address</Text>
+            <View className="mb-4">
+              <View className="flex-row items-center mb-1.5">
+                <MaterialIcons name="email" size={18} color="#666" className="mr-1.5" />
+                <Text className="text-sm text-[#666666] font-medium">Email Address</Text>
               </View>
               <TextInput 
-                style={styles.input} 
+                className="bg-[#F5F5F5] px-3 py-2.5 rounded-lg text-[15px] text-[#333333] border border-[#EEEEEE]" 
                 value={user.email} 
                 editable={false}
                 placeholder="Not provided"
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <View style={styles.labelContainer}>
-                <MaterialIcons name="cake" size={18} color="#666" style={styles.inputIcon} />
-                <Text style={styles.label}>Date of Birth</Text>
+            <View className="mb-4">
+              <View className="flex-row items-center mb-1.5">
+                <MaterialIcons name="cake" size={18} color="#666" className="mr-1.5" />
+                <Text className="text-sm text-[#666666] font-medium">Date of Birth</Text>
               </View>
               <TextInput 
-                style={styles.input} 
+                className="bg-[#F5F5F5] px-3 py-2.5 rounded-lg text-[15px] text-[#333333] border border-[#EEEEEE]" 
                 value={user.dob} 
                 editable={false}
                 placeholder="Not provided"
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="body-outline" size={18} color="#666" style={styles.inputIcon} />
-                <Text style={styles.label}>Gender</Text>
+            <View className="mb-4">
+              <View className="flex-row items-center mb-1.5">
+                <Ionicons name="body-outline" size={18} color="#666" className="mr-1.5" />
+                <Text className="text-sm text-[#666666] font-medium">Gender</Text>
               </View>
               <TextInput 
-                style={styles.input} 
+                className="bg-[#F5F5F5] px-3 py-2.5 rounded-lg text-[15px] text-[#333333] border border-[#EEEEEE]" 
                 value={user.gender} 
                 editable={false}
                 placeholder="Not provided"
@@ -172,35 +171,35 @@ const userDetails = () => {
         </View>
 
         {/* Body Metrics Card */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Body Metrics</Text>
+        <View className="bg-white rounded-xl mx-4 mt-4 shadow overflow-hidden">
+          <View className="flex-row justify-between items-center px-4 py-3.5 border-b border-[#F0F0F0]">
+            <Text className="text-base font-semibold text-[#333333]">Body Metrics</Text>
           </View>
           
-          <View style={styles.cardContent}>
-            <View style={styles.metricsContainer}>
-              <View style={styles.metricBox}>
-                <View style={styles.metricIconContainer}>
+          <View className="p-4">
+            <View className="flex-row justify-between">
+              <View className="flex-1 items-center p-3 bg-[#F8F9FA] rounded-lg mx-1 border border-[#EEEEEE]">
+                <View className="w-8 h-8 rounded-full bg-[rgba(255,111,0,0.1)] justify-center items-center mb-2">
                   <FontAwesome name="balance-scale" size={16} color="#FF6F00" />
                 </View>
-                <Text style={styles.metricValue}>{user.weight || '--'}</Text>
-                <Text style={styles.metricLabel}>Weight (kg)</Text>
+                <Text className="text-lg font-bold text-[#333333] mb-1">{user.weight || '--'}</Text>
+                <Text className="text-xs text-[#666666]">Weight (kg)</Text>
               </View>
               
-              <View style={styles.metricBox}>
-                <View style={styles.metricIconContainer}>
+              <View className="flex-1 items-center p-3 bg-[#F8F9FA] rounded-lg mx-1 border border-[#EEEEEE]">
+                <View className="w-8 h-8 rounded-full bg-[rgba(255,111,0,0.1)] justify-center items-center mb-2">
                   <MaterialIcons name="height" size={16} color="#FF6F00" />
                 </View>
-                <Text style={styles.metricValue}>{user.height || '--'}</Text>
-                <Text style={styles.metricLabel}>Height (cm)</Text>
+                <Text className="text-lg font-bold text-[#333333] mb-1">{user.height || '--'}</Text>
+                <Text className="text-xs text-[#666666]">Height (cm)</Text>
               </View>
               
-              <View style={styles.metricBox}>
-                <View style={styles.metricIconContainer}>
+              <View className="flex-1 items-center p-3 bg-[#F8F9FA] rounded-lg mx-1 border border-[#EEEEEE]">
+                <View className="w-8 h-8 rounded-full bg-[rgba(255,111,0,0.1)] justify-center items-center mb-2">
                   <Ionicons name="calendar-outline" size={16} color="#FF6F00" />
                 </View>
-                <Text style={styles.metricValue}>{calculateAge(user.dob) || '--'}</Text>
-                <Text style={styles.metricLabel}>Age (years)</Text>
+                <Text className="text-lg font-bold text-[#333333] mb-1">{calculateAge(user.dob) || '--'}</Text>
+                <Text className="text-xs text-[#666666]">Age (years)</Text>
               </View>
             </View>
           </View>
@@ -209,186 +208,5 @@ const userDetails = () => {
     </SafeAreaView>
   );
 };
-
-// Styles
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  scrollContent: {
-    paddingTop: 20,
-    paddingBottom: 30,
-    position: 'relative',
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: '#666666',
-    fontSize: 16,
-  },
-  editProfileButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    marginRight: 16,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  editProfileText: {
-    marginLeft: 6,
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#FF6F00',
-  },
-  profileHeader: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 16,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  imageContainer: {
-    position: 'relative',
-    marginBottom: 12,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  editImageButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#FF6F00',
-    borderRadius: 15,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  profileName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333333',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginTop: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-    overflow: 'hidden',
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-  },
-  cardContent: {
-    padding: 16,
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  inputIcon: {
-    marginRight: 6,
-  },
-  label: {
-    fontSize: 14,
-    color: '#666666',
-    fontWeight: '500',
-  },
-  input: {
-    backgroundColor: '#F5F5F5',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    fontSize: 15,
-    color: '#333333',
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
-  },
-  metricsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  metricBox: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 8,
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
-  },
-  metricIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 111, 0, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  metricValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 4,
-  },
-  metricLabel: {
-    fontSize: 12,
-    color: '#666666',
-  }
-});
 
 export default userDetails;

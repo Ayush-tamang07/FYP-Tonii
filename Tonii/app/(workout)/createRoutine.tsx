@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  View, Text, TextInput, TouchableOpacity,
   Image, Alert, FlatList, ActivityIndicator,
   ScrollView
 } from "react-native";
@@ -150,16 +150,16 @@ const CreateRoutine: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View className="flex-1 bg-white p-4">
+      <View className="flex-row justify-start items-center py-4">
         <TouchableOpacity onPress={() => router.push("/(tabs)/workout")}>
           <Ionicons name="arrow-back" size={24} color="#3498db" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Routine</Text>
+        <Text className="text-lg font-bold text-black text-center flex-grow">Create Routine</Text>
       </View>
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 text-black text-base p-4 rounded-lg my-2.5"
         placeholder="Routine title"
         placeholderTextColor="#888"
         value={title}
@@ -167,7 +167,7 @@ const CreateRoutine: React.FC = () => {
       />
       
       {/* Category Filter */}
-      <View style={styles.filterContainer}>
+      <View className="my-2.5">
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
@@ -175,17 +175,15 @@ const CreateRoutine: React.FC = () => {
           {categories.map((category) => (
             <TouchableOpacity
               key={category}
-              style={[
-                styles.categoryButton,
-                activeCategory === category && styles.activeCategoryButton
-              ]}
+              className={`px-5 py-2.5 rounded-full mr-2.5 min-w-20 items-center ${
+                activeCategory === category ? 'bg-[#FF6909]' : 'bg-gray-100'
+              }`}
               onPress={() => filterByCategory(category)}
             >
               <Text 
-                style={[
-                  styles.categoryText,
-                  activeCategory === category && styles.activeCategoryText
-                ]}
+                className={`${
+                  activeCategory === category ? 'text-white font-bold' : 'text-gray-500'
+                } text-sm`}
               >
                 {category}
               </Text>
@@ -204,26 +202,28 @@ const CreateRoutine: React.FC = () => {
             const isSelected = selectedExercises.includes(item.id);
             return (
               <TouchableOpacity
-                style={[styles.exerciseItem, isSelected && styles.selectedExercise]}
+                className={`flex-row items-center p-4 rounded-xl my-1.5 shadow-sm ${
+                  isSelected ? 'bg-[#FFF5EE]' : 'bg-white'
+                }`}
                 onPress={() => toggleSelection(item.id)}
               >
                 <Image 
                   source={{ uri: getCategoryImage(item.category, item.image) }} 
-                  style={styles.exerciseImage} 
+                  className="w-[70px] h-[70px] rounded-full" 
                 />
-                <View style={styles.exerciseInfo}>
-                  <Text style={styles.exerciseName}>{item.name}</Text>
-                  <Text style={styles.exerciseMuscle}>{item.category}</Text>
+                <View className="flex-1 ml-4">
+                  <Text className="text-lg font-bold text-black mb-1">{item.name}</Text>
+                  <Text className="text-base text-gray-500">{item.category}</Text>
                 </View>
                 <TouchableOpacity
-                  style={styles.moreButton}
+                  className="bg-gray-100 px-4 py-2 rounded-full items-center justify-center min-w-[70px]"
                   onPress={() =>
                     router.push({
                       pathname: "/(workout)/singleExercise",
                       params: { id: item.id.toString() },
                     })
                   }>
-                  <Text style={styles.moreButtonText}>More</Text>
+                  <Text className="text-gray-600 text-sm">More</Text>
                 </TouchableOpacity>
               </TouchableOpacity>
             );
@@ -231,8 +231,12 @@ const CreateRoutine: React.FC = () => {
         />
       )}
 
-      <TouchableOpacity style={styles.addButton} onPress={handleSave} disabled={saving}>
-        <Text style={styles.addButtonText}>
+      <TouchableOpacity 
+        className="bg-[#FF6909] p-4 rounded-3xl items-center my-2.5" 
+        onPress={handleSave} 
+        disabled={saving}
+      >
+        <Text className="text-white text-lg font-bold">
           {saving ? "Saving..." : `Save Routine (${selectedExercises.length})`}
         </Text>
       </TouchableOpacity>
@@ -241,116 +245,3 @@ const CreateRoutine: React.FC = () => {
 };
 
 export default CreateRoutine;
-
-// ✅ Styles
-const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff", 
-    padding: 16 
-  },
-  header: { 
-    flexDirection: "row", 
-    justifyContent: "flex-start", 
-    alignItems: "center", 
-    paddingVertical: 15
-  },
-  headerTitle: { 
-    fontSize: 18, 
-    fontWeight: "bold", 
-    color: "#000", 
-    textAlign: "center", 
-    flexGrow: 1 
-  },
-  input: { 
-    backgroundColor: "#F5F5F5", 
-    color: "#000", 
-    fontSize: 16, 
-    padding: 15, 
-    borderRadius: 8, 
-    marginVertical: 10 
-  },
-  filterContainer: {
-    marginVertical: 10
-  },
-  categoryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    backgroundColor: "#F0F0F0",
-    borderRadius: 20,
-    marginRight: 10,
-    minWidth: 80,
-    alignItems: 'center'
-  },
-  activeCategoryButton: {
-    backgroundColor: "#FF6909"
-  },
-  categoryText: {
-    color: "#888",
-    fontSize: 14
-  },
-  activeCategoryText: {
-    color: "#FFF",
-    fontWeight: "bold"
-  },
-  exerciseItem: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    backgroundColor: "#ffffff", 
-    padding: 15, 
-    borderRadius: 12, 
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 1,
-    elevation: 1
-  },
-  selectedExercise: { 
-    backgroundColor: "#FFF5EE",
-  },
-  exerciseImage: { 
-    width: 70, 
-    height: 70, 
-    borderRadius: 35 
-  },
-  exerciseInfo: { 
-    flex: 1, 
-    marginLeft: 15 
-  },
-  exerciseName: { 
-    fontSize: 18, 
-    fontWeight: "bold", 
-    color: "#000",
-    marginBottom: 5
-  },
-  exerciseMuscle: { 
-    fontSize: 15, 
-    color: "#666" 
-  },
-  moreButton: {
-    backgroundColor: "#F0F0F0",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 70
-  },
-  moreButtonText: {
-    color: "#555",
-    fontSize: 14
-  },
-  addButton: { 
-    backgroundColor: "#FF6909", 
-    padding: 16, 
-    borderRadius: 25, 
-    alignItems: "center", 
-    marginVertical: 10
-  },
-  addButtonText: { 
-    color: "#fff", 
-    fontSize: 18, 
-    fontWeight: "bold" 
-  }
-});

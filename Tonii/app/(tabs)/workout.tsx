@@ -25,12 +25,12 @@ const Workout: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<WorkoutPlan | null>(null);
   const BottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoint = useMemo(()=> ["25%"],[]);
-  const openSheet = (plan: WorkoutPlan)=> {
+  const snapPoint = useMemo(() => ["25%"], []);
+  const openSheet = (plan: WorkoutPlan) => {
     setSelectedPlan(plan);
     BottomSheetRef.current?.expand();
   };
-  const backDrop = useCallback((props: any )=><BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1}/>, [])
+  const backDrop = useCallback((props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />, [])
 
   useEffect(() => {
     const fetchWorkoutPlans = async () => {
@@ -76,8 +76,8 @@ const Workout: React.FC = () => {
             className="flex-1 flex-row items-center justify-center py-3.5 bg-[#f0f0f0] rounded-lg shadow"
             onPress={() => router.replace("../(workout)/explore")}
           >
-            <Ionicons name="search-outline" size={18} color="#333" />
-            <Text className="text-base font-semibold text-[#333] ml-1.5">Explore</Text>
+            <Ionicons name="flash-outline" size={18} color="#333" />
+            <Text className="text-base font-semibold text-[#333] ml-1.5">Generate Workout</Text>
           </TouchableOpacity>
         </View>
 
@@ -149,10 +149,10 @@ const Workout: React.FC = () => {
           )
         )}
       </View>
-      <BottomSheet 
-        ref={BottomSheetRef} 
-        snapPoints={snapPoint} 
-        index={-1} 
+      <BottomSheet
+        ref={BottomSheetRef}
+        snapPoints={snapPoint}
+        index={-1}
         enablePanDownToClose={true}
         backdropComponent={backDrop}
         handleIndicatorStyle={{ backgroundColor: '#CCCCCC', width: 40 }}
@@ -163,7 +163,7 @@ const Workout: React.FC = () => {
               {selectedPlan?.name || "Routine"}
             </Text>
           </View>
-          
+
           <View className="divide-y divide-gray-100">
             <TouchableOpacity className="flex-row items-center px-6 py-4">
               <View className="w-8">
@@ -171,14 +171,14 @@ const Workout: React.FC = () => {
               </View>
               <Text className="text-base ml-2">Pin Routine</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity className="flex-row items-center px-6 py-4">
               <View className="w-8">
                 <Ionicons name="create-outline" size={22} color="#3b82f6" />
               </View>
               <Text className="text-base ml-2">Edit Routine</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity className="flex-row items-center px-6 py-4">
               <View className="w-8">
                 <Ionicons name="trash-outline" size={22} color="#ef4444" />
@@ -186,7 +186,7 @@ const Workout: React.FC = () => {
               <Text className="text-red-500 text-base ml-2">Delete Routine</Text>
             </TouchableOpacity>
           </View>
-          
+
           <View className="h-8" />
         </BottomSheetView>
       </BottomSheet>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -16,6 +16,7 @@ import { Ionicons, Feather } from '@expo/vector-icons';
 import { PieChart } from 'react-native-chart-kit';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import apiHandler from '../../context/APIHandler';
+import { fetchUserDetails } from '../../context/userAPI';
 
 const { width } = Dimensions.get('window');
 
@@ -44,6 +45,15 @@ interface CalorieResult {
   }
 }
 
+interface UserData {
+  username: string;
+  email: string;
+  weight: string;
+  dob: string;
+  height: string;
+  gender: string;
+}
+
 const Calorie: React.FC = () => {
   // Form state management
   const [height, setHeight] = useState<string>('');
@@ -57,16 +67,63 @@ const Calorie: React.FC = () => {
   
   // Loading and results state
   const [loading, setLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [calorieResult, setCalorieResult] = useState<CalorieResult | null>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
   
   // Bottom sheet states
   const [bottomSheetType, setBottomSheetType] = useState<string | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['50%'], []);
+  const snapPoints = useMemo(() => ['1%'], []);
   const backDrop = useCallback((props: any) => (
     <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1}/>
   ), []);
+
+  // Fetch user details on component mount
+  useEffect(() => {
+    const loadUserDetails = async () => {
+      setInitialLoading(true);
+      try {
+        const userData = await fetchUserDetails();
+        if (userData) {
+          // Set height if available
+          if (userData.height) {
+            setHeight(userData.height.toString());
+          }
+          
+          // Set weight if available
+          if (userData.weight) {
+            setWeight(userData.weight.toString());
+          }
+          
+          // Calculate age from DOB if available
+          if (userData.dob) {
+            const birthDate = new Date(userData.dob);
+            const today = new Date();
+            let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              calculatedAge--;
+            }
+            
+            setAge(calculatedAge.toString());
+          }
+          
+          // Set gender if available
+          if (userData.gender) {
+            setSelectedGender(userData.gender);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load user details:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    
+    loadUserDetails();
+  }, []);
 
   // Goal options
   const goalOptions: Option[] = [
@@ -270,20 +327,30 @@ const Calorie: React.FC = () => {
     );
   };
 
+  // If initial data is loading, show a loading state
+  if (initialLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50 justify-center items-center">
+        <ActivityIndicator size="large" color="#FF6F00" />
+        <Text className="mt-3 text-gray-600">Loading your profile...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 mt-5">
+    <SafeAreaView className="flex-1 bg-gray-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
         <ScrollView 
           className="px-4 py-4"
-          contentContainerStyle={{ paddingBottom: 30 }}
+          contentContainerStyle={showResults ? { paddingBottom: 30 } : { flexGrow: 1, justifyContent: 'center' }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
-          <View className="mb-4">
+          <View className={`${showResults ? 'mb-4' : 'mb-6'}`}>
             <Text className="text-2xl font-bold text-gray-800 mb-0.5">Nutrition Guidance</Text>
             <Text className="text-sm text-gray-500">Calculate your daily calories and macros</Text>
           </View>
