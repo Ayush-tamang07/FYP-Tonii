@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -9,12 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
-  Modal,
   ActivityIndicator,
   Alert
 } from 'react-native';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import { PieChart } from 'react-native-chart-kit';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import apiHandler from '../../context/APIHandler';
 
 const { width } = Dimensions.get('window');
@@ -61,7 +61,12 @@ const Calorie: React.FC = () => {
   const [showResults, setShowResults] = useState<boolean>(false);
   
   // Bottom sheet states
-  const [bottomSheetOpen, setBottomSheetOpen] = useState<string | null>(null); // 'goal', 'activity', or 'gender'
+  const [bottomSheetType, setBottomSheetType] = useState<string | null>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ['50%'], []);
+  const backDrop = useCallback((props: any) => (
+    <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1}/>
+  ), []);
 
   // Goal options
   const goalOptions: Option[] = [
@@ -88,12 +93,13 @@ const Calorie: React.FC = () => {
 
   // Function to open bottom sheet
   const openBottomSheet = (type: string): void => {
-    setBottomSheetOpen(type);
+    setBottomSheetType(type);
+    bottomSheetRef.current?.expand();
   };
 
   // Function to close bottom sheet
   const closeBottomSheet = (): void => {
-    setBottomSheetOpen(null);
+    bottomSheetRef.current?.close();
   };
 
   // Function to handle goal selection
@@ -204,6 +210,66 @@ const Calorie: React.FC = () => {
   // Get macros data for display
   const macrosData = getMacrosChartData();
 
+  // Render bottom sheet content based on type
+  const renderBottomSheetContent = () => {
+    let title = '';
+    let options: Option[] = [];
+    let currentValue = '';
+    let handleSelect: any = null;
+
+    if (bottomSheetType === 'goal') {
+      title = 'Select Goal';
+      options = goalOptions;
+      currentValue = goal;
+      handleSelect = handleGoalSelect;
+    } else if (bottomSheetType === 'activity') {
+      title = 'Select Activity Level';
+      options = activityOptions;
+      currentValue = activity;
+      handleSelect = handleActivitySelect;
+    } else if (bottomSheetType === 'gender') {
+      title = 'Select Gender';
+      options = genderOptions;
+      currentValue = selectedGender;
+      handleSelect = handleGenderSelect;
+    }
+
+    return (
+      <BottomSheetView className="bg-white p-0">
+        <View className="items-center py-1 mb-1">
+          <Text className="text-gray-600 font-medium" numberOfLines={1}>
+            {title}
+          </Text>
+        </View>
+        
+        <View className="divide-y divide-gray-100">
+          {options.map((option, index) => (
+            <TouchableOpacity
+              key={index}
+              className={`flex-row justify-between items-center px-6 py-4 ${currentValue === option.value ? 'bg-orange-50' : ''}`}
+              onPress={() => {
+                if (bottomSheetType === 'gender') {
+                  handleSelect(option.value);
+                } else {
+                  handleSelect(option.value, option.label);
+                }
+              }}
+            >
+              <Text className={`text-base ${currentValue === option.value ? 'text-orange-600 font-medium' : 'text-gray-800'}`}>
+                {option.label}
+              </Text>
+              {currentValue === option.value && (
+                <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        <View className="h-8" />
+      </BottomSheetView>
+    );
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50 mt-5">
       <KeyboardAvoidingView
@@ -313,7 +379,7 @@ const Calorie: React.FC = () => {
             
             {/* Calculate Button */}
             <TouchableOpacity 
-              className={`rounded-lg h-12 justify-center items-center mt-1 ${loading ? 'bg-gray-400' : 'bg-orange-600'}`}
+              className={`rounded-lg h-12 justify-center items-center mt-1 ${loading ? 'bg-gray-400' : 'bg-[#FF6909]'}`}
               onPress={calculateCalories}
               disabled={loading}
             >
@@ -387,110 +453,17 @@ const Calorie: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Goal Bottom Sheet Modal */}
-      <Modal
-        visible={bottomSheetOpen === 'goal'}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={closeBottomSheet}
+      {/* Bottom Sheet for selections */}
+      <BottomSheet 
+        ref={bottomSheetRef} 
+        snapPoints={snapPoints} 
+        index={-1} 
+        enablePanDownToClose={true}
+        backdropComponent={backDrop}
+        handleIndicatorStyle={{ backgroundColor: '#CCCCCC', width: 40 }}
       >
-        <View className="flex-1 justify-end bg-black bg-opacity-50">
-          <View className="bg-white rounded-t-2xl pb-8">
-            <View className="flex-row justify-between items-center p-4 border-b border-gray-100">
-              <Text className="text-lg font-semibold text-gray-800">Select Goal</Text>
-              <TouchableOpacity onPress={closeBottomSheet}>
-                <Ionicons name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-            <View className="p-2">
-              {goalOptions.map((option, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className={`flex-row justify-between items-center py-4 px-3 rounded-lg my-1 ${goal === option.value ? 'bg-orange-50' : ''}`}
-                  onPress={() => handleGoalSelect(option.value, option.label)}
-                >
-                  <Text className={`text-base ${goal === option.value ? 'text-orange-600 font-medium' : 'text-gray-800'}`}>
-                    {option.label}
-                  </Text>
-                  {goal === option.value && (
-                    <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Activity Level Bottom Sheet Modal */}
-      <Modal
-        visible={bottomSheetOpen === 'activity'}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={closeBottomSheet}
-      >
-        <View className="flex-1 justify-end bg-black bg-opacity-50">
-          <View className="bg-white rounded-t-2xl pb-8">
-            <View className="flex-row justify-between items-center p-4 border-b border-gray-100">
-              <Text className="text-lg font-semibold text-gray-800">Select Activity Level</Text>
-              <TouchableOpacity onPress={closeBottomSheet}>
-                <Ionicons name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-            <View className="p-2">
-              {activityOptions.map((option, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className={`flex-row justify-between items-center py-4 px-3 rounded-lg my-1 ${activity === option.value ? 'bg-orange-50' : ''}`}
-                  onPress={() => handleActivitySelect(option.value, option.label)}
-                >
-                  <Text className={`text-base ${activity === option.value ? 'text-orange-600 font-medium' : 'text-gray-800'}`}>
-                    {option.label}
-                  </Text>
-                  {activity === option.value && (
-                    <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Gender Bottom Sheet Modal */}
-      <Modal
-        visible={bottomSheetOpen === 'gender'}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={closeBottomSheet}
-      >
-        <View className="flex-1 justify-end bg-black bg-opacity-50">
-          <View className="bg-white rounded-t-2xl pb-8">
-            <View className="flex-row justify-between items-center p-4 border-b border-gray-100">
-              <Text className="text-lg font-semibold text-gray-800">Select Gender</Text>
-              <TouchableOpacity onPress={closeBottomSheet}>
-                <Ionicons name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-            <View className="p-2">
-              {genderOptions.map((option, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className={`flex-row justify-between items-center py-4 px-3 rounded-lg my-1 ${selectedGender === option.value ? 'bg-orange-50' : ''}`}
-                  onPress={() => handleGenderSelect(option.value)}
-                >
-                  <Text className={`text-base ${selectedGender === option.value ? 'text-orange-600 font-medium' : 'text-gray-800'}`}>
-                    {option.label}
-                  </Text>
-                  {selectedGender === option.value && (
-                    <Ionicons name="checkmark-circle" size={22} color="#FF6F00" />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
-      </Modal>
+        {renderBottomSheetContent()}
+      </BottomSheet>
     </SafeAreaView>
   );
 };

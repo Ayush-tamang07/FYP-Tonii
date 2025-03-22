@@ -55,7 +55,7 @@ export default function TabLayout() {
       />
 
       {/* New Tab */}
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="new"
         options={{
           title: "New",
@@ -63,7 +63,7 @@ export default function TabLayout() {
             <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
           ),
         }}
-      />
+      /> */}
 
       {/* Calorie Tab */}
       <Tabs.Screen

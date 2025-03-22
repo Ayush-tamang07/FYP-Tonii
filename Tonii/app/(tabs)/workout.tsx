@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
@@ -12,6 +11,7 @@ import {
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { workoutPlan } from "../../context/userAPI";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet"
 
 interface WorkoutPlan {
   id: number;
@@ -23,6 +23,14 @@ const Workout: React.FC = () => {
   const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<WorkoutPlan | null>(null);
+  const BottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoint = useMemo(()=> ["25%"],[]);
+  const openSheet = (plan: WorkoutPlan)=> {
+    setSelectedPlan(plan);
+    BottomSheetRef.current?.expand();
+  };
+  const backDrop = useCallback((props: any )=><BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1}/>, [])
 
   useEffect(() => {
     const fetchWorkoutPlans = async () => {
@@ -49,81 +57,81 @@ const Workout: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>Workout</Text>
+    <SafeAreaView className="flex-1 bg-[#f8f9fa]">
+      <View className="px-4 pt-3 pb-4">
+        <Text className="text-xl font-bold text-[#333] text-center">Workout</Text>
       </View>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.buttonContainer}>
+      <View className="flex-1 px-4 pt-4">
+        <View className="flex-row justify-between mb-6 gap-3">
           <TouchableOpacity
-            style={styles.newRoutineButton}
+            className="flex-1 flex-row items-center justify-center py-3.5 bg-[#FF6F00] rounded-lg shadow"
             onPress={() => router.push("../(workout)/createRoutine")}
           >
             <Ionicons name="clipboard-outline" size={18} color="white" />
-            <Text style={styles.newRoutineButtonText}>New Routine</Text>
+            <Text className="text-base font-semibold text-white ml-1.5">New Routine</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.exploreButton}
+            className="flex-1 flex-row items-center justify-center py-3.5 bg-[#f0f0f0] rounded-lg shadow"
             onPress={() => router.replace("../(workout)/explore")}
           >
             <Ionicons name="search-outline" size={18} color="#333" />
-            <Text style={styles.exploreText}>Explore</Text>
+            <Text className="text-base font-semibold text-[#333] ml-1.5">Explore</Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity
-          style={styles.myRoutineHeader}
+          className="flex-row items-center mb-3.5"
           onPress={() => setExpanded(!expanded)}
         >
           <Ionicons
             name={expanded ? "chevron-down" : "chevron-forward"}
             size={18}
             color="#333"
-            style={styles.expandIcon}
+            className="mr-1"
           />
-          <Text style={styles.myRoutineTitle}>
+          <Text className="text-base font-semibold text-[#333]">
             My Routines ({workoutPlans.length})
           </Text>
         </TouchableOpacity>
 
         {loading ? (
-          <View style={styles.loaderContainer}>
+          <View className="flex-1 justify-center items-center pb-10">
             <ActivityIndicator size="large" color="#FF6F00" />
-            <Text style={styles.loadingText}>Loading your routines...</Text>
+            <Text className="mt-3 text-sm text-[#666]">Loading your routines...</Text>
           </View>
         ) : error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity 
-              style={styles.retryButton}
+          <View className="flex-1 justify-center items-center pb-10">
+            <Text className="text-[#e74c3c] text-center my-2 text-base">{error}</Text>
+            <TouchableOpacity
+              className="mt-3 py-2 px-4 bg-[#f0f0f0] rounded-md"
               onPress={() => setLoading(true)}
             >
-              <Text style={styles.retryButtonText}>Try Again</Text>
+              <Text className="text-[#333] text-sm font-medium">Try Again</Text>
             </TouchableOpacity>
           </View>
         ) : (
           expanded && (
-            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-              <View style={styles.workoutList}>
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              <View className="gap-3 pb-4">
                 {workoutPlans.length === 0 ? (
-                  <View style={styles.emptyStateContainer}>
-                    <Text style={styles.emptyStateText}>No routines yet</Text>
-                    <Text style={styles.emptyStateSubText}>Create your first workout routine</Text>
+                  <View className="p-8 items-center justify-center bg-white rounded-lg border border-[#f0f0f0] border-dashed">
+                    <Text className="text-base font-semibold text-[#555] mb-1.5">No routines yet</Text>
+                    <Text className="text-sm text-[#888] text-center">Create your first workout routine</Text>
                   </View>
                 ) : (
                   workoutPlans.map((plan) => (
-                    <View key={plan.id} style={styles.workoutItem}>
-                      <View style={styles.workoutRow}>
-                        <Text style={styles.workoutText}>{plan.name}</Text>
-                        <TouchableOpacity style={styles.menuButton}>
+                    <View key={plan.id} className="bg-white p-4 rounded-lg shadow border border-[#f0f0f0]">
+                      <View className="flex-row justify-between items-center mb-3">
+                        <Text className="text-base font-semibold text-[#333]">{plan.name}</Text>
+                        <TouchableOpacity className="p-1" onPress={() => openSheet(plan)}>
                           <Entypo name="dots-three-vertical" size={16} color="#555" />
                         </TouchableOpacity>
                       </View>
 
                       <TouchableOpacity
-                        style={styles.startButton}
+                        className="bg-[#FF6F00] py-2.5 rounded-lg items-center"
                         onPress={() =>
                           router.push({
                             pathname: "/(workout)/startWorkout",
@@ -131,7 +139,7 @@ const Workout: React.FC = () => {
                           })
                         }
                       >
-                        <Text style={styles.startButtonText}>Start Routine</Text>
+                        <Text className="text-white text-sm font-semibold">Start Routine</Text>
                       </TouchableOpacity>
                     </View>
                   ))
@@ -141,193 +149,49 @@ const Workout: React.FC = () => {
           )
         )}
       </View>
+      <BottomSheet 
+        ref={BottomSheetRef} 
+        snapPoints={snapPoint} 
+        index={-1} 
+        enablePanDownToClose={true}
+        backdropComponent={backDrop}
+        handleIndicatorStyle={{ backgroundColor: '#CCCCCC', width: 40 }}
+      >
+        <BottomSheetView className="bg-white p-0">
+          <View className="items-center py-1 mb-1">
+            <Text className="text-gray-600 font-medium" numberOfLines={1}>
+              {selectedPlan?.name || "Routine"}
+            </Text>
+          </View>
+          
+          <View className="divide-y divide-gray-100">
+            <TouchableOpacity className="flex-row items-center px-6 py-4">
+              <View className="w-8">
+                <Ionicons name="pin" size={22} color="#10b981" />
+              </View>
+              <Text className="text-base ml-2">Pin Routine</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity className="flex-row items-center px-6 py-4">
+              <View className="w-8">
+                <Ionicons name="create-outline" size={22} color="#3b82f6" />
+              </View>
+              <Text className="text-base ml-2">Edit Routine</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity className="flex-row items-center px-6 py-4">
+              <View className="w-8">
+                <Ionicons name="trash-outline" size={22} color="#ef4444" />
+              </View>
+              <Text className="text-red-500 text-base ml-2">Delete Routine</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View className="h-8" />
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-  },
-  headerContainer: {
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? 12 : 4,
-    paddingBottom: 16,
-    // backgroundColor: "#fff",
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#f0f0f0",
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#333",
-    textAlign: "center",
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 24,
-    gap: 12,
-  },
-  newRoutineButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    backgroundColor: "#FF6F00",
-    borderRadius: 8,
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  exploreButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 1,
-  },
-  newRoutineButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "white",
-    marginLeft: 6,
-  },
-  exploreText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-    marginLeft: 6,
-  },
-  myRoutineHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-  expandIcon: {
-    marginRight: 4,
-  },
-  myRoutineTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 40,
-  },
-  loadingText: {
-    marginTop: 12,
-    color: "#666",
-    fontSize: 14,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 40,
-  },
-  errorText: {
-    color: "#e74c3c",
-    textAlign: "center",
-    marginVertical: 8,
-    fontSize: 15,
-  },
-  retryButton: {
-    marginTop: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 6,
-  },
-  retryButtonText: {
-    color: "#333",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  workoutList: {
-    gap: 12,
-    paddingBottom: 16,
-  },
-  workoutItem: {
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 10,
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    borderWidth: 1,
-    borderColor: "#f0f0f0",
-  },
-  workoutRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  workoutText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-  },
-  menuButton: {
-    padding: 4,
-  },
-  startButton: {
-    backgroundColor: "#FF6F00",
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  startButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  emptyStateContainer: {
-    padding: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: "white",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#f0f0f0",
-    borderStyle: 'dashed',
-  },
-  emptyStateText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#555",
-    marginBottom: 6,
-  },
-  emptyStateSubText: {
-    fontSize: 14,
-    color: "#888",
-    textAlign: 'center',
-  }
-});
 
 export default Workout;
