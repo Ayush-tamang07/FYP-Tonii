@@ -8,7 +8,6 @@ const calculate = async (req, res) => {
       return res.status(400).json({ error: "Please enter all fields" });
     }
 
-    // Calculate BMR 
     let BMR;
     if (gender.toLowerCase() === "male") {
       BMR = 10 * weight + 6.25 * height - 5 * age + 5;
@@ -18,13 +17,11 @@ const calculate = async (req, res) => {
       return res.status(400).json({ error: "Invalid gender. Use 'male' or 'female'." });
     }
 
-    // Activity multiplier based on activity level
     const activityMultiplier = {
-      sedentary: 1.2, // Little to no exercise
-      lightly_active: 1.375, // Light exercise 1-3 days/week
-      moderately_active: 1.55, // Moderate exercise 3-5 days/week
-      very_active: 1.725, // Hard exercise 6-7 days/week
-      super_active: 1.9 // Very intense exercise or physical job
+      sedentary: 1.2, 
+      moderately_active: 1.55, 
+      very_active: 1.725, 
+      super_active: 1.9
     };
 
     const multiplier = activityMultiplier[activity.toLowerCase()];

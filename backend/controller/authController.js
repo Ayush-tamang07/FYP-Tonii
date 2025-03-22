@@ -55,94 +55,6 @@ const userRegister = async (req, res) => {
   }
 };
 
-
-// const loginUser = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     console.log(req.body);
-
-//     if (!email || !password) {
-//       return res.status(400).json({ message: "all field is required" });
-//     }
-
-//     const user = await prisma.user.findFirst({
-//       where: {
-//         email: email,
-//       },
-//     });
-
-//     // checking user
-//     if (!user) {
-//       return res.status(404).json({ message: "user does not exist" });
-//     }
-
-//     // Compare the provided password with the hashed password stored in the database
-//     const checkPassword = await bcrypt.compare(password, user.password);
-
-//     console.log(checkPassword)
-//     if (!checkPassword) {
-//       return res.status(401).json({ message: "Incorrect Password" });
-//     }
-//     const token = jwt.sign(
-//       { userId: user.id, email: user.email }, // Payload
-//       process.env.JWT_SECRET, // Secret key
-//       { expiresIn: "1h" } // Token expiration time
-//     );
-//     return res.status(200).json({
-//       message: "Login Successfully",
-//       user,
-//       token,
-//     });
-//   } catch (error) {
-//     console.error("Error logging in user:", error);
-//     return res.status(500).json({ message: "failed to login" });
-//   }
-// };
-
-const resetPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-  } catch (error) {}
-};
-
-// admin authentication
-// const loginAdmin = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     if (!email || !password) {
-//       return res.status(400).json({ message: "all field is required" });
-//     }
-//     console.log(email);
-//     console.log(password);
-//     const user = await prisma.user.findFirst({
-//       where: {
-//         email: email,
-//       },
-//     });
-//     // checking admin
-//     if (!user) {
-//       return res.status(404).json({ message: "user does not exist" });
-//     }
-//     // Checking if user is an admin
-//     if (user.role !== "admin") {
-//       return res.status(403).json({ message: "Access denied. Admins only." });
-//     }
-
-//     // Compare the provided password with the hashed password stored in the database
-//     const checkPassword = await bcrypt.compare(password, user.password);
-//     if (!checkPassword) {
-//       return res.status(401).json({ message: "Incorrect Password" });
-//     }
-//     return res.status(200).json({
-//       message: "Login Successfully",
-//       user,
-//       // token,
-//     });
-//   } catch (error) {
-//     console.error("Error logging in user:", error);
-//     return res.status(500).json({ message: "failed to login" });
-//   }
-// };
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -171,18 +83,6 @@ const loginUser = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    // if (user.role === "admin") {
-    //   return res.status(200).json({
-    //     message: "Admin login successful",
-    //     token,
-    //   });
-    // }else{
-    //   return res.status(400).json({
-    //     message: "Access Denied. Only admins can access this endpoint."
-    //   });
-      
-    // }
-
     return res.status(200).json({
       message: "User login successful",
       token,
@@ -196,25 +96,22 @@ const loginUser = async (req, res) => {
 
 const updateUserDetails = async (req, res) => {
   try {
-    const { id } = req.params; // Extract ID from request parameters
+    const { id } = req.params; 
     const { username, email, weight, age, height, gender, password } = req.body;
 
-    // ✅ Validate if ID exists and convert it to an integer
     if (!id) {
       return res.status(400).json({ error: "User ID is required." });
     }
-    const userId = parseInt(id, 10); // Convert to integer
+    const userId = parseInt(id, 10); 
 
-    // ✅ Check if the user exists
     const user = await prisma.user.findUnique({
-      where: { id: userId }, // Ensure it's an integer
+      where: { id: userId }, 
     });
 
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // ✅ Check if the email is being updated and already exists
     if (email && email !== user.email) {
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
@@ -222,15 +119,13 @@ const updateUserDetails = async (req, res) => {
       }
     }
 
-    // ✅ Hash the new password if provided
-    let hashedPassword = user.password; // Keep old password if no new one is provided
+    let hashedPassword = user.password;
     if (password) {
       hashedPassword = await bcrypt.hash(password, 10);
     }
 
-    // ✅ Update user details
     const updatedUser = await prisma.user.update({
-      where: { id: userId }, // Ensure it's an integer
+      where: { id: userId },
       data: {
         username: username || user.username,
         email: email || user.email,
@@ -267,7 +162,7 @@ const logout = async (req, res) => {
 
   const token = authorizationHeaderValue.split("Bearer ")[1];
 
-  blacklistedTokens.push(token); // Blacklist the token
+  blacklistedTokens.push(token); 
 
   res.json({ message: "Logged out successfully" });
 };
@@ -301,7 +196,6 @@ const readUser = async (req, res) => {
 module.exports = {
   userRegister,
   loginUser,
-  resetPassword,
   // loginAdmin,
   updateUserDetails,
   logout,

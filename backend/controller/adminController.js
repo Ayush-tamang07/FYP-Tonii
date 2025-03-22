@@ -13,7 +13,6 @@ const addExercise = async (req, res) => {
       category,
     } = req.body;
 
-    // Validate required fields
     if (
       !name ||
       !type ||
@@ -27,7 +26,6 @@ const addExercise = async (req, res) => {
         .status(400)
         .json({ success: false, message: "All fields are required." });
     }
-    // Check if the exercise already exists
     const existingExercise = await prisma.exercise.findFirst({
       where: {
         name: name,
@@ -45,7 +43,6 @@ const addExercise = async (req, res) => {
       });
     }
 
-    // Add the new exercise
     const newExercise = await prisma.exercise.create({
       data: {
         name,
@@ -98,7 +95,7 @@ const deleteExercise = async (req, res) => {
 
 const updateExercise = async (req, res) => {
   try {
-    const { id } = req.params; // Get exercise ID from URL parameters
+    const { id } = req.params; 
     const {
       name,
       type,
@@ -109,14 +106,12 @@ const updateExercise = async (req, res) => {
       category,
     } = req.body;
 
-    // Validate that an ID is provided
     if (!id) {
       return res
         .status(400)
         .json({ success: false, message: "Exercise ID is required." });
     }
 
-    // Validate at least one field to update
     if (
       !name &&
       !type &&
@@ -132,9 +127,8 @@ const updateExercise = async (req, res) => {
       });
     }
 
-    // Find the existing exercise
     const existingExercise = await prisma.exercise.findUnique({
-      where: { id: parseInt(id) }, // Ensure ID is an integer
+      where: { id: parseInt(id) }, 
     });
 
     if (!existingExercise) {
@@ -144,7 +138,6 @@ const updateExercise = async (req, res) => {
       });
     }
 
-    // Update the exercise
     const updatedExercise = await prisma.exercise.update({
       where: { id: parseInt(id) },
       data: {
@@ -178,28 +171,26 @@ const updateExercise = async (req, res) => {
 
 const readFeedback = async (req, res) => {
   try {
-    const { feedback_type, date } = req.query; // Get query parameters
+    const { feedback_type, date } = req.query; 
 
-    // Define filter conditions dynamically
     const filterCondition = {};
 
     if (feedback_type) {
-      filterCondition.feedback_type = feedback_type; // Apply type filter
+      filterCondition.feedback_type = feedback_type; 
     }
 
     if (date) {
       filterCondition.createdAt = {
-        gte: new Date(date + "T00:00:00.000Z"), // Start of the day
-        lt: new Date(date + "T23:59:59.999Z"), // End of the day
+        gte: new Date(date + "T00:00:00.000Z"), 
+        lt: new Date(date + "T23:59:59.999Z"), 
       };
     }
 
-    // Fetch feedback with user name using Prisma `include`
     const feedback = await prisma.feedback.findMany({
       where: filterCondition,
       include: {
         user: {
-          select: { username: true }, // Select only the user's name
+          select: { username: true },
         },
       },
     });
@@ -215,11 +206,10 @@ const createAdminWorkoutPlan  = async (req, res) => {
   try {
     const { name } = req.body;
 
-    // Create the workout plan for admin
     const workoutPlan = await prisma.WorkoutPlan.create({
       data: {
         name,
-        createdByAdmin: true, // Admin-created
+        createdByAdmin: true, 
       },
     });
 
@@ -239,8 +229,8 @@ const getAdminWorkoutPlans = async (req, res) => {
       where: {
         createdByAdmin: true,
         OR: [
-          { assignedToUserId: null }, // Plans available to all users
-          { assignedToUserId: { not: null } } // Plans assigned to users
+          { assignedToUserId: null }, 
+          { assignedToUserId: { not: null } } 
         ]
       },
     });
@@ -253,10 +243,9 @@ const getAdminWorkoutPlans = async (req, res) => {
 };
 const readUserDetailsByAdmin = async (req, res) => {
   try {
-    // Fetch only users where role is 'user'
     const users = await prisma.user.findMany({
       where: {
-        role: "user", // Filter to fetch only users
+        role: "user", 
       },
       select: {
         id: true,
@@ -276,8 +265,6 @@ const readUserDetailsByAdmin = async (req, res) => {
     return res.status(500).json({ message: "Failed to fetch user details" });
   }
 };
-
-
 
 module.exports = {
   addExercise,

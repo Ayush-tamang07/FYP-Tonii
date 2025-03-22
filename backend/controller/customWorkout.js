@@ -1,34 +1,24 @@
-// const { PrismaClient } = require("@prisma/client");
-// const prisma = new PrismaClient();
 const prisma = require("../utils/PrismaClient.js");
 
 const readExercise = async (req, res) => {
   try {
-    // Extract query parameters
     const { equipment, category } = req.query;
 
-    // Initialize a filter object
     const filters = {};
 
-    // Add filters based on the query parameters
     if (equipment && category) {
-      // If both equipment and category are provided, filter by both
       filters.equipment = equipment;
       filters.category = category;
     } else if (equipment) {
-      // If only equipment is provided, filter by equipment
       filters.equipment = equipment;
     } else if (category) {
-      // If only category is provided, filter by category
       filters.category = category;
     }
 
-    // Fetch exercises from the database based on the dynamic filters
     const exercises = await prisma.exercise.findMany({
       where: filters,
     });
 
-    // Handle no results
     if (exercises.length === 0) {
       return res.status(404).json({
         success: false,
@@ -36,7 +26,6 @@ const readExercise = async (req, res) => {
       });
     }
 
-    // Send response with count and exercises
     res.status(200).json({
       success: true,
       count: exercises.length,
@@ -52,46 +41,10 @@ const readExercise = async (req, res) => {
   }
 };
 
-// const createUserWorkoutPlan = async (req, res) => {
-//   try {
-//     const { name } = req.body;
-//     const userId = req.user.userId; // Get user ID from authentication middleware
-//     console.log(userId);
-//     if (!name) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Workout plan name is required.",
-//       });
-//     }
-
-//     // Create the workout plan for the logged-in user
-//     const workoutPlan = await prisma.workoutPlan.create({
-//       data: {
-//         name,
-//         createdByAdmin: false, // User-created
-//         assignedToUserId: userId, // Assigned to logged-in user
-//       },
-//     });
-
-//     res.status(201).json({
-//       success: true,
-//       success: true,
-//       message: "Workout plan created successfully.",
-//       data: workoutPlan,
-//     });
-//   } catch (error) {
-//     console.error("Error creating workout plan:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to create workout plan.",
-//       error: error.message,
-//     });
-//   }
-// };
 const createUserWorkoutPlan = async (req, res) => {
   try {
     const { name } = req.body;
-    const userId = req.user.userId; // Get user ID from authentication middleware
+    const userId = req.user.userId;
 
     if (!name) {
       return res.status(400).json({
@@ -100,12 +53,11 @@ const createUserWorkoutPlan = async (req, res) => {
       });
     }
 
-    // Create the workout plan for the logged-in user
     const workoutPlan = await prisma.workoutPlan.create({
       data: {
         name,
-        createdByAdmin: false, // User-created
-        assignedToUserId: userId, // Assigned to logged-in user
+        createdByAdmin: false,
+        assignedToUserId: userId,
       },
     });
 
@@ -124,7 +76,6 @@ const createUserWorkoutPlan = async (req, res) => {
   }
 };
 
-// module.exports = { createUserWorkoutPlan };
 
 const getUserWorkoutPlans = async (req, res) => {
   try {
@@ -137,7 +88,6 @@ const getUserWorkoutPlans = async (req, res) => {
       });
     }
 
-    // Fetch user role
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { role: true },
@@ -150,7 +100,6 @@ const getUserWorkoutPlans = async (req, res) => {
       });
     }
 
-    // Fetch ONLY workout plans created by userId
     const workoutPlans = await prisma.workoutPlan.findMany({
       where: { assignedToUserId: userId }, // Only fetch plans where the user created them
       include: {
@@ -234,124 +183,6 @@ const getWorkoutPlanExercises = async (req, res) => {
   }
 };
 
-// const addExerciseToWorkoutPlan = async (req, res) => {
-//   try {
-//     const { workoutPlanId, exercises } = req.body;
-
-//     if (!Array.isArray(exercises)) {
-//       return res.status(400).json({
-//         error: "exercises must be an array of objects with exerciseId and sets.",
-//       });
-//     }
-
-//     // Validate all exercise IDs
-//     const validExerciseIds = exercises.map((exercise) => exercise.exerciseId);
-
-//     const existingExercises = await prisma.exercise.findMany({
-//       where: { id: { in: validExerciseIds } },
-//       select: { id: true },
-//     });
-
-//     const existingExerciseIds = existingExercises.map((exercise) => exercise.id);
-
-//     // Check for invalid exercise IDs
-//     const invalidIds = validExerciseIds.filter((id) => !existingExerciseIds.includes(id));
-//     if (invalidIds.length > 0) {
-//       return res.status(400).json({
-//         error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
-//       });
-//     }
-
-//     // Process each exercise
-//     const workoutPlanExercises = await Promise.all(
-//       exercises.map(async ({ exerciseId, sets }) => {
-//         // Create WorkoutPlanExercise entry
-//         const workoutPlanExercise = await prisma.workoutPlanExercise.create({
-//           data: { workoutPlanId, exerciseId },
-//         });
-
-//         // Default to one set if none provided
-//         let setData = [{ reps: null, weight: null }];
-//         if (Array.isArray(sets) && sets.length > 0) {
-//           setData = sets.map((set) => ({
-//             reps: set.reps ?? null,
-//             weight: set.weight ?? null,
-//           }));
-//         }
-
-//         // Add sets to the newly created workoutPlanExercise
-//         const createdSets = await Promise.all(
-//           setData.map((set) =>
-//             prisma.workoutSet.create({
-//               data: {
-//                 workoutPlanExerciseId: workoutPlanExercise.id,
-//                 reps: set.reps,
-//                 weight: set.weight,
-//               },
-//             })
-//           )
-//         );
-
-//         return { workoutPlanExercise, sets: createdSets };
-//       })
-//     );
-
-//     res.status(201).json(workoutPlanExercises);
-//   } catch (error) {
-//     console.error("Error adding exercises to workout plan:", error);
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// const addExercisesToWorkoutPlan = async (req, res) => {
-//   try {
-//     const { workoutPlanId, exercises } = req.body;
-
-//     if (!workoutPlanId || !Array.isArray(exercises) || exercises.length === 0) {
-//       return res.status(400).json({
-//         error: "workoutPlanId is required, and exercises must be a non-empty array of exerciseId.",
-//       });
-//     }
-
-//     // Validate if workoutPlanId exists
-//     const workoutPlanExists = await prisma.workoutPlan.findUnique({
-//       where: { id: workoutPlanId },
-//     });
-
-//     if (!workoutPlanExists) {
-//       return res.status(404).json({ error: "Workout Plan not found" });
-//     }
-
-//     // Validate exercise IDs
-//     const validExerciseIds = exercises;
-//     const existingExercises = await prisma.exercise.findMany({
-//       where: { id: { in: validExerciseIds } },
-//       select: { id: true },
-//     });
-
-//     const existingExerciseIds = existingExercises.map((exercise) => exercise.id);
-
-//     // Check for invalid exercise IDs
-//     const invalidIds = validExerciseIds.filter((id) => !existingExerciseIds.includes(id));
-//     if (invalidIds.length > 0) {
-//       return res.status(400).json({
-//         error: `Invalid exerciseId(s): ${invalidIds.join(", ")}`,
-//       });
-//     }
-
-//     // Add exercises to the workout plan
-//     const addedExercises = await prisma.workoutPlanExercise.createMany({
-//       data: exercises.map((exerciseId) => ({
-//         workoutPlanId,
-//         exerciseId,
-//       })),
-//     });
-
-//     res.status(201).json({ message: "Exercises added successfully", addedExercises });
-//   } catch (error) {
-//     console.error("Error adding exercises to workout plan:", error);
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 const addExercisesToWorkoutPlan = async (req, res) => {
   try {
     const { workoutPlanId, exercises } = req.body;
@@ -363,7 +194,6 @@ const addExercisesToWorkoutPlan = async (req, res) => {
       });
     }
 
-    // Validate if workoutPlanId exists
     const workoutPlanExists = await prisma.workoutPlan.findUnique({
       where: { id: workoutPlanId },
     });
@@ -372,7 +202,6 @@ const addExercisesToWorkoutPlan = async (req, res) => {
       return res.status(404).json({ error: "Workout Plan not found" });
     }
 
-    // Validate exercise IDs
     const validExerciseIds = exercises;
     const existingExercises = await prisma.exercise.findMany({
       where: { id: { in: validExerciseIds } },
@@ -383,7 +212,6 @@ const addExercisesToWorkoutPlan = async (req, res) => {
       (exercise) => exercise.id
     );
 
-    // Check for invalid exercise IDs
     const invalidIds = validExerciseIds.filter(
       (id) => !existingExerciseIds.includes(id)
     );
@@ -393,7 +221,6 @@ const addExercisesToWorkoutPlan = async (req, res) => {
       });
     }
 
-    // Add exercises to the workout plan
     const addedExercises = await prisma.workoutPlanExercise.createMany({
       data: exercises.map((exerciseId) => ({
         workoutPlanId,
@@ -410,34 +237,6 @@ const addExercisesToWorkoutPlan = async (req, res) => {
   }
 };
 
-// Remove an exercise from a workout plan
-// const removeExerciseFromWorkoutPlan = async (req, res) => {
-//   try {
-//     const { workoutPlanId, exerciseId } = req.body;
-
-//     // Remove the exercise from the workout plan
-//     const workoutPlanExercise = await prisma.workoutPlanExercise.delete({
-//       where: {
-//         workoutPlanId_exerciseId: {
-//           workoutPlanId,
-//           exerciseId,
-//         },
-//       },
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       data: workoutPlanExercise,
-//     });
-//   } catch (error) {
-//     console.error("Error removing exercise:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to remove exercise from workout plan.",
-//       error: error.message,
-//     });
-//   }
-// };
 const removeExerciseFromWorkoutPlan = async (req, res) => {
   try {
     const { workoutPlanId, exerciseIds } = req.body;
@@ -456,7 +255,6 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
       });
     }
 
-    // Validate that exercises exist in the database
     const validExercises = await prisma.workoutPlanExercise.findMany({
       where: {
         workoutPlanId,
@@ -474,7 +272,6 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
       });
     }
 
-    // Remove all valid exercises from the workout plan
     const deletionPromises = validExerciseIds.map((id) =>
       prisma.workoutPlanExercise.delete({
         where: {
@@ -501,7 +298,7 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
 const deleteWorkoutPlan = async (req, res) => {
   try {
     const { workoutPlanId } = req.params;
-    const { userId, userRole } = req.body; // Receive user ID & role from frontend
+    const { userId, userRole } = req.body; 
 
     if (!workoutPlanId || !userId) {
       return res
@@ -519,7 +316,6 @@ const deleteWorkoutPlan = async (req, res) => {
         .json({ success: false, message: "Invalid Workout Plan ID." });
     }
 
-    // Fetch the workout plan
     const workoutPlan = await prisma.workoutPlan.findUnique({
       where: { id: planId },
     });
@@ -530,7 +326,6 @@ const deleteWorkoutPlan = async (req, res) => {
         .json({ success: false, message: "Workout Plan not found." });
     }
 
-    // ✅ Permission Check:
     if (
       userRole !== "admin" &&
       workoutPlan.assignedToUserId !== parseInt(userId)
@@ -543,7 +338,6 @@ const deleteWorkoutPlan = async (req, res) => {
         });
     }
 
-    // ✅ Cascade delete handled by Prisma
     await prisma.workoutPlan.delete({
       where: { id: planId },
     });
@@ -567,12 +361,10 @@ const createWorkoutPlanWithExercises = async (req, res) => {
   try {
     const { name, exercises } = req.body ;
 
-    // Create Workout Plan
     const workoutPlan = await prisma.workoutPlan.create({
       data: { name },
     });
 
-    // If exercises are provided, add them to the workout plan
     if (Array.isArray(exercises) && exercises.length > 0) {
       await addExerciseToWorkoutPlan({
         ...req,
@@ -589,15 +381,14 @@ const createWorkoutPlanWithExercises = async (req, res) => {
 
 const finishWorkout = async (req, res) => {
   try {
-    const { userId, workoutPlanId } = req.body; // Get userId and workoutPlanId from request
+    const { userId, workoutPlanId } = req.body; 
 
-    // Check if user already completed a workout today
     const existingProgress = await prisma.workoutProgress.findFirst({
       where: {
         userId,
         workoutPlanId,
         completedAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)), // Filter for today
+          gte: new Date(new Date().setHours(0, 0, 0, 0)), 
         },
       },
     });
@@ -608,7 +399,6 @@ const finishWorkout = async (req, res) => {
         .json({ success: false, message: "Workout already logged today" });
     }
 
-    // Insert new workout progress record
     const progress = await prisma.workoutProgress.create({
       data: {
         userId,
@@ -628,12 +418,13 @@ const finishWorkout = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 const exerciseDetails = async (req, res) => {
   try {
-    const { id } = req.params; // Get exercise ID from request parameters
+    const { id } = req.params; 
 
     const exerciseDetailsData = await prisma.exercise.findUnique({
-      where: { id: Number(id) }, // Ensure ID is a number if it's stored as an integer
+      where: { id: Number(id) }, 
     });
 
     if (!exerciseDetailsData) {
@@ -653,7 +444,7 @@ const exerciseDetails = async (req, res) => {
 
 const readExercises = async (req, res) => {
   try {
-    const exercises = await prisma.exercise.findMany(); // Fetch all exercises
+    const exercises = await prisma.exercise.findMany(); 
     res.status(200).json(exercises);
   } catch (error) {
     console.error("Error reading exercises:", error);

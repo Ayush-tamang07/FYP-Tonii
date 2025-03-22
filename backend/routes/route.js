@@ -30,8 +30,8 @@ router.post("/calculate", calculate)
 
 router.get('/exercise',customWorkout.readExercise)
 router.get('/exercises',customWorkout.readExercises)
-router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan);  // Create workout plan
-router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  // Get user's workout plans
+router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan); 
+router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  
 router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorkout.getWorkoutPlanExercises);
 // router.get('/user/workout-plans',authMiddleware(), customWorkout.getWorkoutPlanExercises);  // Get user's workout plans
 // router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
@@ -41,6 +41,7 @@ router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan);
 router.post("/user/finish-workout", customWorkout.finishWorkout);
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 // router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
+
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise

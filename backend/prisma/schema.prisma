@@ -37,7 +37,10 @@ model WorkoutPlan {
   user             User?                 @relation(fields: [assignedToUserId], references: [id])
   exercises        WorkoutPlanExercise[]
   createdAt        DateTime              @default(now())
+  isPinned        Boolean               @default(false)
+  
   workoutProgress WorkoutProgress[]
+  @@index([isPinned])
 }
 
 model WorkoutPlanExercise {

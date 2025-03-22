@@ -3,19 +3,17 @@ const prisma = require("../utils/PrismaClient.js");
 const addFeedback = async (req, res) => {
     try {
       const { feedback_type, description } = req.body;
-      const { userId } = req.params;  // Get userId from the route parameter
+      const { userId } = req.params;  
   
-      // Ensure all required fields are provided
       if (!feedback_type || !description || !userId) {
         return res.status(400).json({ message: "All fields are required." });
       }
   
-      // Create feedback and link to the user by userId
       const feedback = await prisma.feedback.create({
         data: {
           feedback_type,
           description,
-          userId: parseInt(userId),  // Ensure userId is an integer
+          userId: parseInt(userId),  
         },
       });
   
