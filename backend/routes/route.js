@@ -41,6 +41,7 @@ router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan);
 router.post("/user/finish-workout", customWorkout.finishWorkout);
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 // router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
+router.post("/workout-plans/pin", customWorkout.pinWorkoutPlan)
 
 
 // Admin Function

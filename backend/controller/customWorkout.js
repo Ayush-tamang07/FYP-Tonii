@@ -452,6 +452,28 @@ const readExercises = async (req, res) => {
   }
 };
 
+const pinWorkoutPlan = async (req, res) => {
+  try {
+      const { workoutPlanId, pin } = req.body;
+
+      if (workoutPlanId === undefined || pin === undefined) {
+          return res.status(400).json({ message: "Workout Plan ID and pin status are required" });
+      }
+
+      const updatedWorkout = await prisma.workoutPlan.update({
+          where: { id: workoutPlanId },
+          data: { isPinned: pin },
+      });
+
+      return res.status(200).json({ 
+          message: pin ? "Workout plan pinned successfully" : "Workout plan unpinned successfully", 
+          workoutPlan: updatedWorkout 
+      });
+  } catch (error) {
+      console.error("Error updating workout plan:", error);
+      return res.status(500).json({ message: "Internal server error" });
+  }
+};
 module.exports = {
   readExercise,
   createUserWorkoutPlan,
@@ -465,4 +487,5 @@ module.exports = {
   finishWorkout,
   exerciseDetails,
   readExercises,
+  pinWorkoutPlan
 };

@@ -68,7 +68,7 @@ model Exercise {
   difficulty   String
   category     String                @default("Uncategorized")
   instructions String                @db.Text
-  videoUrl     String                @default("https://v1.pinimg.com/videos/mc/expMp4/74/92/98/74929875361f0f599fe039ea0fcf344b_t3.mp4")
+  videoUrl     String                @default("https://www.shutterstock.com/shutterstock/videos/3582829621/preview/stock-footage-young-man-doing-weightlifting-exercises-dumbbells-bench-press-in-gym.webm")
   workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans
 }
 
