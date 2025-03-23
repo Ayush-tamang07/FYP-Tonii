@@ -9,11 +9,13 @@ import {
 } from "react-native";
 import { fetchUserDetails, workoutPlan } from "../../context/userAPI";
 import { router } from "expo-router";
-import BMIChart from "../../components/BMIChart"; // Import the BMI Chart component
+import BMIChart from "../../components/BMIChart"; 
+import { Ionicons } from "@expo/vector-icons";
 
 interface WorkoutPlan {
   id: number;
   name: string;
+  isPinned: boolean; // Using the database schema field
 }
 
 interface UserData {
@@ -27,6 +29,7 @@ interface UserData {
 const home = () => {
   const [user, setUser] = useState<UserData>({ username: "" });
   const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+  const [pinnedPlans, setPinnedPlans] = useState<WorkoutPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [workoutLoading, setWorkoutLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +63,12 @@ const home = () => {
         } else if (response.status === 400) {
           setError(response.message);
         } else {
-          setWorkoutPlans(response.data || []);
+          const allPlans = response.data || [];
+          setWorkoutPlans(allPlans);
+          
+          // Filter out pinned plans
+          const pinned = allPlans.filter((plan: WorkoutPlan) => plan.isPinned);
+          setPinnedPlans(pinned);
         }
       } catch (err) {
         setError("Failed to fetch workout plans.");
@@ -73,12 +81,20 @@ const home = () => {
     fetchWorkoutPlans();
   }, []);
 
-  const navigateToWorkout = (id: number) => {
-    router.push(`/workout/${id}`);
+  // Start workout function - redirect to startWorkout page with plan ID
+  const startWorkout = (id: number) => {
+    router.push({
+      pathname: "/(workout)/startWorkout",
+      params: { id: id },
+    });
   };
   
   const navigateToAllRecords = () => {
     router.push("/(streak)/streak");
+  };
+
+  const navigateToWorkouts = () => {
+    router.push("/(tabs)/workout");
   };
   
   // Generate week days for history section
@@ -114,7 +130,7 @@ const home = () => {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView 
         className="flex-1" 
-        contentContainerClassName="p-5 pb-20" 
+        contentContainerStyle={{ padding: 20, paddingBottom: 80 }} 
         showsVerticalScrollIndicator={false} 
       >
         <View className="mb-8 pt-2.5">
@@ -130,7 +146,12 @@ const home = () => {
         
         {/* Workout Plans Section */}
         <View className="mb-8 bg-white rounded-2xl p-5 shadow-md">
-          <Text className="text-lg font-bold mb-4 text-gray-800">Pin Workout Plans</Text>
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold text-gray-800">Pin Workout Plans</Text>
+            <TouchableOpacity onPress={navigateToWorkouts}>
+              <Text className="text-orange-600 text-base font-medium">See all</Text>
+            </TouchableOpacity>
+          </View>
           
           {workoutLoading && (
             <View className="p-5 items-center">
@@ -156,24 +177,39 @@ const home = () => {
                     <Text className="text-white font-semibold text-base">Create Your First Plan</Text>
                   </TouchableOpacity>
                 </View>
+              ) : pinnedPlans.length === 0 ? (
+                <View className="items-center p-8 bg-gray-50 rounded-lg">
+                  <Text className="text-base text-gray-500 mb-5">No pinned workout plans yet.</Text>
+                  <TouchableOpacity 
+                    className="bg-orange-600 py-3 px-6 rounded-full"
+                    onPress={navigateToWorkouts}
+                  >
+                    <Text className="text-white font-semibold text-base">Pin a Workout</Text>
+                  </TouchableOpacity>
+                </View>
               ) : (
                 <ScrollView 
                   className="max-h-64 rounded-lg"
                   showsVerticalScrollIndicator={true}
                   nestedScrollEnabled={true}
                 >
-                  {workoutPlans.map((plan) => (
-                    <TouchableOpacity 
-                      key={plan.id} 
-                      className="bg-gray-50 p-4.5 rounded-lg mb-2.5 flex-row items-center justify-between border-l-4 border-orange-600"
-                      onPress={() => navigateToWorkout(plan.id)}
-                      activeOpacity={0.7}
-                    >
-                      <Text className="text-base font-semibold text-gray-800">{plan.name}</Text>
-                      <View className="justify-center items-center">
-                        <Text className="text-2xl text-orange-600 font-bold">›</Text>
+                  {pinnedPlans.map((plan: WorkoutPlan) => (
+                    <View key={plan.id} className="mb-2.5 last:mb-0">
+                      <View className="bg-gray-50 rounded-lg overflow-hidden">
+                        <View className="flex-row items-center">
+                          <View className="w-1.5 bg-orange-600 h-full" />
+                          <View className="flex-1 flex-row items-center justify-between py-4 px-3">
+                            <Text className="text-base font-semibold text-gray-800 ml-2">{plan.name}</Text>
+                            <TouchableOpacity 
+                              className="bg-orange-600 py-2 px-4 rounded-lg"
+                              onPress={() => startWorkout(plan.id)}
+                            >
+                              <Text className="text-white font-medium text-sm">Start</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
                       </View>
-                    </TouchableOpacity>
+                    </View>
                   ))}
                 </ScrollView>
               )}

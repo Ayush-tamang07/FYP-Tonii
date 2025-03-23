@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import apiHandler from "./APIHandler";
 import * as SecureStore from "expo-secure-store";
 
@@ -91,6 +92,66 @@ export const getWorkoutById = async (id: string) => {
     return { status: 500, error };
   }
 };
+interface PinWorkoutPlanData {
+  workoutPlanId: number;
+  pin: boolean;
+}
 
+interface ApiResponse {
+  status: number;
+  message?: string;
+  workoutPlan?: any;
+  [key: string]: any;
+}
+interface ErrorResponseData {
+  message?: string;
+  [key: string]: any;
+}
 
-  
+export const pinWorkoutPlan = async (data: PinWorkoutPlanData): Promise<ApiResponse> => {
+  try {
+    const token = await SecureStore.getItemAsync("AccessToken");
+    
+    if (!token) {
+      return { status: 401, message: "Unauthorized: No token found" };
+    }
+    
+    // Set the authorization header
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+    
+    // Send data directly - Axios handles JSON conversion
+    const response = await apiHandler.post('/workout-plans/pin', data, config);
+    
+    // Axios automatically converts response to JSON
+    return {
+      status: response.status,
+      ...response.data
+    };
+  } catch (error: unknown) {
+    console.error('Error pinning workout plan:', error);
+    
+    // Type guard to check if it's an Axios error
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as AxiosError<ErrorResponseData>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data || {};
+        
+        return {
+          status: axiosError.response.status,
+          message: errorData.message || `Error: ${axiosError.response.status}`,
+          ...errorData
+        };
+      }
+    }
+    
+    return {
+      status: 500,
+      message: 'Network error occurred'
+    };
+  }
+};

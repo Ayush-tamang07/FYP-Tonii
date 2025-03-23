@@ -7,15 +7,17 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Platform,
+  Alert,
 } from "react-native";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { workoutPlan } from "../../context/userAPI";
+import { workoutPlan, pinWorkoutPlan } from "../../context/userAPI";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet"
 
 interface WorkoutPlan {
   id: number;
   name: string;
+  isPinned?: boolean;
 }
 
 const Workout: React.FC = () => {
@@ -24,37 +26,91 @@ const Workout: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<WorkoutPlan | null>(null);
+  const [pinningInProgress, setPinningInProgress] = useState(false);
   const BottomSheetRef = useRef<BottomSheet>(null);
   const snapPoint = useMemo(() => ["25%"], []);
+  
   const openSheet = (plan: WorkoutPlan) => {
     setSelectedPlan(plan);
     BottomSheetRef.current?.expand();
   };
-  const backDrop = useCallback((props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />, [])
+  
+  const backDrop = useCallback((props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />, []);
 
   useEffect(() => {
-    const fetchWorkoutPlans = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await workoutPlan();
-        if (response.status === 401) {
-          setError("Unauthorized: Please log in again.");
-        } else if (response.status === 400) {
-          setError(response.message);
-        } else {
-          setWorkoutPlans(response.data || []);
-        }
-      } catch (err) {
-        setError("Failed to fetch workout plans.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchWorkoutPlans();
   }, []);
+
+  const fetchWorkoutPlans = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await workoutPlan();
+      if (response.status === 401) {
+        setError("Unauthorized: Please log in again.");
+      } else if (response.status === 400) {
+        setError(response.message);
+      } else {
+        setWorkoutPlans(response.data || []);
+      }
+    } catch (err) {
+      setError("Failed to fetch workout plans.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTogglePin = async () => {
+    if (!selectedPlan || pinningInProgress) return;
+    
+    setPinningInProgress(true);
+    
+    try {
+      const newPinState = !(selectedPlan.isPinned || false);
+      const response = await pinWorkoutPlan({
+        workoutPlanId: selectedPlan.id,
+        pin: newPinState
+      });
+      
+      if (response.status === 200) {
+        // Update the workout plans list with the new pin status
+        setWorkoutPlans(prevPlans => 
+          prevPlans.map(plan => 
+            plan.id === selectedPlan.id 
+              ? { ...plan, isPinned: newPinState } 
+              : plan
+          )
+        );
+        
+        // Close the bottom sheet
+        BottomSheetRef.current?.close();
+        
+        // Show success message
+        Alert.alert(
+          newPinState ? "Routine Pinned" : "Routine Unpinned", 
+          `${selectedPlan.name} has been ${newPinState ? "pinned" : "unpinned"}.`
+        );
+      } else {
+        Alert.alert("Error", "Failed to update routine pin status.");
+      }
+    } catch (err) {
+      Alert.alert("Error", "An error occurred while updating routine.");
+    } finally {
+      setPinningInProgress(false);
+    }
+  };
+
+  // Sort workout plans to show pinned ones first
+  const sortedWorkoutPlans = useMemo(() => {
+    return [...workoutPlans].sort((a, b) => {
+      // Pinned plans come first
+      if ((a.isPinned || false) && !(b.isPinned || false)) return -1;
+      if (!(a.isPinned || false) && (b.isPinned || false)) return 1;
+      // Then sort alphabetically by name
+      return a.name.localeCompare(b.name);
+    });
+  }, [workoutPlans]);
 
   return (
     <SafeAreaView className="flex-1 bg-[#f8f9fa]">
@@ -106,7 +162,7 @@ const Workout: React.FC = () => {
             <Text className="text-[#e74c3c] text-center my-2 text-base">{error}</Text>
             <TouchableOpacity
               className="mt-3 py-2 px-4 bg-[#f0f0f0] rounded-md"
-              onPress={() => setLoading(true)}
+              onPress={() => fetchWorkoutPlans()}
             >
               <Text className="text-[#333] text-sm font-medium">Try Again</Text>
             </TouchableOpacity>
@@ -115,16 +171,21 @@ const Workout: React.FC = () => {
           expanded && (
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
               <View className="gap-3 pb-4">
-                {workoutPlans.length === 0 ? (
+                {sortedWorkoutPlans.length === 0 ? (
                   <View className="p-8 items-center justify-center bg-white rounded-lg border border-[#f0f0f0] border-dashed">
                     <Text className="text-base font-semibold text-[#555] mb-1.5">No routines yet</Text>
                     <Text className="text-sm text-[#888] text-center">Create your first workout routine</Text>
                   </View>
                 ) : (
-                  workoutPlans.map((plan) => (
+                  sortedWorkoutPlans.map((plan) => (
                     <View key={plan.id} className="bg-white p-4 rounded-lg shadow border border-[#f0f0f0]">
                       <View className="flex-row justify-between items-center mb-3">
-                        <Text className="text-base font-semibold text-[#333]">{plan.name}</Text>
+                        <View className="flex-row items-center">
+                          {plan.isPinned && (
+                            <Ionicons name="pin" size={16} color="#10b981" style={{ marginRight: 6 }} />
+                          )}
+                          <Text className="text-base font-semibold text-[#333]">{plan.name}</Text>
+                        </View>
                         <TouchableOpacity className="p-1" onPress={() => openSheet(plan)}>
                           <Entypo name="dots-three-vertical" size={16} color="#555" />
                         </TouchableOpacity>
@@ -165,11 +226,26 @@ const Workout: React.FC = () => {
           </View>
 
           <View className="divide-y divide-gray-100">
-            <TouchableOpacity className="flex-row items-center px-6 py-4">
+            <TouchableOpacity 
+              className="flex-row items-center px-6 py-4" 
+              onPress={handleTogglePin}
+              disabled={pinningInProgress}
+            >
               <View className="w-8">
-                <Ionicons name="pin" size={22} color="#10b981" />
+                <Ionicons 
+                  name={selectedPlan?.isPinned ? "pin-outline" : "pin"} 
+                  size={22} 
+                  color="#10b981" 
+                />
               </View>
-              <Text className="text-base ml-2">Pin Routine</Text>
+              <Text className="text-base ml-2">
+                {pinningInProgress 
+                  ? "Processing..." 
+                  : selectedPlan?.isPinned 
+                    ? "Unpin Routine" 
+                    : "Pin Routine"
+                }
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="flex-row items-center px-6 py-4">

@@ -74,7 +74,7 @@ const Calorie: React.FC = () => {
   // Bottom sheet states
   const [bottomSheetType, setBottomSheetType] = useState<string | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['1%'], []);
+  const snapPoints = useMemo(() => ['50%'], []); // Increased from '1%' to '50%' for better visibility
   const backDrop = useCallback((props: any) => (
     <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1}/>
   ), []);
@@ -341,11 +341,11 @@ const Calorie: React.FC = () => {
     <SafeAreaView className="flex-1 bg-gray-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
+        className="flex-1 mt-4"
       >
         <ScrollView 
           className="px-4 py-4"
-          contentContainerStyle={showResults ? { paddingBottom: 30 } : { flexGrow: 1, justifyContent: 'center' }}
+          contentContainerStyle={showResults ? { paddingBottom: 30 } : { paddingBottom: 30 }} // Fixed to always start from top
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
