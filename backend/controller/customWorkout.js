@@ -295,17 +295,18 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
     });
   }
 };
+
 const deleteWorkoutPlan = async (req, res) => {
   try {
     const { workoutPlanId } = req.params;
-    const { userId, userRole } = req.body; 
+    const { userId, userRole } = req.user; // Extracting from authMiddleware
 
-    if (!workoutPlanId || !userId) {
+    if (!workoutPlanId) {
       return res
         .status(400)
         .json({
           success: false,
-          message: "Workout Plan ID and User ID are required.",
+          message: "Workout Plan ID is required.",
         });
     }
 
@@ -328,7 +329,7 @@ const deleteWorkoutPlan = async (req, res) => {
 
     if (
       userRole !== "admin" &&
-      workoutPlan.assignedToUserId !== parseInt(userId)
+      workoutPlan.assignedToUserId !== userId
     ) {
       return res
         .status(403)

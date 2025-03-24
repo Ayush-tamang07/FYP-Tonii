@@ -37,7 +37,7 @@ router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorko
 // router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
-router.delete('/workout-plans/:workoutPlanId', customWorkout.deleteWorkoutPlan); 
+router.delete('/workout-plans/:workoutPlanId', authMiddleware(), customWorkout.deleteWorkoutPlan); 
 router.post("/user/finish-workout", customWorkout.finishWorkout);
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 // router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);

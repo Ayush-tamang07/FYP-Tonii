@@ -11,6 +11,7 @@ const addExercise = async (req, res) => {
       difficulty,
       instructions,
       category,
+      videoUrl,
     } = req.body;
 
     if (
@@ -20,7 +21,8 @@ const addExercise = async (req, res) => {
       !equipment ||
       !difficulty ||
       !instructions ||
-      !category
+      !category ||
+      !videoUrl
     ) {
       return res
         .status(400)
@@ -52,6 +54,7 @@ const addExercise = async (req, res) => {
         difficulty,
         category,
         instructions,
+        videoUrl
       },
     });
 
@@ -104,6 +107,7 @@ const updateExercise = async (req, res) => {
       difficulty,
       instructions,
       category,
+      videoUrl
     } = req.body;
 
     if (!id) {
@@ -119,7 +123,8 @@ const updateExercise = async (req, res) => {
       !equipment &&
       !difficulty &&
       !category &&
-      !instructions
+      !instructions&&
+      !videoUrl
     ) {
       return res.status(400).json({
         success: false,
@@ -148,6 +153,7 @@ const updateExercise = async (req, res) => {
         ...(difficulty && { difficulty }),
         ...(category && { category }),
         ...(instructions && { instructions }),
+        ...(videoUrl && { videoUrl }),
       },
     });
 
