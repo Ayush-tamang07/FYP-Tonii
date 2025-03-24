@@ -11,6 +11,7 @@ import {
 function ExerciseContent() {
   const [exercises, setExercises] = useState([]); // Default empty array
   const [expandedRows, setExpandedRows] = useState({}); // Track expanded instructions
+  const [expandedVideoUrls, setExpandedVideoUrls] = useState({}); // Track expanded video URLs
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // "success" or "error"
@@ -22,8 +23,8 @@ function ExerciseContent() {
     difficulty: "",
     category: "",
     instructions: "",
+    videoUrl: "", // Changed from videoURL to videoUrl to match backend
   });
-  // const [originalExercises, setOriginalExercises] = useState([]);
   const [editExercise, setEditExercise] = useState(null); // Track the exercise being edited
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -42,7 +43,6 @@ function ExerciseContent() {
       } catch (error) {
         console.error("Error fetching exercises:", error);
         setExercises([]);
-        setOriginalExercises([]);
       }
     };
 
@@ -70,6 +70,15 @@ function ExerciseContent() {
       [id]: !prev[id],
     }));
   };
+  
+  // Toggle Expand/Collapse Video URLs
+  const toggleExpandVideo = (id) => {
+    setExpandedVideoUrls((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewExercise((prev) => ({ ...prev, [name]: value }));
@@ -107,6 +116,7 @@ function ExerciseContent() {
           difficulty: "",
           category: "",
           instructions: "",
+          videoUrl: ""  // Changed from videoURL to videoUrl
         });
       }, 1500); // Close modal after 1.5 seconds
     } catch (error) {
@@ -180,6 +190,7 @@ function ExerciseContent() {
     setEditExercise(exercise);
     setIsEditModalOpen(true);
   };
+  
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditExercise((prev) => ({
@@ -187,6 +198,7 @@ function ExerciseContent() {
       [name]: value,
     }));
   };
+  
   const handleUpdateExercise = async () => {
     if (!editExercise || !editExercise.id) {
       console.error("Invalid exercise data");
@@ -280,6 +292,7 @@ function ExerciseContent() {
               <th className="border border-gray-300 p-2">Category</th>
               <th className="border border-gray-300 p-2">Equipment</th>
               <th className="border border-gray-300 p-2">Instructions</th>
+              <th className="border border-gray-300 p-2">Video URL</th>
               <th className="border border-gray-300 p-2">Actions</th>
             </tr>
           </thead>
@@ -321,6 +334,21 @@ function ExerciseContent() {
                       {expandedRows[exercise.id] ? "Read Less" : "Read More"}
                     </button>
                   </td>
+                  <td className="border border-gray-300">
+                    {expandedVideoUrls[exercise.id]
+                      ? exercise.videoUrl || "No video URL provided."
+                      : `${
+                          exercise.videoUrl
+                            ? exercise.videoUrl.substring(0, 30)
+                            : "No video URL provided."
+                        }...`}
+                    <button
+                      onClick={() => toggleExpandVideo(exercise.id)}
+                      className="text-blue-500 underline text-sm"
+                    >
+                      {expandedVideoUrls[exercise.id] ? "Read Less" : "Read More"}
+                    </button>
+                  </td>
 
                   <td className="p-2 flex space-x-2">
                     <button
@@ -341,7 +369,7 @@ function ExerciseContent() {
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="text-center p-4">
+                <td colSpan="10" className="text-center p-4">
                   No exercises found.
                 </td>
               </tr>
@@ -430,22 +458,7 @@ function ExerciseContent() {
                 </option>
               ))}
             </select>
-
-            {/*  */}
-            {/* <select
-              name="equipment"
-              value={filters.equipment}
-              onChange={handleFilterChange}
-              className="border p-2 mb-2"
-            >
-              <option value="">Equipment</option>
-              {equipmentOptions.map((equipment) => (
-                <option key={equipment} value={equipment}>
-                  {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
-                </option>
-              ))}
-            </select> */}
-            {/*  */}
+            
             <select
               name="equipment"
               value={newExercise.equipment}
@@ -459,14 +472,6 @@ function ExerciseContent() {
                 </option>
               ))}
             </select>
-            {/* <input
-              type="text"
-              name="equipment"
-              placeholder="Equipment"
-              value={newExercise.equipment}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            /> */}
 
             <textarea
               name="instructions"
@@ -475,6 +480,17 @@ function ExerciseContent() {
               onChange={handleInputChange}
               className="border p-2 w-full mb-2"
             ></textarea>
+            
+            {/* Added Video URL input */}
+            <input
+              type="text"
+              name="videoUrl"
+              placeholder="Video URL"
+              value={newExercise.videoUrl}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-2"
+            />
+            
             <div className="flex justify-end">
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -577,6 +593,16 @@ function ExerciseContent() {
               onChange={handleEditInputChange}
               className="border p-2 w-full mb-2"
             ></textarea>
+            
+            {/* Added Video URL input for edit form */}
+            <input
+              type="text"
+              name="videoUrl"
+              placeholder="Video URL"
+              value={editExercise.videoUrl}
+              onChange={handleEditInputChange}
+              className="border p-2 w-full mb-2"
+            />
 
             <div className="flex justify-end">
               <button
