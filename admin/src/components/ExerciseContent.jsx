@@ -70,7 +70,7 @@ function ExerciseContent() {
       [id]: !prev[id],
     }));
   };
-  
+
   // Toggle Expand/Collapse Video URLs
   const toggleExpandVideo = (id) => {
     setExpandedVideoUrls((prev) => ({
@@ -78,7 +78,7 @@ function ExerciseContent() {
       [id]: !prev[id],
     }));
   };
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewExercise((prev) => ({ ...prev, [name]: value }));
@@ -116,7 +116,7 @@ function ExerciseContent() {
           difficulty: "",
           category: "",
           instructions: "",
-          videoUrl: ""  // Changed from videoURL to videoUrl
+          videoUrl: "", // Changed from videoURL to videoUrl
         });
       }, 1500); // Close modal after 1.5 seconds
     } catch (error) {
@@ -190,7 +190,7 @@ function ExerciseContent() {
     setEditExercise(exercise);
     setIsEditModalOpen(true);
   };
-  
+
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditExercise((prev) => ({
@@ -198,7 +198,7 @@ function ExerciseContent() {
       [name]: value,
     }));
   };
-  
+
   const handleUpdateExercise = async () => {
     if (!editExercise || !editExercise.id) {
       console.error("Invalid exercise data");
@@ -346,7 +346,9 @@ function ExerciseContent() {
                       onClick={() => toggleExpandVideo(exercise.id)}
                       className="text-blue-500 underline text-sm"
                     >
-                      {expandedVideoUrls[exercise.id] ? "Read Less" : "Read More"}
+                      {expandedVideoUrls[exercise.id]
+                        ? "Read Less"
+                        : "Read More"}
                     </button>
                   </td>
 
@@ -379,241 +381,438 @@ function ExerciseContent() {
       </div>
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-1/3">
-            <h2 className="text-lg font-bold mb-4">Add New Exercise</h2>
-
-            {/* Show Success or Error Message inside the form */}
-            {message && (
-              <div
-                className={`text-white p-2 rounded mb-4 ${
-                  messageType === "success" ? "bg-green-500" : "bg-red-500"
-                }`}
-              >
-                {message}
-              </div>
-            )}
-
-            <input
-              type="text"
-              name="name"
-              placeholder="Exercise name"
-              value={newExercise.name}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            />
-            {/* exercise type */}
-            <select
-              name="type"
-              value={newExercise.type}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Type</option>
-              {typeOptions.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
-            </select>
-            {/* muscle */}
-            <select
-              name="muscle"
-              value={newExercise.muscle}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Muscle</option>
-              {muscleOptions.map((muscle) => (
-                <option key={muscle} value={muscle}>
-                  {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
-                </option>
-              ))}
-            </select>
-            {/* difficulty */}
-            <select
-              name="difficulty"
-              value={newExercise.difficulty}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Difficulty</option>
-              {difficultyOptions.map((difficulty) => (
-                <option key={difficulty} value={difficulty}>
-                  {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-                </option>
-              ))}
-            </select>
-            {/* category */}
-            <select
-              name="category"
-              value={newExercise.category}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Category</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </option>
-              ))}
-            </select>
-            
-            <select
-              name="equipment"
-              value={newExercise.equipment}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Equipment</option>
-              {equipmentOptions.map((equipment) => (
-                <option key={equipment} value={equipment}>
-                  {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
-                </option>
-              ))}
-            </select>
-
-            <textarea
-              name="instructions"
-              placeholder="Instructions"
-              value={newExercise.instructions}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            ></textarea>
-            
-            {/* Added Video URL input */}
-            <input
-              type="text"
-              name="videoUrl"
-              placeholder="Video URL"
-              value={newExercise.videoUrl}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-2"
-            />
-            
-            <div className="flex justify-end">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-xl mx-4 overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Add New Exercise
+              </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                className="text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-4">
+              {/* Success or Error Message */}
+              {message && (
+                <div
+                  className={`mb-4 px-4 py-3 rounded-md text-sm font-medium ${
+                    messageType === "success"
+                      ? "bg-green-100 text-green-800 border border-green-200"
+                      : "bg-red-100 text-red-800 border border-red-200"
+                  }`}
+                >
+                  {messageType === "success" && (
+                    <span className="inline-flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {message}
+                    </span>
+                  )}
+                  {messageType === "error" && (
+                    <span className="inline-flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {message}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Form Grid Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Exercise Name */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Exercise Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter exercise name"
+                    value={newExercise.name}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Exercise Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type
+                  </label>
+                  <select
+                    name="type"
+                    value={newExercise.type}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Type</option>
+                    {typeOptions.map((type) => (
+                      <option key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Muscle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Muscle
+                  </label>
+                  <select
+                    name="muscle"
+                    value={newExercise.muscle}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Muscle</option>
+                    {muscleOptions.map((muscle) => (
+                      <option key={muscle} value={muscle}>
+                        {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Difficulty */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Difficulty
+                  </label>
+                  <select
+                    name="difficulty"
+                    value={newExercise.difficulty}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Difficulty</option>
+                    {difficultyOptions.map((difficulty) => (
+                      <option key={difficulty} value={difficulty}>
+                        {difficulty.charAt(0).toUpperCase() +
+                          difficulty.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={newExercise.category}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Category</option>
+                    {categoryOptions.map((category) => (
+                      <option key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Equipment */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Equipment
+                  </label>
+                  <select
+                    name="equipment"
+                    value={newExercise.equipment}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Equipment</option>
+                    {equipmentOptions.map((equipment) => (
+                      <option key={equipment} value={equipment}>
+                        {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Video URL */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Video URL
+                  </label>
+                  <input
+                    type="text"
+                    name="videoUrl"
+                    placeholder="Enter video URL"
+                    value={newExercise.videoUrl}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Instructions */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Instructions
+                  </label>
+                  <textarea
+                    name="instructions"
+                    placeholder="Enter detailed instructions"
+                    value={newExercise.instructions}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    rows="4"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddExercise}
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="ml-3 px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
-                Add
+                Add Exercise
               </button>
             </div>
           </div>
         </div>
       )}
       {isEditModalOpen && editExercise && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-1/3">
-            <h2 className="text-lg font-bold mb-4">Edit Exercise</h2>
-
-            <input
-              type="text"
-              name="name"
-              placeholder="Exercise name"
-              value={editExercise.name}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            />
-            <select
-              name="type"
-              value={editExercise.type}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Type</option>
-              {typeOptions.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
-            </select>
-            <select
-              name="muscle"
-              value={editExercise.muscle}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Muscle</option>
-              {muscleOptions.map((muscle) => (
-                <option key={muscle} value={muscle}>
-                  {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
-                </option>
-              ))}
-            </select>
-            <select
-                name="equipment"
-                value={editExercise.equipment}
-                onChange={handleEditInputChange}
-                className="border p-2 w-full mb-2"
-              >
-                <option value="">Equipment</option>
-                {equipmentOptions.map((equipment) => (
-                  <option key={equipment} value={equipment}>
-                    {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
-                  </option>
-                ))}
-              </select>
-            <select
-              name="difficulty"
-              value={editExercise.difficulty}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Difficulty</option>
-              {difficultyOptions.map((difficulty) => (
-                <option key={difficulty} value={difficulty}>
-                  {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-                </option>
-              ))}
-            </select>
-            <select
-              name="category"
-              value={editExercise.category}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            >
-              <option value="">Category</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </option>
-              ))}
-            </select>
-            <textarea
-              name="instructions"
-              placeholder="Instructions"
-              value={editExercise.instructions}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            ></textarea>
-            
-            {/* Added Video URL input for edit form */}
-            <input
-              type="text"
-              name="videoUrl"
-              placeholder="Video URL"
-              value={editExercise.videoUrl}
-              onChange={handleEditInputChange}
-              className="border p-2 w-full mb-2"
-            />
-
-            <div className="flex justify-end">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-xl mx-4 overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Edit Exercise
+              </h2>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                className="text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-4">
+              {/* Form Grid Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Exercise Name */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Exercise Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter exercise name"
+                    value={editExercise.name}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Exercise Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type
+                  </label>
+                  <select
+                    name="type"
+                    value={editExercise.type}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Type</option>
+                    {typeOptions.map((type) => (
+                      <option key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Muscle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Muscle
+                  </label>
+                  <select
+                    name="muscle"
+                    value={editExercise.muscle}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Muscle</option>
+                    {muscleOptions.map((muscle) => (
+                      <option key={muscle} value={muscle}>
+                        {muscle.charAt(0).toUpperCase() + muscle.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Equipment */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Equipment
+                  </label>
+                  <select
+                    name="equipment"
+                    value={editExercise.equipment}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Equipment</option>
+                    {equipmentOptions.map((equipment) => (
+                      <option key={equipment} value={equipment}>
+                        {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Difficulty */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Difficulty
+                  </label>
+                  <select
+                    name="difficulty"
+                    value={editExercise.difficulty}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Difficulty</option>
+                    {difficultyOptions.map((difficulty) => (
+                      <option key={difficulty} value={difficulty}>
+                        {difficulty.charAt(0).toUpperCase() +
+                          difficulty.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={editExercise.category}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  >
+                    <option value="">Select Category</option>
+                    {categoryOptions.map((category) => (
+                      <option key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Video URL */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Video URL
+                  </label>
+                  <input
+                    type="text"
+                    name="videoUrl"
+                    placeholder="Enter video URL"
+                    value={editExercise.videoUrl}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  />
+                </div>
+
+                {/* Instructions */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Instructions
+                  </label>
+                  <textarea
+                    name="instructions"
+                    placeholder="Enter detailed instructions"
+                    value={editExercise.instructions}
+                    onChange={handleEditInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    rows="4"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateExercise}
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="ml-3 px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
                 Save Changes
               </button>
