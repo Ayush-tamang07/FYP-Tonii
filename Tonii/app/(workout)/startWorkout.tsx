@@ -43,12 +43,16 @@ const StartWorkout = () => {
   const [completedExercises, setCompletedExercises] = useState<{ [key: number]: boolean }>({});
 
   // Category image URLs
-  const chest = "https://i.pinimg.com/474x/c9/b4/54/c9b4541a7a7caba5ef28d8e2bc7d8442.jpg"
-  const back = "https://i.pinimg.com/474x/de/e7/41/dee741a33bf48089d71ffe5b4355e3ef.jpg"
-  const shoulders = "https://i.pinimg.com/474x/9e/c1/04/9ec1042e907e606428e9b08785882fde.jpg"
+  const chest= "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*9OrxMWzC6ARoatL1rrufQg.jpeg"
+  // const back1 = "https://i.pinimg.com/474x/de/e7/41/dee741a33bf48089d71ffe5b4355e3ef.jpg"
+  const back = "https://www.shutterstock.com/image-photo/rear-view-athletic-man-showing-600w-316147079.jpg"
+  // const shoulders = "https://i.pinimg.com/474x/9e/c1/04/9ec1042e907e606428e9b08785882fde.jpg"
+  const shoulders ="https://www.madscientistofmuscle.com/1-exercises/1-muscle-anatomy/graphics/deltoids.jpg"
   const leg = "https://i.pinimg.com/474x/fa/13/dd/fa13dddb484b4a9d6585c46647ab70d6.jpg"
   const arms = "https://i.pinimg.com/736x/1c/07/e7/1c07e752bc6f56bc7e3df79c1980efea.jpg"
-  const core = "https://i.pinimg.com/474x/a5/5f/d1/a55fd1efb160ad91b420113794d478c6.jpg"
+  // const core = "https://i.pinimg.com/474x/a5/5f/d1/a55fd1efb160ad91b420113794d478c6.jpg"
+  const core = "https://st2.depositphotos.com/1726139/5347/i/950/depositphotos_53477943-stock-photo-strong-bodybuilder-with-perfect-abs.jpg"
+
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -179,10 +183,10 @@ const StartWorkout = () => {
       <View className="flex-1 px-5">
         <View className="flex-row items-center py-4 mb-2.5 border-b border-[#e0e0e0]">
           <TouchableOpacity 
-            className="p-2 rounded-full bg-[#3498db]" 
+            className="" 
             onPress={() => router.push("/(tabs)/workout")}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           <Text className="text-xl font-bold text-[#333] text-center flex-grow mr-10">
             Workout Routine

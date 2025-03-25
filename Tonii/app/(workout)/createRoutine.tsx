@@ -27,7 +27,7 @@ const CreateRoutine: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   
   // Category image URLs
-  const chest = "https://i.pinimg.com/474x/c9/b4/54/c9b4541a7a7caba5ef28d8e2bc7d8442.jpg"
+  const chest= "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*9OrxMWzC6ARoatL1rrufQg.jpeg"
   const back = "https://i.pinimg.com/474x/de/e7/41/dee741a33bf48089d71ffe5b4355e3ef.jpg"
   const shoulders = "https://i.pinimg.com/736x/06/10/f3/0610f3183ea0d933fabea62bb65e9c4e.jpg"
   // const shoulders = "https://i.pinimg.com/474x/9e/c1/04/9ec1042e907e606428e9b08785882fde.jpg"
@@ -154,7 +154,7 @@ const CreateRoutine: React.FC = () => {
     <View className="flex-1 bg-white p-4">
       <View className="flex-row justify-start items-center py-4">
         <TouchableOpacity onPress={() => router.push("/(tabs)/workout")}>
-          <Ionicons name="arrow-back" size={24} color="#3498db" />
+          <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="text-lg font-bold text-black text-center flex-grow">Create Routine</Text>
       </View>

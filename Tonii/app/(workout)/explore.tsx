@@ -7,12 +7,15 @@ import {
   ScrollView, 
   TouchableOpacity,
   ActivityIndicator,
-  SafeAreaView
+  SafeAreaView,
+  Modal,
+  Alert
 } from "react-native";
 import apiHandler from "@/context/APIHandler";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { fetchUserDetails } from '../../context/userAPI';
+import * as SecureStore from "expo-secure-store";
 
 interface UserDetails {
   age: number | "";
@@ -33,6 +36,7 @@ interface Exercise {
   muscle: string;
   equipment: string;
   difficulty: string;
+  id?: number; // Adding optional id for saving to workout plan
 }
 
 const Explore: React.FC = () => {
@@ -54,6 +58,11 @@ const Explore: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // New state for workout save modal
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [workoutTitle, setWorkoutTitle] = useState("");
+  const [savingWorkout, setSavingWorkout] = useState(false);
 
   // Predefined options for dropdown selections
   const goalOptions = ["lose weight", "build muscle", "strength", "endurance"];
@@ -161,7 +170,12 @@ const Explore: React.FC = () => {
       
       // Check the structure of the response and extract the suggestions array
       if (response.data && response.data.suggestions) {
-        setExercises(response.data.suggestions);
+        // Map potential exercise IDs from the response or use placeholders
+        const suggestionsWithIds = response.data.suggestions.map((exercise: Exercise, index: number) => ({
+          ...exercise,
+          id: exercise.id || index + 1 // Use existing ID or create a temporary one
+        }));
+        setExercises(suggestionsWithIds);
       } else {
         console.error("Unexpected response format:", response.data);
         setError("Received unexpected data format from server");
@@ -171,6 +185,65 @@ const Explore: React.FC = () => {
       setError("Failed to fetch workout suggestions. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle opening the save modal
+  const handleOpenSaveModal = () => {
+    if (exercises.length === 0) {
+      Alert.alert("No Exercises", "Please generate a workout plan first.");
+      return;
+    }
+    setSaveModalVisible(true);
+  };
+
+  // Handle saving the workout plan
+  const handleSaveWorkout = async () => {
+    if (!workoutTitle.trim()) {
+      Alert.alert("Error", "Please enter a routine title");
+      return;
+    }
+
+    setSavingWorkout(true);
+    try {
+      const token = await SecureStore.getItemAsync("AccessToken");
+
+      // Create workout plan
+      const response = await apiHandler.post(
+        "/user/workout-plans",
+        { name: workoutTitle },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+
+      const workoutPlanId = response.data?.data?.id;
+      if (!workoutPlanId) throw new Error("Workout Plan ID missing");
+
+      // Extract IDs from exercises if available, or fetch from database
+      const exerciseIds = exercises.map(exercise => exercise.id).filter(id => id !== undefined);
+      
+      if (exerciseIds.length === 0) {
+        throw new Error("No valid exercise IDs found");
+      }
+
+      // Add exercises to the workout plan
+      const addExerciseResponse = await apiHandler.post(
+        "/workout-plans/add-exercise",
+        { workoutPlanId, exercises: exerciseIds },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+
+      if (addExerciseResponse.status === 201) {
+        Alert.alert("Success", "Workout routine saved successfully!");
+        setSaveModalVisible(false);
+        setWorkoutTitle("");
+      } else {
+        throw new Error("Failed to add exercises");
+      }
+    } catch (error: any) {
+      console.error("Error saving workout:", error);
+      Alert.alert("Error", error.message || "Failed to save workout plan.");
+    } finally {
+      setSavingWorkout(false);
     }
   };
 
@@ -405,12 +478,17 @@ const Explore: React.FC = () => {
                     <Text className="text-sm text-gray-600">Equipment: {item.equipment}</Text>
                     <Text className="text-sm text-gray-600">Difficulty: {item.difficulty}</Text>
                   </View>
-                  {/* <TouchableOpacity className="bg-[#FF6F00] rounded-lg py-2.5 items-center mt-1">
-                    <Text className="text-white font-medium">Start Exercise</Text>
-                  </TouchableOpacity> */}
                 </View>
               )}
             />
+            
+            {/* Save Workout Button */}
+            <TouchableOpacity 
+              className="bg-[#FF6F00] rounded-lg py-3 items-center mt-4"
+              onPress={handleOpenSaveModal}
+            >
+              <Text className="text-white text-base font-semibold">Save This Workout Plan</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           loading ? null : (
@@ -423,6 +501,52 @@ const Explore: React.FC = () => {
           )
         )}
       </ScrollView>
+      
+      {/* Save Workout Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={saveModalVisible}
+        onRequestClose={() => setSaveModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-white rounded-xl p-5 w-[90%] max-w-md">
+            <Text className="text-xl font-bold text-center mb-4">Save Workout Plan</Text>
+            
+            <TextInput
+              className="bg-gray-100 rounded-lg px-4 py-3 text-base mb-4"
+              placeholder="Enter workout title"
+              value={workoutTitle}
+              onChangeText={setWorkoutTitle}
+            />
+            
+            <View className="flex-row justify-between mt-2">
+              <TouchableOpacity 
+                className="bg-gray-300 rounded-lg py-3 px-5 flex-1 mr-2 items-center"
+                onPress={() => {
+                  setSaveModalVisible(false);
+                  setWorkoutTitle("");
+                }}
+                disabled={savingWorkout}
+              >
+                <Text className="font-semibold">Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                className="bg-[#FF6F00] rounded-lg py-3 px-5 flex-1 ml-2 items-center"
+                onPress={handleSaveWorkout}
+                disabled={savingWorkout}
+              >
+                {savingWorkout ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text className="font-semibold text-white">Save</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
