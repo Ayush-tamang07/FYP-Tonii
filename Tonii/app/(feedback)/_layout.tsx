@@ -15,7 +15,7 @@ const Layout = () => {
       <StatusBar barStyle="light-content" backgroundColor="white" translucent={false} />
 
       <Stack>
-        <Stack.Screen name="userDetails" options={{ headerShown: false }} />
+        <Stack.Screen name="Feedback" options={{ headerShown: false }} />
       </Stack>
       {/* <Toast /> */}
     </GestureHandlerRootView>

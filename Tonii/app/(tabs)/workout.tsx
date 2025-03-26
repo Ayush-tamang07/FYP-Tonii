@@ -112,6 +112,14 @@ const Workout: React.FC = () => {
     });
   }, [workoutPlans]);
 
+  const deleteWorkoutPlan = async ()=>{
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-[#f8f9fa]">
       <View className="px-4 pt-3 pb-4">

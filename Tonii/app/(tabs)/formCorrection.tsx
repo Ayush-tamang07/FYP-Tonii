@@ -3,7 +3,7 @@ import React from 'react'
 
 const formCorrection = () => {
   return (
-    <View>
+    <View className='bg-white'>
       <Text>formCorrection</Text>
     </View>
   )

@@ -33,6 +33,34 @@ export const registerUser = async (
   }
 };
 
+
+export const sendFeedback = async (id: string, feedbackType: string, description: string) => {
+    try {
+        const token = await SecureStore.getItemAsync("AccessToken");
+
+        if (!token) {
+            return { status: 401, message: "Unauthorized: No token found" };
+        }
+
+        const response = await apiHandler.post(
+            `user/addFeedback`, 
+            { feedbackType, description }, 
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error("Feedback submission error:", error);
+        return { status: 400, message: "Failed to send feedback" };
+    }
+};
+
+
 export const fetchUserDetails = async () => {
   try {
     const token = await SecureStore.getItemAsync("AccessToken"); // Retrieve token

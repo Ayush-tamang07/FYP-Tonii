@@ -34,6 +34,8 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(workout)" options={{ headerShown: false }} />
+        <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+        <Stack.Screen name="(feedback)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       </GestureHandlerRootView>

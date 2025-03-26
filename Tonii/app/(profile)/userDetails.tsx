@@ -14,6 +14,7 @@ import {
 import { MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
 import * as SecureStore from "expo-secure-store";
 import { fetchUserDetails } from '../../context/userAPI';
+import { router } from 'expo-router';
 
 interface UserData {
   username: string;
@@ -84,6 +85,12 @@ const userDetails = () => {
   return (
     <SafeAreaView className="flex-1 bg-[#F8F9FA]">
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <View className='bg-white flex-row items-center p-4'>
+      <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
+        <MaterialIcons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+        <Text className='text-center text-2xl flex-1 font-semibold'>User Details</Text>
+      </View>
       
       <ScrollView 
         showsVerticalScrollIndicator={false}
