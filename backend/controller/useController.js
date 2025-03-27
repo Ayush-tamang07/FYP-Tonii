@@ -1,28 +1,29 @@
 const prisma = require("../utils/PrismaClient.js");
 
 const addFeedback = async (req, res) => {
-    try {
+  try {
       const { feedback_type, description } = req.body;
-      const { userId } = req.params;  
-  
+      const userId = req.user.userId;  
+
       if (!feedback_type || !description || !userId) {
-        return res.status(400).json({ message: "All fields are required." });
+          return res.status(400).json({ message: "All fields are required." });
       }
-  
+
       const feedback = await prisma.feedback.create({
-        data: {
-          feedback_type,
-          description,
-          userId: parseInt(userId),  
-        },
+          data: {
+              feedback_type,
+              description,
+              userId,
+          },
       });
-  
+
       return res.status(201).json({ message: "Feedback submitted successfully.", feedback });
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
+  } catch (error) {
+      console.error("Error submitting feedback:", error.message);
       return res.status(500).json({ message: "Internal server error." });
-    }
-  };
+  }
+};
+
   
 
 module.exports = {

@@ -25,7 +25,7 @@ router.post('/verifyOtp',resetPassword.verifyOTP)
 router.post('/resetPassword',resetPassword.resetPassword)
 
 // User Function
-router.post('/user/addFeedback/:userId', userController.addFeedback)
+router.post('/user/addFeedback', authMiddleware(),userController.addFeedback)
 router.post("/calculate", calculate)
 
 router.get('/exercise',customWorkout.readExercise)
