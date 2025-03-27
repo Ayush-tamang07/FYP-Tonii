@@ -4,16 +4,36 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
 import { dropdownOptions } from '../../constants/dropdownOptions';
+import apiHandler from '@/context/APIHandler';
+import { sendFeedback } from '@/context/userAPI';
 
 const Feedback = () => {
     const [feedbackType, setFeedbackType] = useState('');
     const [description, setDescription] = useState('');
 
     const submitFeedback = async () => {
- 
-        console.warn(feedbackType,description);
-
+        try {
+            if (!feedbackType || !description) {
+                // console.log("Fill all fields");
+                Alert.alert("Error", "Fill all fields");
+                return;
+            }
+    
+            const response = await sendFeedback( feedbackType, description);
+    
+            if (response.status === 201) {
+                Alert.alert("Success", "Feedback submitted successfully!");
+                setFeedbackType('');
+                setDescription('');
+            } else {
+                Alert.alert("Success", response.message);
+            }
+        } catch (error) {
+            console.error("Error submitting feedback:", error);
+            Alert.alert("Error", "Something went wrong. Please try again.");
+        }
     };
+    
 
     return (
         <ScrollView className='bg-white'>
