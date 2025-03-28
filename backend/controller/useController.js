@@ -4,6 +4,7 @@ const addFeedback = async (req, res) => {
   try {
       const { feedback_type, description } = req.body;
       const userId = req.user.userId;  
+      // console.log(req.body);
 
       if (!feedback_type || !description || !userId) {
           return res.status(400).json({ message: "All fields are required." });
@@ -16,7 +17,7 @@ const addFeedback = async (req, res) => {
               userId,
           },
       });
-
+      
       return res.status(201).json({ message: "Feedback submitted successfully.", feedback });
   } catch (error) {
       console.error("Error submitting feedback:", error.message);

@@ -13,6 +13,8 @@ import { Ionicons, Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { workoutPlan, pinWorkoutPlan } from "../../context/userAPI";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet"
+import { deleteWorkoutPlan } from '@/context/userAPI';
+
 
 interface WorkoutPlan {
   id: number;
@@ -29,12 +31,12 @@ const Workout: React.FC = () => {
   const [pinningInProgress, setPinningInProgress] = useState(false);
   const BottomSheetRef = useRef<BottomSheet>(null);
   const snapPoint = useMemo(() => ["25%"], []);
-  
+
   const openSheet = (plan: WorkoutPlan) => {
     setSelectedPlan(plan);
     BottomSheetRef.current?.expand();
   };
-  
+
   const backDrop = useCallback((props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />, []);
 
   useEffect(() => {
@@ -63,32 +65,32 @@ const Workout: React.FC = () => {
 
   const handleTogglePin = async () => {
     if (!selectedPlan || pinningInProgress) return;
-    
+
     setPinningInProgress(true);
-    
+
     try {
       const newPinState = !(selectedPlan.isPinned || false);
       const response = await pinWorkoutPlan({
         workoutPlanId: selectedPlan.id,
         pin: newPinState
       });
-      
+
       if (response.status === 200) {
         // Update the workout plans list with the new pin status
-        setWorkoutPlans(prevPlans => 
-          prevPlans.map(plan => 
-            plan.id === selectedPlan.id 
-              ? { ...plan, isPinned: newPinState } 
+        setWorkoutPlans(prevPlans =>
+          prevPlans.map(plan =>
+            plan.id === selectedPlan.id
+              ? { ...plan, isPinned: newPinState }
               : plan
           )
         );
-        
+
         // Close the bottom sheet
         BottomSheetRef.current?.close();
-        
+
         // Show success message
         Alert.alert(
-          newPinState ? "Routine Pinned" : "Routine Unpinned", 
+          newPinState ? "Routine Pinned" : "Routine Unpinned",
           `${selectedPlan.name} has been ${newPinState ? "pinned" : "unpinned"}.`
         );
       } else {
@@ -112,13 +114,29 @@ const Workout: React.FC = () => {
     });
   }, [workoutPlans]);
 
-  const deleteWorkoutPlan = async ()=>{
+  const handleDeleteWorkoutPlan = async (workoutPlanId: number) => {
     try {
-      
+      const response = await deleteWorkoutPlan(workoutPlanId);
+  
+      if (!response) {
+        Alert.alert("Error", "Failed to delete workout plan.");
+        return;
+
+      }
+  
+      if (response.status == 200) {
+        
+        Alert.alert("Success", "Workout plan deleted successfully!");
+        // Optionally, refresh the workout plan list or navigate back
+      } else {
+        Alert.alert("Error", response.message || "Failed to delete workout plan.");
+      }
     } catch (error) {
-      
+      console.error("Error deleting workout plan:", error);
+      Alert.alert("Error", "An unexpected error occurred while deleting the workout plan.");
     }
-  }
+  };
+  
 
   return (
     <SafeAreaView className="flex-1 bg-[#f8f9fa]">
@@ -193,6 +211,7 @@ const Workout: React.FC = () => {
                             <Ionicons name="pin" size={16} color="#10b981" style={{ marginRight: 6 }} />
                           )}
                           <Text className="text-base font-semibold text-[#333]">{plan.name}</Text>
+                          <Text>{plan.id}</Text>
                         </View>
                         <TouchableOpacity className="p-1" onPress={() => openSheet(plan)}>
                           <Entypo name="dots-three-vertical" size={16} color="#555" />
@@ -206,8 +225,7 @@ const Workout: React.FC = () => {
                             pathname: "/(workout)/startWorkout",
                             params: { id: plan.id },
                           })
-                        }
-                      >
+                        }                      >
                         <Text className="text-white text-sm font-semibold">Start Routine</Text>
                       </TouchableOpacity>
                     </View>
@@ -234,23 +252,23 @@ const Workout: React.FC = () => {
           </View>
 
           <View className="divide-y divide-gray-100">
-            <TouchableOpacity 
-              className="flex-row items-center px-6 py-4" 
+            <TouchableOpacity
+              className="flex-row items-center px-6 py-4"
               onPress={handleTogglePin}
               disabled={pinningInProgress}
             >
               <View className="w-8">
-                <Ionicons 
-                  name={selectedPlan?.isPinned ? "pin-outline" : "pin"} 
-                  size={22} 
-                  color="#10b981" 
+                <Ionicons
+                  name={selectedPlan?.isPinned ? "pin-outline" : "pin"}
+                  size={22}
+                  color="#10b981"
                 />
               </View>
               <Text className="text-base ml-2">
-                {pinningInProgress 
-                  ? "Processing..." 
-                  : selectedPlan?.isPinned 
-                    ? "Unpin Routine" 
+                {pinningInProgress
+                  ? "Processing..."
+                  : selectedPlan?.isPinned
+                    ? "Unpin Routine"
                     : "Pin Routine"
                 }
               </Text>
@@ -263,7 +281,8 @@ const Workout: React.FC = () => {
               <Text className="text-base ml-2">Edit Routine</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center px-6 py-4">
+            {/* <TouchableOpacity className="flex-row items-center px-6 py-4" onPress={()=> handleDeleteWorkoutPlan(workoutPlans.id)}> */}
+            <TouchableOpacity className="flex-row items-center px-6 py-4" onPress={() => selectedPlan && handleDeleteWorkoutPlan(selectedPlan.id)}>
               <View className="w-8">
                 <Ionicons name="trash-outline" size={22} color="#ef4444" />
               </View>

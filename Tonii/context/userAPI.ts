@@ -32,35 +32,92 @@ export const registerUser = async (
     };
   }
 };
-
-
-export const sendFeedback = async (feedbackType: string, description: string) => {
+export const deleteWorkoutPlan = async (workoutPlanId: number) => {
   try {
-      const token = await SecureStore.getItemAsync("AccessToken");
+    const token = await SecureStore.getItemAsync("AccessToken");
 
-      if (!token) {
-          return { status: 401, message: "Unauthorized: No token found" };
+    if (!token) {
+      return { status: 401, message: "Unauthorized: No token found" };
+    }
+    const response = await apiHandler.delete(`workout-plans/${workoutPlanId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {}
+};
+
+export const finishWorkout = async (id: number) => {
+  try {
+    const token = await SecureStore.getItemAsync("AccessToken");
+
+    if (!token) {
+      return { status: 401, message: "Unauthorized: No token found" };
+    }
+    const response = await apiHandler.post(
+      "/user/finish-workout",
+      { workoutPlanId:id },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       }
-
-      const response = await apiHandler.post(
-          "user/addFeedback",
-          { feedback_type: feedbackType, description },
-          {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-              },
-          }
-      );
-
-      return response.data;
+    );
+    return response.data;
   } catch (error) {
-      console.error("Feedback submission error:", error);
-      return { status: 400, message: "Failed to send feedback" };
+    return { status: 500, message: "Something went wrong" };
+  }
+};
+export const userProgress = async () => {
+  try {
+    const token = await SecureStore.getItemAsync("AccessToken");
+
+    if (!token) {
+      return { status: 401, message: "Unauthorized: No token found" };
+    }
+    const response = await apiHandler.get("/user/getProgress", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user progress:", error);
+    return { status: 500, message: "Internal Server Error", error };
   }
 };
 
+export const sendFeedback = async (
+  feedback_type: string,
+  description: string
+) => {
+  try {
+    const token = await SecureStore.getItemAsync("AccessToken");
 
+    if (!token) {
+      return { status: 401, message: "Unauthorized: No token found" };
+    }
+
+    const response = await apiHandler.post(
+      "user/addFeedback",
+      { feedback_type, description },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Feedback submission error:", error);
+    return { status: 400, message: "Failed to send feedback" };
+  }
+};
 
 export const fetchUserDetails = async () => {
   try {
@@ -137,50 +194,52 @@ interface ErrorResponseData {
   [key: string]: any;
 }
 
-export const pinWorkoutPlan = async (data: PinWorkoutPlanData): Promise<ApiResponse> => {
+export const pinWorkoutPlan = async (
+  data: PinWorkoutPlanData
+): Promise<ApiResponse> => {
   try {
     const token = await SecureStore.getItemAsync("AccessToken");
-    
+
     if (!token) {
       return { status: 401, message: "Unauthorized: No token found" };
     }
-    
+
     // Set the authorization header
     const config = {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     };
-    
+
     // Send data directly - Axios handles JSON conversion
-    const response = await apiHandler.post('/workout-plans/pin', data, config);
-    
+    const response = await apiHandler.post("/workout-plans/pin", data, config);
+
     // Axios automatically converts response to JSON
     return {
       status: response.status,
-      ...response.data
+      ...response.data,
     };
   } catch (error: unknown) {
-    console.error('Error pinning workout plan:', error);
-    
+    console.error("Error pinning workout plan:", error);
+
     // Type guard to check if it's an Axios error
-    if (error && typeof error === 'object' && 'response' in error) {
+    if (error && typeof error === "object" && "response" in error) {
       const axiosError = error as AxiosError<ErrorResponseData>;
-      
+
       if (axiosError.response) {
         const errorData = axiosError.response.data || {};
-        
+
         return {
           status: axiosError.response.status,
           message: errorData.message || `Error: ${axiosError.response.status}`,
-          ...errorData
+          ...errorData,
         };
       }
     }
-    
+
     return {
       status: 500,
-      message: 'Network error occurred'
+      message: "Network error occurred",
     };
   }
 };

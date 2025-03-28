@@ -299,22 +299,22 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
 const deleteWorkoutPlan = async (req, res) => {
   try {
     const { workoutPlanId } = req.params;
-    const { userId, userRole } = req.user; // Extracting from authMiddleware
+    console.log(req.params)
+    const userId = req.user.userId; // Get the logged-in user's ID
 
     if (!workoutPlanId) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Workout Plan ID is required.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Workout Plan ID is required.",
+      });
     }
 
     const planId = parseInt(workoutPlanId);
     if (isNaN(planId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid Workout Plan ID." });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Workout Plan ID.",
+      });
     }
 
     const workoutPlan = await prisma.workoutPlan.findUnique({
@@ -322,41 +322,39 @@ const deleteWorkoutPlan = async (req, res) => {
     });
 
     if (!workoutPlan) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Workout Plan not found." });
+      return res.status(404).json({
+        success: false,
+        message: "Workout Plan not found.",
+      });
     }
 
-    if (
-      userRole !== "admin" &&
-      workoutPlan.assignedToUserId !== userId
-    ) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "You do not have permission to delete this workout plan.",
-        });
+    // Ensure that only the user who created the plan can delete it
+    if (workoutPlan.assignedToUserId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own workout plans.",
+      });
     }
 
     await prisma.workoutPlan.delete({
       where: { id: planId },
     });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Workout Plan deleted successfully." });
+    res.status(200).json({
+      success: true,
+      message: "Workout Plan deleted successfully.",
+    });
   } catch (error) {
     console.error("Error deleting workout plan:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to delete workout plan.",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete workout plan.",
+      error: error.message,
+    });
   }
 };
+
+
 
 const createWorkoutPlanWithExercises = async (req, res) => {
   try {
@@ -382,43 +380,82 @@ const createWorkoutPlanWithExercises = async (req, res) => {
 
 const finishWorkout = async (req, res) => {
   try {
-    const { userId, workoutPlanId } = req.body; 
+    const userId = req.user.userId;
+    const { workoutPlanId } = req.body;
+    console.log(req.body)
 
+    // Validate input
+    if (!userId || !workoutPlanId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing userId or workoutPlanId",
+      });
+    }
+
+    // Check if workout plan belongs to the user (user-created)
+    const workoutPlan = await prisma.workoutPlan.findUnique({
+      where: {
+        id: workoutPlanId,
+      },
+    });
+
+    if (!workoutPlan) {
+      return res.status(404).json({
+        success: false,
+        message: "Workout plan not found",
+      });
+    }
+
+    if (workoutPlan.createdByAdmin || workoutPlan.assignedToUserId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to finish this workout plan",
+      });
+    }
+
+    // ✅ OPTIONAL: Avoid multiple logs for the same day
+    const todayStart = new Date().toISOString().split('T')[0];
     const existingProgress = await prisma.workoutProgress.findFirst({
       where: {
         userId,
         workoutPlanId,
         completedAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)), 
+          gte: new Date(`${todayStart}T00:00:00.000Z`),
         },
       },
     });
 
     if (existingProgress) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Workout already logged today" });
+      return res.status(400).json({
+        success: false,
+        message: "Workout already logged today",
+      });
     }
 
+    // ✅ Create progress
     const progress = await prisma.workoutProgress.create({
       data: {
         userId,
         workoutPlanId,
+        completedAt: new Date(),
       },
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Workout logged successfully!",
-        progress,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Workout logged successfully!",
+      progress,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error finishing workout:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
+
 
 const exerciseDetails = async (req, res) => {
   try {

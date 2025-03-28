@@ -33,7 +33,7 @@ const Feedback = () => {
             Alert.alert("Error", "Something went wrong. Please try again.");
         }
     };
-    
+
 
     return (
         <ScrollView className='bg-white'>

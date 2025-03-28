@@ -7,6 +7,7 @@ const resetPassword = require('../controller/resetPassword.js');
 const userController = require('../controller/useController.js');
 const suggestionController = require('../controller/suggestionController.js');
 const authMiddleware = require('../middleware/authmiddleware.js');
+const startWorkoutController = require('../controller/startWorkoutController.js');
 
 const router = express.Router();
 
@@ -38,11 +39,12 @@ router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorko
 router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
 router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
 router.delete('/workout-plans/:workoutPlanId', authMiddleware(), customWorkout.deleteWorkoutPlan); 
-router.post("/user/finish-workout", customWorkout.finishWorkout);
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 // router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
 router.post("/workout-plans/pin", customWorkout.pinWorkoutPlan)
 
+router.post("/user/finish-workout", authMiddleware(),customWorkout.finishWorkout);
+router.get("/user/getProgress", authMiddleware(),startWorkoutController.getUserProgress);
 
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
