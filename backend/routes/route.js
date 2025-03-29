@@ -17,18 +17,21 @@ router.post("/auth/login", authController.loginUser)
 router.post("/logout", authController.logout)
 router.put("/user/:id", authController.updateUserDetails)
 
-// Admin Authentication routes
-// router.post("/admin/login", authController.loginAdmin)
-
 // password reset
 router.post('/requestOtp',resetPassword.reqOTP)
 router.post('/verifyOtp',resetPassword.verifyOTP)
 router.post('/resetPassword',resetPassword.resetPassword)
 
+// Admin Authentication routes
+// router.post("/admin/login", authController.loginAdmin)
+
+
+
 // User Function
 router.post('/user/addFeedback', authMiddleware(),userController.addFeedback)
 router.post("/calculate", calculate)
 
+// custom workout plan
 router.get('/exercise',customWorkout.readExercise)
 router.get('/exercises',customWorkout.readExercises)
 router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan); 
@@ -43,6 +46,7 @@ router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 // router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
 router.post("/workout-plans/pin", customWorkout.pinWorkoutPlan)
 
+// streak
 router.post("/user/finish-workout", authMiddleware(),customWorkout.finishWorkout);
 router.get("/user/getProgress", authMiddleware(),startWorkoutController.getUserProgress);
 
