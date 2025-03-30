@@ -13,9 +13,9 @@ const Layout = () => {
   return (
     <GestureHandlerRootView className="flex-1">
       <StatusBar barStyle="light-content" backgroundColor="white" translucent={false} />
-
       <Stack>
         <Stack.Screen name="userDetails" options={{ headerShown: false }} />
+        <Stack.Screen name="UpdateUser" options={{ headerShown: false }} />
       </Stack>
       {/* <Toast /> */}
     </GestureHandlerRootView>

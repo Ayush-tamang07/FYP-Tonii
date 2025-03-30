@@ -23,6 +23,7 @@ interface UserData {
   dob: string;
   height: string;
   gender: string;
+  image: string;
 }
 
 const userDetails = () => {
@@ -33,6 +34,7 @@ const userDetails = () => {
     dob: '',
     height: '',
     gender: '',
+    image:''
   });
 
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,7 @@ const userDetails = () => {
           dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : '',
           height: data.height ? data.height.toString() : '',
           gender: data.gender || '',
+          image: data.image || '',
         });
       }
       setLoading(false);
@@ -97,7 +100,7 @@ const userDetails = () => {
         contentContainerClassName="pt-5 pb-8 relative"
       >
         {/* Edit Profile Button - Positioned at the top right */}
-        <TouchableOpacity className="flex-row items-center self-end bg-white py-2 px-4 rounded-full mr-4 mb-2 shadow">
+        <TouchableOpacity className="flex-row items-center self-end bg-white py-2 px-4 rounded-full mr-4 mb-2 shadow" onPress={()=> router.push("/(profile)/UpdateUser")}>
           <MaterialIcons name="edit" size={20} color="#FF6F00" />
           <Text className="ml-1.5 text-sm font-medium text-[#FF6F00]">Edit Profile</Text>
         </TouchableOpacity>
@@ -106,12 +109,12 @@ const userDetails = () => {
         <View className="items-center py-6 bg-white mb-4 rounded-xl mx-4 shadow">
           <View className="relative mb-3">
             <Image
-              source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }}
+              source={{uri:user.image}}
               className="w-[100px] h-[100px] rounded-full border-3 border-white shadow"
             />
-            <TouchableOpacity className="absolute bottom-0 right-0 bg-[#FF6F00] rounded-full w-[30px] h-[30px] justify-center items-center border-2 border-white">
+            {/* <TouchableOpacity className="absolute bottom-0 right-0 bg-[#FF6F00] rounded-full w-[30px] h-[30px] justify-center items-center border-2 border-white">
               <MaterialIcons name="photo-camera" size={20} color="#FFF" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <Text className="text-2xl font-bold text-[#333333]">{user.username}</Text>
         </View>

@@ -17,6 +17,7 @@ const profile = () => {
   const [user, setUser] = useState({
     username: '',
     email: '',
+    image:''
   });
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +29,7 @@ const profile = () => {
         setUser({
           username: data.username || '',
           email: data.email || '',
+          image: data.image || '',
         });
       }
       setLoading(false);
@@ -55,7 +57,7 @@ const profile = () => {
       <View className="items-center mx-5 mt-5 p-5 shadow-sm">
         <View className="relative mb-4">
           <Image
-            source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqSTTueKdjM4z7B0u5Gqx5UFUZjqtL3_8QhQ&s' }}
+            source={{ uri: user.image }}
             className="w-[90px] h-[90px] rounded-full border-2 border-[#f5f5f5]"
           />
           {/* <TouchableOpacity className="absolute bottom-0 right-0 bg-[#3498db] w-7 h-7 rounded-full justify-center items-center border-2 border-white">

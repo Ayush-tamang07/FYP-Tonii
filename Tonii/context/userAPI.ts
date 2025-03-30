@@ -243,3 +243,22 @@ export const pinWorkoutPlan = async (
     };
   }
 };
+export const updateUserDetails = async (formData: FormData) => {
+  try {
+    const token = await SecureStore.getItemAsync("AccessToken");
+    const response = await apiHandler.put(
+      '/user/updateUser',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.status === 200;
+  } catch (error) {
+    console.error('Update error:', error);
+    return false;
+  }
+};

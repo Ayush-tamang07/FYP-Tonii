@@ -76,7 +76,6 @@ const Workout: React.FC = () => {
       });
 
       if (response.status === 200) {
-        // Update the workout plans list with the new pin status
         setWorkoutPlans(prevPlans =>
           prevPlans.map(plan =>
             plan.id === selectedPlan.id
@@ -85,10 +84,8 @@ const Workout: React.FC = () => {
           )
         );
 
-        // Close the bottom sheet
         BottomSheetRef.current?.close();
 
-        // Show success message
         Alert.alert(
           newPinState ? "Routine Pinned" : "Routine Unpinned",
           `${selectedPlan.name} has been ${newPinState ? "pinned" : "unpinned"}.`
@@ -103,13 +100,10 @@ const Workout: React.FC = () => {
     }
   };
 
-  // Sort workout plans to show pinned ones first
   const sortedWorkoutPlans = useMemo(() => {
     return [...workoutPlans].sort((a, b) => {
-      // Pinned plans come first
       if ((a.isPinned || false) && !(b.isPinned || false)) return -1;
       if (!(a.isPinned || false) && (b.isPinned || false)) return 1;
-      // Then sort alphabetically by name
       return a.name.localeCompare(b.name);
     });
   }, [workoutPlans]);
@@ -127,7 +121,6 @@ const Workout: React.FC = () => {
       if (response.status == 200) {
         
         Alert.alert("Success", "Workout plan deleted successfully!");
-        // Optionally, refresh the workout plan list or navigate back
       } else {
         Alert.alert("Error", response.message || "Failed to delete workout plan.");
       }
@@ -139,9 +132,10 @@ const Workout: React.FC = () => {
   
 
   return (
+    // 
     <SafeAreaView className="flex-1 bg-[#f8f9fa]">
-      <View className="px-4 pt-3 pb-4">
-        <Text className="text-xl font-bold text-[#333] text-center">Workout</Text>
+      <View className="px-4 pt-5 pb-4">
+        <Text className="text-2xl font-bold text-[#333] text-center">Workout</Text>
       </View>
 
       <View className="flex-1 px-4 pt-4">
@@ -211,7 +205,7 @@ const Workout: React.FC = () => {
                             <Ionicons name="pin" size={16} color="#10b981" style={{ marginRight: 6 }} />
                           )}
                           <Text className="text-base font-semibold text-[#333]">{plan.name}</Text>
-                          <Text>{plan.id}</Text>
+                          {/* <Text>{plan.id}</Text> */}
                         </View>
                         <TouchableOpacity className="p-1" onPress={() => openSheet(plan)}>
                           <Entypo name="dots-three-vertical" size={16} color="#555" />
