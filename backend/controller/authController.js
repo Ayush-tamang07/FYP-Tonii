@@ -94,61 +94,61 @@ const loginUser = async (req, res) => {
   }
 };
 
-const updateUserDetails = async (req, res) => {
-  try {
-    const { id } = req.params; 
-    const { username, email, weight, age, height, gender, password } = req.body;
+// const updateUserDetails = async (req, res) => {
+//   try {
+//     const { id } = req.params; 
+//     const { username, email, weight, age, height, gender, password } = req.body;
 
-    if (!id) {
-      return res.status(400).json({ error: "User ID is required." });
-    }
-    const userId = parseInt(id, 10); 
+//     if (!id) {
+//       return res.status(400).json({ error: "User ID is required." });
+//     }
+//     const userId = parseInt(id, 10); 
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId }, 
-    });
+//     const user = await prisma.user.findUnique({
+//       where: { id: userId }, 
+//     });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found." });
-    }
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found." });
+//     }
 
-    if (email && email !== user.email) {
-      const existingUser = await prisma.user.findUnique({ where: { email } });
-      if (existingUser) {
-        return res.status(409).json({ error: "Email already exists." });
-      }
-    }
+//     if (email && email !== user.email) {
+//       const existingUser = await prisma.user.findUnique({ where: { email } });
+//       if (existingUser) {
+//         return res.status(409).json({ error: "Email already exists." });
+//       }
+//     }
 
-    let hashedPassword = user.password;
-    if (password) {
-      hashedPassword = await bcrypt.hash(password, 10);
-    }
+//     let hashedPassword = user.password;
+//     if (password) {
+//       hashedPassword = await bcrypt.hash(password, 10);
+//     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        username: username || user.username,
-        email: email || user.email,
-        weight: weight ? parseFloat(weight) : user.weight,
-        age: age ? parseInt(age) : user.age,
-        height: height ? parseFloat(height) : user.height,
-        gender: gender || user.gender,
-        password: hashedPassword,
-      },
-    });
+//     const updatedUser = await prisma.user.update({
+//       where: { id: userId },
+//       data: {
+//         username: username || user.username,
+//         email: email || user.email,
+//         weight: weight ? parseFloat(weight) : user.weight,
+//         age: age ? parseInt(age) : user.age,
+//         height: height ? parseFloat(height) : user.height,
+//         gender: gender || user.gender,
+//         password: hashedPassword,
+//       },
+//     });
 
-    console.log("User updated:", updatedUser);
-    return res
-      .status(200)
-      .json({
-        message: "User details updated successfully",
-        user: updatedUser,
-      });
-  } catch (error) {
-    console.error("Update error:", error);
-    return res.status(500).json({ error: "Failed to update user details" });
-  }
-};
+//     console.log("User updated:", updatedUser);
+//     return res
+//       .status(200)
+//       .json({
+//         message: "User details updated successfully",
+//         user: updatedUser,
+//       });
+//   } catch (error) {
+//     console.error("Update error:", error);
+//     return res.status(500).json({ error: "Failed to update user details" });
+//   }
+// };
 
 const logout = async (req, res) => {
   const authorizationHeaderValue = req.headers["authorization"];
@@ -180,6 +180,7 @@ const readUser = async (req, res) => {
         dob: true,
         height: true,
         gender: true,
+        image: true,
       },
     });
 
@@ -197,7 +198,7 @@ module.exports = {
   userRegister,
   loginUser,
   // loginAdmin,
-  updateUserDetails,
+  // updateUserDetails,
   logout,
   readUser,
 };

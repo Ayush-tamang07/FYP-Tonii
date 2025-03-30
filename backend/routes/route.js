@@ -8,14 +8,17 @@ const userController = require('../controller/useController.js');
 const suggestionController = require('../controller/suggestionController.js');
 const authMiddleware = require('../middleware/authmiddleware.js');
 const startWorkoutController = require('../controller/startWorkoutController.js');
+const upload = userController.upload;  
 
 const router = express.Router();
+// const multer = require('multer');
 
 // User Authentication routes
 router.post("/auth/register", authController.userRegister)
 router.post("/auth/login", authController.loginUser)
 router.post("/logout", authController.logout)
-router.put("/user/:id", authController.updateUserDetails)
+// router.put("/user/:id", authController.updateUserDetails)
+
 
 // password reset
 router.post('/requestOtp',resetPassword.reqOTP)
@@ -25,11 +28,10 @@ router.post('/resetPassword',resetPassword.resetPassword)
 // Admin Authentication routes
 // router.post("/admin/login", authController.loginAdmin)
 
-
-
 // User Function
 router.post('/user/addFeedback', authMiddleware(),userController.addFeedback)
 router.post("/calculate", calculate)
+router.put("/user/updateUser", authMiddleware(), upload.single("image"), userController.updateUser);
 
 // custom workout plan
 router.get('/exercise',customWorkout.readExercise)
