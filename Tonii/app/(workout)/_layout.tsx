@@ -20,6 +20,7 @@ const Layout = () => {
         <Stack.Screen name="addExercise" options={{ headerShown: false }} />
         <Stack.Screen name="startWorkout" options={{ headerShown: false }} />
         <Stack.Screen name="singleExercise" options={{ headerShown: false }} />
+        <Stack.Screen name="EditWorkoutPlan" options={{ headerShown: false }} />
       </Stack>
       {/* <Toast /> */}
     </GestureHandlerRootView>

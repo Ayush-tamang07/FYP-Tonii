@@ -262,3 +262,4 @@ export const updateUserDetails = async (formData: FormData) => {
     return false;
   }
 };
+

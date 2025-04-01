@@ -111,15 +111,15 @@ const Workout: React.FC = () => {
   const handleDeleteWorkoutPlan = async (workoutPlanId: number) => {
     try {
       const response = await deleteWorkoutPlan(workoutPlanId);
-  
+
       if (!response) {
         Alert.alert("Error", "Failed to delete workout plan.");
         return;
 
       }
-  
+
       if (response.status == 200) {
-        
+
         Alert.alert("Success", "Workout plan deleted successfully!");
       } else {
         Alert.alert("Error", response.message || "Failed to delete workout plan.");
@@ -129,7 +129,7 @@ const Workout: React.FC = () => {
       Alert.alert("Error", "An unexpected error occurred while deleting the workout plan.");
     }
   };
-  
+
 
   return (
     // 
@@ -268,7 +268,15 @@ const Workout: React.FC = () => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center px-6 py-4">
+            <TouchableOpacity className="flex-row items-center px-6 py-4"
+              onPress={() =>
+                router.push({
+                  pathname: "../(workout)/EditWorkoutPlan",
+                  params: { id: selectedPlan?.id.toString() },
+                })
+              }
+
+            >
               <View className="w-8">
                 <Ionicons name="create-outline" size={22} color="#3b82f6" />
               </View>
