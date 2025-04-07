@@ -24,6 +24,7 @@ model User {
   password String
   role     String   @default("user")
   image    String?
+  otp String?
 
   workoutPlans WorkoutPlan[] // A user can have many workout plans, no foreign key in User
   feedbacks    Feedback[] // A user can have many feedback entries

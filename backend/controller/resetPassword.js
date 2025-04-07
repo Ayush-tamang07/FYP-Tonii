@@ -7,7 +7,7 @@ const reqOTP = async (req, res) => {
     const { email } = req.body;
     if (!validator.isEmail(email)) {
       return res.status(400).json({ message: "Invalid email address" });
-    }s
+    }
     const user = await prisma.user.findUnique({
       where: {
         email: email,
@@ -51,6 +51,7 @@ const reqOTP = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
