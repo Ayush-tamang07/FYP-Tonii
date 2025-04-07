@@ -91,7 +91,8 @@ function Login() {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.forgotPasswordContainer}>
+              <TouchableOpacity style={styles.forgotPasswordContainer} 
+              onPress={()=>router.push("/(resetPassword)/Reset")}>
                 <Text style={styles.forgotPassword}>Forgot Password?</Text>
               </TouchableOpacity>
 
