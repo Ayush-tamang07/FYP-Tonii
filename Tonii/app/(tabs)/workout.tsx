@@ -134,8 +134,9 @@ const Workout: React.FC = () => {
   return (
     // 
     <SafeAreaView className="flex-1 bg-[#f8f9fa]">
-      <View className="px-4 pt-5 pb-4">
-        <Text className="text-2xl font-bold text-[#333] text-center">Workout</Text>
+      {/* <View className="px-4 pt-5 pb-4"> */}
+      <View className="bg-white p-3 shadow-sm">
+        <Text className="text-2xl font-bold text-[#333] text-center bg-white">Workout</Text>
       </View>
 
       <View className="flex-1 px-4 pt-4">

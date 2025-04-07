@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, LayoutChangeEvent } from 'react-native';
 
 interface BMIChartProps {
   weight: number | string;
@@ -9,44 +9,28 @@ interface BMIChartProps {
 }
 
 const BMIChart: React.FC<BMIChartProps> = ({ weight, height, age = 25, gender = 'male' }) => {
-  // Convert weight and height to numbers (in case they're strings)
+  const [barWidth, setBarWidth] = useState(0);
+
   const weightNum = typeof weight === 'string' ? parseFloat(weight) : weight;
   const heightNum = typeof height === 'string' ? parseFloat(height) : height;
   const ageNum = typeof age === 'string' ? parseFloat(age) : age;
-  
-  // Calculate BMI: weight(kg) / (height(m) * height(m))
+
   const calculateBMI = (): number => {
     if (!weightNum || !heightNum) return 0;
-    
-    // Convert height from cm to m
     const heightInMeters = heightNum / 100;
     let baseBMI = weightNum / (heightInMeters * heightInMeters);
-    
-    // Apply age and gender adjustments
-    // These are small adjustments based on research that suggests BMI interpretation
-    // can vary slightly with age and gender
-    let adjustedBMI = baseBMI;
-    
-    // Age adjustment: Older adults may have different body composition
-    if (ageNum > 65) {
-      adjustedBMI -= 1; // Allow slightly higher BMI for elderly
-    } else if (ageNum < 18) {
-      // For teens/children, different charts should be used, but we'll make a small adjustment
-      adjustedBMI += 0.5;
-    }
-    
-    // Gender adjustment: women typically have higher body fat percentage
-    if (gender.toLowerCase() === 'female') {
-      adjustedBMI -= 0.5; // Slight adjustment for women
-    }
-    
-    return baseBMI; // Return raw BMI for standard WHO classification
+
+    if (ageNum > 65) baseBMI -= 1;
+    else if (ageNum < 18) baseBMI += 0.5;
+
+    if (gender.toLowerCase() === 'female') baseBMI -= 0.5;
+
+    return baseBMI;
   };
-  
+
   const bmi = calculateBMI();
   const bmiRounded = bmi.toFixed(1);
-  
-  // Determine BMI category using WHO classification
+
   const getBMICategory = (): string => {
     if (bmi < 16.0) return 'Severely Underweight';
     if (bmi < 18.5) return 'Underweight';
@@ -56,51 +40,34 @@ const BMIChart: React.FC<BMIChartProps> = ({ weight, height, age = 25, gender = 
     if (bmi < 40.0) return 'Severely Obese';
     return 'Morbidly Obese';
   };
-  
-  // Calculate the position of the indicator arrow (as percentage)
-  const getIndicatorPosition = (): number => {
+
+  const getBMICategoryColor = (): string => {
+    if (bmi < 16.0) return '#FFFACD';
+    if (bmi < 18.5) return '#FFF59D';
+    if (bmi < 25.0) return '#81C784';
+    if (bmi < 30.0) return '#FFB74D';
+    if (bmi < 35.0) return '#FF8A65';
+    if (bmi < 40.0) return '#E57373';
+    return '#D32F2F';
+  };
+
+  const getIndicatorPosition = () => {
     if (bmi <= 15) return 0;
-    if (bmi >= 45) return 100;
-    
-    // Map BMI range to percentage (15-45 BMI to 0-100%)
-    const rangeMin = 15;
-    const rangeMax = 45;
-    const percentage = ((bmi - rangeMin) / (rangeMax - rangeMin)) * 100;
+    if (bmi >= 45) return barWidth;
+
+    const percentage = ((bmi - 15) / (45 - 15)) * barWidth;
     return percentage;
   };
-  
+
   const indicatorPosition = getIndicatorPosition();
   const bmiCategory = getBMICategory();
-  
-  // Determine the color for the BMI category
-  const getBMICategoryColor = (): string => {
-    if (bmi < 16.0) return '#FFFACD'; // Pale yellow for severely underweight
-    if (bmi < 18.5) return '#FFF59D'; // Yellow for underweight
-    if (bmi < 25.0) return '#81C784'; // Green for normal
-    if (bmi < 30.0) return '#FFB74D'; // Orange for overweight
-    if (bmi < 35.0) return '#FF8A65'; // Light red for moderately obese
-    if (bmi < 40.0) return '#E57373'; // Medium red for severely obese
-    return '#D32F2F'; // Dark red for morbidly obese
+
+  const handleBarLayout = (event: LayoutChangeEvent) => {
+    setBarWidth(event.nativeEvent.layout.width);
   };
-  
-  // Define advice based on BMI category
-  const getBMIAdvice = (): string => {
-    if (bmi < 18.5) return 'Consider increasing calorie intake with nutritious foods';
-    if (bmi < 25.0) return 'Maintain healthy eating and regular physical activity';
-    if (bmi < 30.0) return 'Consider moderate exercise and balanced diet';
-    return 'Consult with healthcare professional for weight management plan';
-  };
-  
-  // Render nothing if we don't have valid height and weight
-  if (!weightNum || !heightNum) {
-    return null;
-  }
-  
-  // Define the styles for the triangle indicator with the percentage position
-  const indicatorStyle = {
-    left: indicatorPosition + '%' as any
-  };
-  
+
+  if (!weightNum || !heightNum) return null;
+
   return (
     <View style={styles.section}>
       <View style={styles.headerContainer}>
@@ -115,24 +82,31 @@ const BMIChart: React.FC<BMIChartProps> = ({ weight, height, age = 25, gender = 
             <Text style={styles.categoryText}>{bmiCategory}</Text>
           </View>
         </View>
-        
-        {/* BMI Scale */}
+
         <View style={styles.bmiScaleContainer}>
-          {/* Triangle indicator - using the separate style object */}
-          <View style={[styles.triangleIndicator, indicatorStyle]} />
-          
-          {/* BMI color bar */}
-          <View style={styles.bmiColorBar}>
-            <View style={[styles.bmiSegment, { flex: 1, backgroundColor: '#FFFACD' }]} /> {/* < 16.0 */}
-            <View style={[styles.bmiSegment, { flex: 2.5, backgroundColor: '#FFF59D' }]} /> {/* 16.0-18.4 */}
-            <View style={[styles.bmiSegment, { flex: 6.5, backgroundColor: '#81C784' }]} /> {/* 18.5-24.9 */}
-            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#FFB74D' }]} /> {/* 25.0-29.9 */}
-            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#FF8A65' }]} /> {/* 30.0-34.9 */}
-            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#E57373' }]} /> {/* 35.0-39.9 */}
-            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#D32F2F' }]} /> {/* > 40.0 */}
+          {/* BMI Scale with onLayout */}
+          <View style={styles.bmiColorBar} onLayout={handleBarLayout}>
+            {/* Triangle indicator */}
+            {barWidth > 0 && (
+              <View
+                style={[
+                  styles.triangleIndicator,
+                  { transform: [{ translateX: indicatorPosition - 10 }] },
+                ]}
+              />
+            )}
+
+            {/* Color segments */}
+            <View style={[styles.bmiSegment, { flex: 1, backgroundColor: '#FFFACD' }]} />
+            <View style={[styles.bmiSegment, { flex: 2.5, backgroundColor: '#FFF59D' }]} />
+            <View style={[styles.bmiSegment, { flex: 6.5, backgroundColor: '#81C784' }]} />
+            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#FFB74D' }]} />
+            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#FF8A65' }]} />
+            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#E57373' }]} />
+            <View style={[styles.bmiSegment, { flex: 5, backgroundColor: '#D32F2F' }]} />
           </View>
-          
-          {/* BMI scale numbers */}
+
+          {/* Scale numbers */}
           <View style={styles.bmiScaleNumbers}>
             <Text style={styles.scaleNumber}>16.0</Text>
             <Text style={styles.scaleNumber}>18.5</Text>
@@ -200,7 +174,7 @@ const styles = StyleSheet.create({
   },
   triangleIndicator: {
     position: 'absolute',
-    top: 0,
+    top: -10,
     width: 0,
     height: 0,
     borderLeftWidth: 10,
@@ -209,7 +183,6 @@ const styles = StyleSheet.create({
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
     borderBottomColor: '#000',
-    transform: [{ translateX: -10 }],
     zIndex: 10,
   },
   bmiColorBar: {
@@ -217,6 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 5,
     overflow: 'hidden',
+    position: 'relative',
   },
   bmiSegment: {
     height: '100%',

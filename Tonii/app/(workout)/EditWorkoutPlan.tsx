@@ -21,6 +21,10 @@ interface Exercise {
   category: string;
   image?: string;
 }
+interface WorkoutPlan{
+  id: number;
+  WorkoutName: string;
+}
 
 const EditWorkoutPlan = () => {
   const { id } = useLocalSearchParams();
@@ -174,9 +178,10 @@ const EditWorkoutPlan = () => {
           <TouchableOpacity 
             className="p-4 bg-[#FF6F00] mt-4 mx-4 rounded-lg shadow-sm flex-row items-center justify-center"
             onPress={() => router.push({
-              pathname: "/(workout)/createRoutine",
+              pathname: "/(workout)/AddExerciseToRoutine ",
               params: { workoutPlanId: id }
             })}
+            
           >
             <MaterialIcons name="add" size={20} color="white" />
             <Text className="text-white font-semibold ml-2">Add Exercise</Text>

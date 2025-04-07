@@ -130,12 +130,12 @@ const UpdateUser = () => {
       <View className="bg-white flex-row items-center p-5 shadow-sm">
         <TouchableOpacity 
           onPress={() => router.back()}
-          className="w-10 h-10 justify-center items-center rounded-full bg-[#F5F5F5]"
+          className="w-10 h-10 justify-center items-center rounded-full"
         >
           <MaterialIcons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text className="text-center text-xl flex-1 font-bold text-[#333]">Update Profile</Text>
-        <View className="w-10" /> {/* Empty view for balance */}
+        <Text className="text-center text-xl flex-1 font-bold text-[#333]">Edit Profile</Text>
+        <View className="w-10" />
       </View>
 
       <ScrollView 

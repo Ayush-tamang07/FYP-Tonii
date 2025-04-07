@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  SafeAreaView, 
-  ActivityIndicator, 
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
   TouchableOpacity
 } from "react-native";
 import { fetchUserDetails, workoutPlan } from "../../context/userAPI";
 import { router } from "expo-router";
-import BMIChart from "../../components/BMIChart"; 
+import BMIChart from "../../components/BMIChart";
 import { Ionicons } from "@expo/vector-icons";
 
 interface WorkoutPlan {
   id: number;
   name: string;
-  isPinned: boolean; // Using the database schema field
+  isPinned: boolean;
 }
 
 interface UserData {
@@ -33,16 +33,16 @@ const home = () => {
   const [loading, setLoading] = useState(true);
   const [workoutLoading, setWorkoutLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [currentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(18);
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       const data = await fetchUserDetails();
       if (data) {
-        setUser({ 
+        setUser({
           username: data.username || "User",
           weight: data.weight || "",
           height: data.height || "",
@@ -65,7 +65,7 @@ const home = () => {
         } else {
           const allPlans = response.data || [];
           setWorkoutPlans(allPlans);
-          
+
           // Filter out pinned plans
           const pinned = allPlans.filter((plan: WorkoutPlan) => plan.isPinned);
           setPinnedPlans(pinned);
@@ -81,14 +81,13 @@ const home = () => {
     fetchWorkoutPlans();
   }, []);
 
-  // Start workout function - redirect to startWorkout page with plan ID
   const startWorkout = (id: number) => {
     router.push({
       pathname: "/(workout)/startWorkout",
       params: { id: id },
     });
   };
-  
+
   const navigateToAllRecords = () => {
     router.push("/(streak)/streak");
   };
@@ -96,12 +95,11 @@ const home = () => {
   const navigateToWorkouts = () => {
     router.push("/(tabs)/workout");
   };
-  
-  // Generate week days for history section
+
   const renderWeekDays = () => {
     const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    const days = [16, 17, 18, 19, 20, 21, 22]; // Days shown in screenshot
-    
+    const days = [16, 17, 18, 19, 20, 21, 22];
+
     return (
       <View className="mb-5">
         <View className="flex-row justify-between mb-2.5">
@@ -111,8 +109,8 @@ const home = () => {
         </View>
         <View className="flex-row justify-between">
           {days.map((day, index) => (
-            <TouchableOpacity 
-              key={`day-${index}`} 
+            <TouchableOpacity
+              key={`day-${index}`}
               onPress={() => setSelectedDay(day)}
               className={`w-9 h-9 rounded-full justify-center items-center mx-0.5 ${day === selectedDay ? 'bg-orange-600' : ''}`}
             >
@@ -128,23 +126,27 @@ const home = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView 
-        className="flex-1" 
-        contentContainerStyle={{ padding: 20, paddingBottom: 80 }} 
-        showsVerticalScrollIndicator={false} 
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ padding: 20, paddingBottom: 80 }}
+        showsVerticalScrollIndicator={false}
       >
         <View className="mb-8 pt-2.5">
           {loading ? (
             <ActivityIndicator size="large" color="#FF6F00" />
           ) : (
-            <Text className="text-2xl leading-8">
-              Hi, <Text className="text-2xl font-bold text-orange-600">{user.username}!</Text>{"\n"}
-              <Text className="text-lg text-gray-600 mt-1">Ready to crush your goals today?</Text>
-            </Text>
+            <View>
+              <Text className="text-2xl leading-8">
+                Hi, <Text className="font-bold text-orange-600">{user.username}!</Text>
+              </Text>
+              <Text className="text-lg text-gray-600 mt-1">
+                Ready to crush your goals today?
+              </Text>
+            </View>
+
           )}
         </View>
-        
-        {/* Workout Plans Section */}
+
         <View className="mb-8 bg-white rounded-2xl p-5 shadow-md">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-lg font-bold text-gray-800">Pin Workout Plans</Text>
@@ -152,25 +154,25 @@ const home = () => {
               <Text className="text-orange-600 text-base font-medium">See all</Text>
             </TouchableOpacity>
           </View>
-          
+
           {workoutLoading && (
             <View className="p-5 items-center">
               <ActivityIndicator size="large" color="#FF6F00" />
             </View>
           )}
-          
+
           {error && (
             <View className="bg-red-50 rounded-lg p-4 my-2.5 border-l-4 border-red-600">
               <Text className="text-red-700 text-base font-medium">{error}</Text>
             </View>
           )}
-          
+
           {!workoutLoading && !error && (
             <View className="rounded-lg max-h-64">
               {workoutPlans.length === 0 ? (
                 <View className="items-center p-8 bg-gray-50 rounded-lg">
                   <Text className="text-base text-gray-500 mb-5">No workout plans available.</Text>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     className="bg-orange-600 py-3 px-6 rounded-full"
                     onPress={() => router.push("/(workout)/createRoutine")}
                   >
@@ -180,7 +182,7 @@ const home = () => {
               ) : pinnedPlans.length === 0 ? (
                 <View className="items-center p-8 bg-gray-50 rounded-lg">
                   <Text className="text-base text-gray-500 mb-5">No pinned workout plans yet.</Text>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     className="bg-orange-600 py-3 px-6 rounded-full"
                     onPress={navigateToWorkouts}
                   >
@@ -188,7 +190,7 @@ const home = () => {
                   </TouchableOpacity>
                 </View>
               ) : (
-                <ScrollView 
+                <ScrollView
                   className="max-h-64 rounded-lg"
                   showsVerticalScrollIndicator={true}
                   nestedScrollEnabled={true}
@@ -200,7 +202,7 @@ const home = () => {
                           <View className="w-1.5 bg-orange-600 h-full" />
                           <View className="flex-1 flex-row items-center justify-between py-4 px-3">
                             <Text className="text-base font-semibold text-gray-800 ml-2">{plan.name}</Text>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                               className="bg-orange-600 py-2 px-4 rounded-lg"
                               onPress={() => startWorkout(plan.id)}
                             >
@@ -216,7 +218,7 @@ const home = () => {
             </View>
           )}
         </View>
-        
+
         {/* History Section */}
         <View className="mb-8 bg-white rounded-2xl p-5 shadow-md">
           <View className="flex-row justify-between items-center mb-4">
@@ -225,9 +227,9 @@ const home = () => {
               <Text className="text-orange-600 text-base font-medium">All records</Text>
             </TouchableOpacity>
           </View>
-          
+
           {renderWeekDays()}
-          
+
           <View className="flex-row items-center justify-between pt-4 border-t border-gray-100">
             <Text className="text-base text-gray-600">Day Streak</Text>
             <View className="flex-row items-center">
@@ -236,8 +238,7 @@ const home = () => {
             </View>
           </View>
         </View>
-        
-        {/* BMI Chart - Moved to the end as requested */}
+
         {!loading && user.height && user.weight && (
           <BMIChart height={user.height} weight={user.weight} />
         )}

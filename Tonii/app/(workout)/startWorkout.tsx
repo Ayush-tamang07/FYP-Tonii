@@ -320,7 +320,7 @@ const StartWorkout = () => {
                         })
                       }
                     >
-                      <Text className="text-[#555] text-sm font-medium">More</Text>
+                      <MaterialIcons name="info-outline" size={20} color="#3498db" />
                     </TouchableOpacity>
 
                     <View className={`h-6 w-6 rounded-full border-2 ${completedExercises[exercise.id]
