@@ -1,6 +1,7 @@
 const prisma = require("../utils/PrismaClient.js");
 
 
+
 const addExercise = async (req, res) => {
   try {
     const {
@@ -272,6 +273,33 @@ const readUserDetailsByAdmin = async (req, res) => {
   }
 };
 
+const getDailyActiveUsers = async (req, res) => {
+  try {
+    const dauData = await prisma.$queryRaw`
+      SELECT 
+        DATE(completedAt) AS date,
+        COUNT(DISTINCT userId) AS count
+      FROM workoutProgress
+      GROUP BY DATE(completedAt)
+      ORDER BY DATE(completedAt) ASC
+    `;
+
+    // Convert BigInt to Number
+    const formatted = dauData.map(row => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    console.error("Error fetching DAU:", error);
+    res.status(500).json({ error: "Failed to get Daily Active Users" });
+  }
+};
+
+
+
+
 module.exports = {
   addExercise,
   deleteExercise,
@@ -279,5 +307,7 @@ module.exports = {
   readFeedback,
   createAdminWorkoutPlan,
   getAdminWorkoutPlans,
-  readUserDetailsByAdmin
+  readUserDetailsByAdmin,
+  getDailyActiveUsers
+
 };

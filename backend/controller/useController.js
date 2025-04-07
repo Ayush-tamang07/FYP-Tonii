@@ -7,7 +7,7 @@ const upload = multer({ storage: storage });
 
 
 
-const   updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { name, email, dob, gender,height, weight } = req.body;

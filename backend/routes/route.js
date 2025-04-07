@@ -42,11 +42,13 @@ router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorko
 // router.get('/user/workout-plans',authMiddleware(), customWorkout.getWorkoutPlanExercises);  // Get user's workout plans
 // router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
-router.delete('/workout-plans/remove-exercise', customWorkout.removeExerciseFromWorkoutPlan); 
+router.delete('/workout-plans/remove-exercise', authMiddleware(),customWorkout.removeExerciseFromWorkoutPlan); 
 router.delete('/workout-plans/:workoutPlanId', authMiddleware(), customWorkout.deleteWorkoutPlan); 
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
 // router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
 router.post("/workout-plans/pin", customWorkout.pinWorkoutPlan)
+router.put("/user/workout-plan/:id/exercises", authMiddleware(), customWorkout.updateWorkoutPlanExercises);
+
 
 // streak
 router.post("/user/finish-workout", authMiddleware(),customWorkout.finishWorkout);
@@ -59,6 +61,7 @@ router.get("/admin/readUser", authMiddleware(), adminController.readUserDetailsB
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 router.get("/admin/readFeedback",adminController.readFeedback);
+router.get("/analytics/dau", adminController.getDailyActiveUsers)
  
 // workout plan created by admin
 router.post("/admin/workout-plans",adminController.createAdminWorkoutPlan);

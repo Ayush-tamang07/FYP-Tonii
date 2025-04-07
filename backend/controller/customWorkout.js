@@ -76,7 +76,6 @@ const createUserWorkoutPlan = async (req, res) => {
   }
 };
 
-
 const getUserWorkoutPlans = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -237,64 +236,7 @@ const addExercisesToWorkoutPlan = async (req, res) => {
   }
 };
 
-const removeExerciseFromWorkoutPlan = async (req, res) => {
-  try {
-    const { workoutPlanId, exerciseIds } = req.body;
 
-    if (!workoutPlanId || !exerciseIds) {
-      return res.status(400).json({
-        success: false,
-        message: "WorkoutPlanId and exerciseIds are required.",
-      });
-    }
-
-    if (!Array.isArray(exerciseIds)) {
-      return res.status(400).json({
-        success: false,
-        message: "exerciseIds must be an array of integers.",
-      });
-    }
-
-    const validExercises = await prisma.workoutPlanExercise.findMany({
-      where: {
-        workoutPlanId,
-        exerciseId: { in: exerciseIds },
-      },
-      select: { id: true },
-    });
-
-    const validExerciseIds = validExercises.map((exercise) => exercise.id);
-
-    if (validExerciseIds.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No valid exercises found for the given workout plan.",
-      });
-    }
-
-    const deletionPromises = validExerciseIds.map((id) =>
-      prisma.workoutPlanExercise.delete({
-        where: {
-          id,
-        },
-      })
-    );
-
-    await Promise.all(deletionPromises);
-
-    res.status(200).json({
-      success: true,
-      message: "Exercises removed successfully from the workout plan.",
-    });
-  } catch (error) {
-    console.error("Error removing exercises from workout plan:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to remove exercises from workout plan.",
-      error: error.message,
-    });
-  }
-};
 
 const deleteWorkoutPlan = async (req, res) => {
   try {
@@ -353,7 +295,6 @@ const deleteWorkoutPlan = async (req, res) => {
     });
   }
 };
-
 
 
 const createWorkoutPlanWithExercises = async (req, res) => {
@@ -455,8 +396,6 @@ const finishWorkout = async (req, res) => {
     });
   }
 };
-
-
 const exerciseDetails = async (req, res) => {
   try {
     const { id } = req.params; 
@@ -512,6 +451,203 @@ const pinWorkoutPlan = async (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const editWorkoutPlan = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const {workoutPlanId} = req.body;
+
+
+
+    return res.status(200).json({ message: "Workout plan updated successfully", data: updatedPlan });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+const removeExerciseFromWorkoutPlan = async (req, res) => {
+  try {
+    const { workoutPlanId, exerciseId } = req.body;
+    const userId = req.user.userId;
+
+    if (!workoutPlanId || !exerciseId) {
+      return res.status(400).json({
+        success: false,
+        message: "workoutPlanId and exerciseId are required.",
+      });
+    }
+
+    // Find the workoutPlanExercise entry
+    const wpExercise = await prisma.workoutPlanExercise.findFirst({
+      where: {
+        workoutPlanId,
+        exerciseId,
+        workoutPlan: {
+          OR: [
+            { assignedToUserId: userId }, // for user-created plans
+            { createdByAdmin: true },     // optionally allow admin plans to be modified
+          ]
+        }
+      }
+    });
+
+    if (!wpExercise) {
+      return res.status(404).json({
+        success: false,
+        message: "Exercise not found in the specified workout plan.",
+      });
+    }
+
+    // Delete the entry (WorkoutSet will cascade delete automatically)
+    await prisma.workoutPlanExercise.delete({
+      where: { id: wpExercise.id },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Exercise removed from workout plan successfully.",
+    });
+
+  } catch (error) {
+    console.error("Error removing exercise:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while removing exercise from workout plan.",
+      error: error.message,
+    });
+  }
+};
+// const updateWorkoutPlanExercises = async (req, res) => {
+//   try {
+//     const { exercises } = req.body;
+//     const workoutPlanId = parseInt(req.params.id);
+//     const userId = req.user.userId;
+
+//     if (!Array.isArray(exercises) || exercises.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Exercise list must be a non-empty array.",
+//       });
+//     }
+
+//     // Verify workout plan access
+//     const workoutPlan = await prisma.workoutPlan.findFirst({
+//       where: {
+//         id: workoutPlanId,
+//         OR: [
+//           { assignedToUserId: userId }, // user-created
+//           { createdByAdmin: true },     // admin-created
+//         ],
+//       },
+//     });
+
+//     if (!workoutPlan) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Workout plan not found or not authorized.",
+//       });
+//     }
+
+//     // Remove existing exercises from the plan
+//     await prisma.workoutPlanExercise.deleteMany({
+//       where: { workoutPlanId },
+//     });
+
+//     // Create new entries
+//     const newEntries = exercises.map((exerciseId) => ({
+//       workoutPlanId,
+//       exerciseId,
+//     }));
+
+//     await prisma.workoutPlanExercise.createMany({
+//       data: newEntries,
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Workout plan updated successfully.",
+//     });
+
+//   } catch (error) {
+//     console.error("Error updating workout plan:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error while updating workout plan.",
+//       error: error.message,
+//     });
+//   }
+// };
+const updateWorkoutPlanExercises = async (req, res) => {
+  try {
+    const { add = [], remove = [] } = req.body;
+    const workoutPlanId = parseInt(req.params.id);
+    const userId = req.user.userId;
+
+    // Verify workout plan access
+    const workoutPlan = await prisma.workoutPlan.findFirst({
+      where: {
+        id: workoutPlanId,
+        OR: [
+          { assignedToUserId: userId },
+          { createdByAdmin: true },
+        ],
+      },
+    });
+
+    if (!workoutPlan) {
+      return res.status(404).json({
+        success: false,
+        message: "Workout plan not found or not authorized.",
+      });
+    }
+
+    // Remove selected exercises
+    if (remove.length > 0) {
+      await prisma.workoutPlanExercise.deleteMany({
+        where: {
+          workoutPlanId,
+          exerciseId: { in: remove },
+        },
+      });
+    }
+
+    // Add new ones (avoid duplicates)
+    const existing = await prisma.workoutPlanExercise.findMany({
+      where: {
+        workoutPlanId,
+        exerciseId: { in: add },
+      },
+      select: { exerciseId: true },
+    });
+
+    const existingIds = new Set(existing.map(e => e.exerciseId));
+    const newToAdd = add.filter(eId => !existingIds.has(eId)).map(exerciseId => ({
+      workoutPlanId,
+      exerciseId,
+    }));
+
+    if (newToAdd.length > 0) {
+      await prisma.workoutPlanExercise.createMany({ data: newToAdd });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Workout plan updated successfully.",
+    });
+
+  } catch (error) {
+    console.error("Error updating workout plan:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while updating workout plan.",
+      error: error.message,
+    });
+  }
+};
+
+
+
 module.exports = {
   readExercise,
   createUserWorkoutPlan,
@@ -525,5 +661,7 @@ module.exports = {
   finishWorkout,
   exerciseDetails,
   readExercises,
-  pinWorkoutPlan
+  pinWorkoutPlan,
+  editWorkoutPlan,
+  updateWorkoutPlanExercises
 };
