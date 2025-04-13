@@ -67,11 +67,12 @@ const loginUser = async (req, res) => {
       where: { email },
     });
 
-    const role = user.role;
-
+    
     if (!user) {
       return res.status(404).json({ message: "User does not exist" });
     }
+    
+  
 
     const checkPassword = await bcrypt.compare(password, user.password);
     if (!checkPassword) {
@@ -86,7 +87,7 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       message: "User login successful",
       token,
-      role
+      role:user.role
     });
   } catch (error) {
     console.error("Error logging in user:", error);

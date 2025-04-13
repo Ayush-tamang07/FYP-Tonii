@@ -2,7 +2,7 @@ const prisma = require("../utils/PrismaClient.js");
 const getUserProgress = async (req, res) => {
     
     try {
-      const { userId } = req.params;
+      const userId  = req.user.userId;
   
       const progress = await prisma.workoutProgress.findMany({
         where: { userId },

@@ -24,11 +24,12 @@ model User {
   password String
   role     String   @default("user")
   image    String?
-  otp String?
+  otp      String?
 
-  workoutPlans WorkoutPlan[] // A user can have many workout plans, no foreign key in User
-  feedbacks    Feedback[] // A user can have many feedback entries
+  workoutPlans    WorkoutPlan[] // A user can have many workout plans, no foreign key in User
+  feedbacks       Feedback[] // A user can have many feedback entries
   workoutProgress WorkoutProgress[]
+  Notification    Notification[]
 }
 
 model WorkoutPlan {
@@ -39,9 +40,10 @@ model WorkoutPlan {
   user             User?                 @relation(fields: [assignedToUserId], references: [id])
   exercises        WorkoutPlanExercise[]
   createdAt        DateTime              @default(now())
-  isPinned        Boolean               @default(false)
-  
+  isPinned         Boolean               @default(false)
+
   workoutProgress WorkoutProgress[]
+
   @@index([isPinned])
 }
 
@@ -61,6 +63,7 @@ model WorkoutSet {
   reps                  Int
   weight                Float
 }
+
 model Exercise {
   id           Int                   @id @default(autoincrement())
   name         String
@@ -74,8 +77,6 @@ model Exercise {
   workoutPlans WorkoutPlanExercise[] // Many-to-many relation with workout plans
 }
 
-
-
 model Feedback {
   id            Int      @id @default(autoincrement())
   feedback_type String
@@ -84,12 +85,20 @@ model Feedback {
   user          User     @relation(fields: [userId], references: [id])
   createdAt     DateTime @default(now())
 }
+
 model WorkoutProgress {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Each progress belongs to a user
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade) // Each progress belongs to a user
   workoutPlanId Int
-  workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade) // Reference the workout plan
-  completedAt DateTime @default(now()) // Stores the date when the workout was completed
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade) // Reference the workout plan
+  completedAt   DateTime    @default(now()) // Stores the date when the workout was completed
 }
 
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
