@@ -46,7 +46,7 @@ const userRegister = async (req, res) => {
       },
     });
 
-    console.log("User registered:", newUser);
+    // console.log("User registered:", newUser);
     return res.status(201).json({ message: "User registered successfully", user: newUser });
 
   } catch (error) {

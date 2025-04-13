@@ -1,7 +1,5 @@
 const prisma = require("../utils/PrismaClient.js");
 
-
-
 const addExercise = async (req, res) => {
   try {
     const {
@@ -175,7 +173,6 @@ const updateExercise = async (req, res) => {
 
 
 
-
 const readFeedback = async (req, res) => {
   try {
     const { feedback_type, date } = req.query; 
@@ -309,5 +306,4 @@ module.exports = {
   getAdminWorkoutPlans,
   readUserDetailsByAdmin,
   getDailyActiveUsers
-
 };
