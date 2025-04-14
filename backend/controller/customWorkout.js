@@ -132,6 +132,7 @@ const getUserWorkoutPlans = async (req, res) => {
     });
   }
 };
+
 const getWorkoutPlanExercises = async (req, res) => {
   try {
     const userId = req.user.userId;

@@ -14,8 +14,8 @@ const router = express.Router();
 // const multer = require('multer');
 
 // User Authentication routes
-router.post("/auth/register", authController.userRegister)
-router.post("/auth/login", authController.loginUser)
+router.post("/auth/register", authController.userRegister) // test done
+router.post("/auth/login", authController.loginUser) // test done
 router.post("/logout", authController.logout)
 // router.put("/user/:id", authController.updateUserDetails)
 
@@ -29,16 +29,16 @@ router.post('/resetPassword',resetPassword.resetPassword)
 // router.post("/admin/login", authController.loginAdmin)
 
 // User Function
-router.post('/user/addFeedback', authMiddleware(),userController.addFeedback)
-router.post("/calculate", calculate)
+router.post('/user/addFeedback', authMiddleware(),userController.addFeedback) // test done
+router.post("/calculate", calculate) // test done
 router.put("/user/updateUser", authMiddleware(), upload.single("image"), userController.updateUser);
 
 // custom workout plan
 router.get('/exercise',customWorkout.readExercise)
 router.get('/exercises',customWorkout.readExercises)
-router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan); 
-router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  
-router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorkout.getWorkoutPlanExercises);
+router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan); // test done
+router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  // test done
+router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorkout.getWorkoutPlanExercises); // test done
 // router.get('/user/workout-plans',authMiddleware(), customWorkout.getWorkoutPlanExercises);  // Get user's workout plans
 // router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
 router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
