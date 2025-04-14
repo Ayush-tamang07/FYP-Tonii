@@ -171,8 +171,6 @@ const updateExercise = async (req, res) => {
   }
 };
 
-
-
 const readFeedback = async (req, res) => {
   try {
     const { feedback_type, date } = req.query; 

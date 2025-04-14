@@ -62,3 +62,91 @@ describe("POST /api/admin/addExercise", () => {
     );
   });
 });
+
+describe("GET /api/admin/readFeedback", () => {
+  let userId;
+  let createdDate;
+
+  beforeAll(async () => {
+    // Create a user
+    const user = await prisma.user.create({
+      data: {
+        username: "feedbackUser",
+        email: "feedback@example.com",
+        password: "testpass",
+        height: 170,
+        weight: 70,
+        dob: new Date("2005-03-24T00:00:00Z"),
+        gender: "male",
+      },
+    });
+
+    userId = user.id;
+
+    // Create feedback entries
+    const feedback1 = await prisma.feedback.create({
+      data: {
+        feedback_type: "Bug Report",
+        description: "Test bug report feedback",
+        userId,
+        createdAt: new Date("2024-12-01T10:00:00.000Z"),
+      },
+    });
+
+    const feedback2 = await prisma.feedback.create({
+      data: {
+        feedback_type: "Suggestion",
+        description: "Test suggestion feedback",
+        userId,
+        createdAt: new Date("2024-12-01T15:30:00.000Z"),
+      },
+    });
+
+    createdDate = "2024-12-01";
+  });
+
+  afterAll(async () => {
+    await prisma.feedback.deleteMany({ where: { userId } });
+    await prisma.user.delete({ where: { id: userId } });
+    await prisma.$disconnect();
+  });
+
+  it("should return all feedbacks when no filters are provided", async () => {
+    const res = await request(app).get("/api/admin/readFeedback");
+
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body[0]).toHaveProperty("feedback_type");
+    expect(res.body[0]).toHaveProperty("user");
+    expect(res.body[0].user).toHaveProperty("username");
+  });
+
+  it("should filter feedback by feedback_type", async () => {
+    const res = await request(app).get("/api/admin/readFeedback?feedback_type=Bug Report");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
+    res.body.forEach(item => {
+      expect(item.feedback_type).toBe("Bug Report");
+    });
+  });
+
+  it("should filter feedback by date", async () => {
+    const res = await request(app).get(`/api/admin/readFeedback?date=${createdDate}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
+    res.body.forEach(item => {
+      expect(new Date(item.createdAt).toISOString().startsWith(createdDate)).toBe(true);
+    });
+  });
+
+  it("should return empty array for non-matching filters", async () => {
+    const res = await request(app).get("/api/admin/readFeedback?feedback_type=InvalidType");
+
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBe(0);
+  });
+});
