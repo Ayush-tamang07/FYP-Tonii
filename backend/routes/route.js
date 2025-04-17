@@ -8,6 +8,7 @@ const userController = require('../controller/useController.js');
 const suggestionController = require('../controller/suggestionController.js');
 const authMiddleware = require('../middleware/authmiddleware.js');
 const startWorkoutController = require('../controller/startWorkoutController.js');
+const reminder = require('../controller/reminderController');
 const upload = userController.upload;  
 
 const router = express.Router();
@@ -18,7 +19,8 @@ router.post("/auth/register", authController.userRegister) // test done
 router.post("/auth/login", authController.loginUser) // test done
 router.post("/logout", authController.logout)
 // router.put("/user/:id", authController.updateUserDetails)
-
+router.post("/reminders", authMiddleware(),reminder.createReminder);
+router.get("/getReminders", authMiddleware(),reminder.getReminders);
 
 // password reset
 router.post('/requestOtp',resetPassword.reqOTP)

@@ -96,9 +96,12 @@ model WorkoutProgress {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  message   String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  message     String
+  createdAt   DateTime  @default(now())
+  scheduledAt DateTime? 
+  isSent      Boolean   @default(false)
+  user        User      @relation(fields: [userId], references: [id])
 }
+
