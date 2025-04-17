@@ -1,3 +1,4 @@
+import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -11,7 +12,7 @@ import {
 } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { fetchUserDetails } from '../../context/userAPI';
-import { router } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 
 const profile = () => {
   const [user, setUser] = useState({
@@ -20,6 +21,7 @@ const profile = () => {
     image:''
   });
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,6 +47,21 @@ const profile = () => {
       </View>
     );
   }
+  // import AsyncStorage from '@react-native-async-storage/async-storage';
+  
+  const handleLogout = async () => {
+    try {
+      // Clear stored user authentication tokens or data
+      const token = await SecureStore.deleteItemAsync("AccessToken");
+      
+      // Reset the navigation stack or navigate directly to the login screen
+      router.replace('/(auth)/login');
+  
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+  
 
   return (
     <ScrollView
@@ -109,6 +126,7 @@ const profile = () => {
         <TouchableOpacity
           className="bg-[#e74c3c] flex-row items-center justify-center py-3.5 rounded-lg shadow-sm"
           activeOpacity={0.8}
+          onPress={handleLogout}
         >
           <MaterialIcons name="logout" size={18} color="white" />
           <Text className="text-white text-base font-semibold ml-2">Log out</Text>

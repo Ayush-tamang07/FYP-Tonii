@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { initializationNotification } from '@/context/notification';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -16,7 +17,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-
+  initializationNotification();
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -38,6 +39,7 @@ export default function RootLayout() {
         <Stack.Screen name="(feedback)" options={{ headerShown: false }} />
         <Stack.Screen name="(streak)" options={{ headerShown: false }} />
         <Stack.Screen name="(resetPassword)" options={{ headerShown: false }} />
+        <Stack.Screen name="(notification)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       </GestureHandlerRootView>

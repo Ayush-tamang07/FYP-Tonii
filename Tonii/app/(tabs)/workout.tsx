@@ -129,15 +129,14 @@ const Workout: React.FC = () => {
       Alert.alert("Error", "An unexpected error occurred while deleting the workout plan.");
     }
   };
-
-
+  
   return (
     // 
     <SafeAreaView className="flex-1 bg-[#f8f9fa]">
       {/* <View className="px-4 pt-5 pb-4"> */}
       <View className="bg-white p-3 shadow-sm">
         <Text className="text-2xl font-bold text-[#333] text-center bg-white">Workout</Text>
-      </View>
+      </View> 
 
       <View className="flex-1 px-4 pt-4">
         <View className="flex-row justify-between mb-6 gap-3">
@@ -276,12 +275,22 @@ const Workout: React.FC = () => {
                   params: { id: selectedPlan?.id.toString() },
                 })
               }
-
             >
               <View className="w-8">
                 <Ionicons name="create-outline" size={22} color="#3b82f6" />
               </View>
               <Text className="text-base ml-2">Edit Routine</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity className="flex-row items-center px-6 py-4"
+              onPress={() =>
+                router.push("/(notification)/setReminder")
+              }
+            >
+              <View className="w-8">
+                <Ionicons name="alarm-outline" size={22} color="#3b82f6" />
+              </View>
+              <Text className="text-base ml-2">Set Reminder</Text>
             </TouchableOpacity>
 
             {/* <TouchableOpacity className="flex-row items-center px-6 py-4" onPress={()=> handleDeleteWorkoutPlan(workoutPlans.id)}> */}

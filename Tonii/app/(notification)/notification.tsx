@@ -9,7 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 interface NotificationItem {
   id: number;
   message: string;
-  scheduledAt: string;
+  createdAt: string;
 }
 
 const NotificationScreen: React.FC = () => {
@@ -31,11 +31,7 @@ const NotificationScreen: React.FC = () => {
       console.log("Response:", response.data); // Debug
 
       if (response.data && response.data.reminders) {
-        // Sort notifications by scheduledAt date in descending order (newest first)
-        const sortedNotifications = [...response.data.reminders].sort((a, b) => 
-          new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
-        );
-        setNotifications(sortedNotifications);
+        setNotifications(response.data.reminders);
       } else {
         setNotifications([]);
       }
@@ -95,7 +91,7 @@ const NotificationScreen: React.FC = () => {
                     <MaterialIcons name="notifications" size={16} color="#FCAC29" />
                   </View>
                   <Text className="text-xs text-gray-500 font-medium">
-                    {new Date(item.scheduledAt).toLocaleString()}
+                    {new Date(item.createdAt).toLocaleString()}
                   </Text>
                 </View>
                 <Text className="text-gray-800 font-medium leading-5">{item.message}</Text>

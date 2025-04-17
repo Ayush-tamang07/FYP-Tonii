@@ -43,16 +43,6 @@ export default function TabLayout() {
         },
       }}
     >
-      {/* Home Tab */}
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" size={size} color={color} />
-          ),
-        }}
-      />
 
       {/* New Tab */}
       {/* <Tabs.Screen
@@ -86,6 +76,17 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* Home Tab */}
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+
 
       {/* Form Correction Tab */}
       <Tabs.Screen

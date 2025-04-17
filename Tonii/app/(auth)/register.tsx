@@ -260,7 +260,7 @@ const Register = () => {
                   ]}>Female</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity 
+                {/* <TouchableOpacity 
                   style={[
                     styles.genderOption, 
                     selectedGender === 'other' && styles.selectedGender
@@ -271,7 +271,7 @@ const Register = () => {
                     styles.genderText,
                     selectedGender === 'other' && styles.selectedGenderText
                   ]}>Other</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             </View>
 
@@ -303,13 +303,13 @@ const Register = () => {
               </View>
             </View>
 
-            <View style={styles.termsContainer}>
+            {/* <View style={styles.termsContainer}>
               <TouchableOpacity style={styles.checkbox}></TouchableOpacity>
               <Text style={styles.termsText}>
                 By checking the box you agree to our{' '}
                 <Text style={styles.termsLink}>Terms and Conditions.</Text>
               </Text>
-            </View>
+            </View> */}
 
             <TouchableOpacity 
               style={[styles.button, loading && styles.disabledButton]} 
