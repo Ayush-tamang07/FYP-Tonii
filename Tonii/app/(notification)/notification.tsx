@@ -65,7 +65,7 @@ const NotificationScreen: React.FC = () => {
         >
           <MaterialIcons name='arrow-back' size={24} color='#333' />
         </TouchableOpacity>
-        <Text className="text-center text-2xl flex-1 font-semibold text-gray-800">Feedback</Text>
+        <Text className="text-center text-2xl flex-1 font-semibold text-gray-800">Notification</Text>
       </View>
 
       {/* Content */}
