@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  SafeAreaView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Image,
   Alert
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as SecureStore from "expo-secure-store";
 import apiHandler from "../../context/APIHandler";
 
@@ -21,19 +21,15 @@ interface Exercise {
   category: string;
   image?: string;
 }
-interface WorkoutPlan{
-  id: number;
-  WorkoutName: string;
-}
 
 const EditWorkoutPlan = () => {
   const { id } = useLocalSearchParams();
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [initialExerciseIds, setInitialExerciseIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [workoutName, setWorkoutName] = useState("Workout Plan");
+  // const [workoutName, setWorkoutName] = useState("Workout Plan");
 
-  // Category image URLs
   const chest = "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*9OrxMWzC6ARoatL1rrufQg.jpeg";
   const back = "https://www.shutterstock.com/image-photo/rear-view-athletic-man-showing-600w-316147079.jpg";
   const shoulders = "https://www.madscientistofmuscle.com/1-exercises/1-muscle-anatomy/graphics/deltoids.jpg";
@@ -52,8 +48,6 @@ const EditWorkoutPlan = () => {
           return;
         }
 
-        // Try to fetch exercises directly without fetching plan details first
-        // This approach matches how it's done in StartWorkout
         const response = await apiHandler.get(`/user/workout-plan/${id}/exercises`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,14 +57,13 @@ const EditWorkoutPlan = () => {
         if (response.data.success) {
           const fetchedExercises = response.data.exercises.map((item: any) => item.exercise);
           setExercises(fetchedExercises);
+          setInitialExerciseIds(fetchedExercises.map((ex: Exercise) => ex.id));
         } else {
           setError(response.data.message || "Failed to fetch exercises");
         }
       } catch (err: any) {
         console.error("Error fetching workout details:", err);
-        
-        // Check if it's a 404 error specifically
-        if (err.response && err.response.status === 404) {
+        if (err.response?.status === 404) {
           setError("Workout plan not found. It may have been deleted.");
         } else {
           setError('Failed to load workout plan exercises. Please try again.');
@@ -83,22 +76,20 @@ const EditWorkoutPlan = () => {
     fetchExercises();
   }, [id]);
 
-  // Get appropriate image based on category
   const getCategoryImage = (category: string, fallbackImage?: string): string => {
-    if (!category) return chest; // Default fallback
-
-    const lowerCategory = category.toLowerCase();
-    if (lowerCategory.includes('chest')) return chest;
-    if (lowerCategory.includes('back')) return back;
-    if (lowerCategory.includes('shoulder')) return shoulders;
-    if (lowerCategory.includes('leg') || lowerCategory.includes('quad') || lowerCategory.includes('hamstring') || lowerCategory.includes('calf')) return leg;
-    if (lowerCategory.includes('arm') || lowerCategory.includes('bicep') || lowerCategory.includes('tricep')) return arms;
-    if (lowerCategory.includes('core') || lowerCategory.includes('ab') || lowerCategory.includes('abdominal')) return core;
+    if (!category) return chest;
+    const lower = category.toLowerCase();
+    if (lower.includes('chest')) return chest;
+    if (lower.includes('back')) return back;
+    if (lower.includes('shoulder')) return shoulders;
+    if (lower.includes('leg') || lower.includes('quad') || lower.includes('hamstring') || lower.includes('calf')) return leg;
+    if (lower.includes('arm') || lower.includes('bicep') || lower.includes('tricep')) return arms;
+    if (lower.includes('core') || lower.includes('ab')) return core;
     return fallbackImage || chest;
   };
 
   const removeExercise = (exerciseId: number) => {
-    setExercises(prevExercises => prevExercises.filter(ex => ex.id !== exerciseId));
+    setExercises(prev => prev.filter(ex => ex.id !== exerciseId));
   };
 
   const saveChanges = async () => {
@@ -109,15 +100,15 @@ const EditWorkoutPlan = () => {
         return;
       }
 
-      const exerciseIds = exercises.map(ex => ex.id);
+      const currentIds = exercises.map(ex => ex.id);
+      const add = currentIds.filter(id => !initialExerciseIds.includes(id));
+      const remove = initialExerciseIds.filter(id => !currentIds.includes(id));
 
       const response = await apiHandler.put(
-        `/user/workout-plan/${id}/exercises`, 
-        { exercises: exerciseIds },
+        `/user/workout-plan/${id}/exercises`,
+        { add, remove },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -130,23 +121,14 @@ const EditWorkoutPlan = () => {
       }
     } catch (error: any) {
       console.error("Error saving workout plan:", error);
-      
-      // More specific error message based on the response
-      if (error.response && error.response.status === 404) {
-        Alert.alert("Error", "Workout plan not found. It may have been deleted.");
-      } else {
-        Alert.alert("Error", "Failed to save changes to workout plan");
-      }
+      Alert.alert("Error", "Failed to save changes to workout plan");
     }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       <View className="bg-white flex-row items-center p-5 shadow-sm">
-        <TouchableOpacity
-          onPress={() => router.push("/(tabs)/workout")}
-          className="w-10 h-10 justify-center items-center rounded-full"
-        >
+        <TouchableOpacity onPress={() => router.push("/(tabs)/workout")} className="w-10 h-10 justify-center items-center rounded-full">
           <MaterialIcons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text className="text-center text-xl flex-1 font-bold text-[#333]">Edit Workout</Text>
@@ -162,18 +144,15 @@ const EditWorkoutPlan = () => {
         <View className="flex-1 justify-center items-center p-5">
           <MaterialIcons name="error-outline" size={40} color="#dc3545" />
           <Text className="text-[#dc3545] text-center mt-3 text-base mb-5">{error}</Text>
-          <TouchableOpacity
-            className="bg-[#6c757d] px-5 py-3 rounded-lg"
-            onPress={() => router.push("/(tabs)/workout")}
-          >
+          <TouchableOpacity className="bg-[#6c757d] px-5 py-3 rounded-lg" onPress={() => router.push("/(tabs)/workout")}>
             <Text className="text-white font-semibold">Go Back</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <>
-          <View className="p-4 bg-white mt-2 mx-4 rounded-lg shadow-sm">
+          {/* <View className="p-4 bg-white mt-2 mx-4 rounded-lg shadow-sm">
             <Text className="text-lg font-bold text-[#333]">{workoutName}</Text>
-          </View>
+          </View> */}
 
           <TouchableOpacity 
             className="p-4 bg-[#FF6F00] mt-4 mx-4 rounded-lg shadow-sm flex-row items-center justify-center"
@@ -181,7 +160,6 @@ const EditWorkoutPlan = () => {
               pathname: "/(workout)/AddExerciseToRoutine ",
               params: { workoutPlanId: id }
             })}
-            
           >
             <MaterialIcons name="add" size={20} color="white" />
             <Text className="text-white font-semibold ml-2">Add Exercise</Text>
@@ -197,15 +175,6 @@ const EditWorkoutPlan = () => {
             {exercises.length === 0 ? (
               <View className="flex-1 justify-center items-center py-10">
                 <Text className="text-[#888] text-base">No exercises in this workout plan</Text>
-                <TouchableOpacity 
-                  className="mt-4 p-3 bg-[#f0f0f0] rounded-lg"
-                  onPress={() => router.push({
-                    pathname: "/(workout)/addExercise",
-                    params: { workoutPlanId: id }
-                  })}
-                >
-                  <Text className="text-[#555]">Add Exercises</Text>
-                </TouchableOpacity>
               </View>
             ) : (
               exercises.map((exercise) => (
@@ -261,7 +230,7 @@ const EditWorkoutPlan = () => {
                 className="bg-[#4CAF50] p-4 rounded-xl shadow-sm items-center"
                 onPress={saveChanges}
               >
-                <Text className="text-white font-b old text-base">Save Changes</Text>
+                <Text className="text-white font-bold text-base">Save Changes</Text>
               </TouchableOpacity>
             </View>
           )}

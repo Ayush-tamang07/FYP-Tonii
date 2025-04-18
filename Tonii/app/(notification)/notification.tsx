@@ -5,7 +5,6 @@ import apiHandler from '@/context/APIHandler';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 
-// Define the type for a notification item
 interface NotificationItem {
   id: number;
   message: string;
@@ -19,7 +18,7 @@ const NotificationScreen: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       const token = await SecureStore.getItemAsync("AccessToken");
-      console.log("Token:", token); // Debug
+      console.log("Token:", token); 
 
       const response = await apiHandler.get("/getReminders", {
         headers: {
@@ -28,7 +27,7 @@ const NotificationScreen: React.FC = () => {
         },
       });
 
-      console.log("Response:", response.data); // Debug
+      console.log("Response:", response.data); 
 
       if (response.data && response.data.reminders) {
         setNotifications(response.data.reminders);

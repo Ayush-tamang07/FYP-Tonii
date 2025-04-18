@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiHandler = axios.create({
-  baseURL: "https://8e28-2400-1a00-bd11-67f2-c006-15fd-dadd-fe88.ngrok-free.app/api",
+  baseURL: "https://419d-2400-1a00-bd11-67f2-88d4-c0f9-e73d-b176.ngrok-free.app/api",
   responseType: "json",
   withCredentials: true,
 });

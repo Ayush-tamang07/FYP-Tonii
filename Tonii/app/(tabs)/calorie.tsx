@@ -351,7 +351,7 @@ const Calorie: React.FC = () => {
         >
           {/* Header */}
           <View className={`${showResults ? 'mb-4' : 'mb-6'}`}>
-            <Text className="text-2xl font-bold text-gray-800 mb-0.5">Nutrition Guidance</Text>
+            <Text className="text-2xl font-bold text-gray-800 mb-0.5">Calorie Calculation</Text>
             <Text className="text-sm text-gray-500">Calculate your daily calories and macros</Text>
           </View>
 
