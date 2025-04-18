@@ -80,7 +80,7 @@ function FeedbackContent() {
           onChange={(e) => setSelectedFeedbackType(e.target.value)}
         >
           <option value="">Select Feedback Type</option>
-          <option value="Bug">Bug Report</option>
+          <option value="Bug Report">Bug Report</option>
           <option value="Feature Request">Feature Request</option>
           <option value="General Feedback">General Feedback</option>
           <option value="Usability Feedback">Usability Feedback</option>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaUsers, FaDumbbell, FaComment } from "react-icons/fa";
+import ActiveUser from "./ActiveUser";
 
 function DashboardContent() {
   const [userCount, setUserCount] = useState(0);
@@ -52,6 +53,9 @@ function DashboardContent() {
           <h3 className="text-xl font-semibold mb-2">Feedback</h3>
           <p className="text-2xl font-bold text-orange-500">{feedbackCount}</p>
         </div>
+      </div>
+      <div className="">
+        <ActiveUser/>
       </div>
     </div>
   );

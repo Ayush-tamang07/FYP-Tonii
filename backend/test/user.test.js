@@ -4,7 +4,6 @@ const prisma = require("../utils/PrismaClient.js");
 
 describe('POST /user/login', () => {
 
-  // ✅ Test with correct credentials
   it('should return 200, token, and role for valid credentials', async () => {
     const response = await request(app).post('/api/auth/login').send({
       email: 'test@gmail.com',
@@ -17,7 +16,6 @@ describe('POST /user/login', () => {
     expect(response.body).toHaveProperty('role');
   });
 
-  // ❌ Incorrect password
   it('should return 401 for incorrect password', async () => {
     const response = await request(app).post('/api/auth/login').send({
       email: 'test@gmail.com',
@@ -28,7 +26,6 @@ describe('POST /user/login', () => {
     expect(response.body).toHaveProperty('message', 'Incorrect Password');
   });
 
-  // ❌ Non-existent user
   it('should return 404 for non-existent email', async () => {
     const response = await request(app).post('/api/auth/login').send({
       email: 'noUser@gmail.com',
@@ -39,7 +36,6 @@ describe('POST /user/login', () => {
     expect(response.body).toHaveProperty('message', 'User does not exist');
   });
 
-  // ❌ Missing email and password
   it('should return 400 when email and password are missing', async () => {
     const response = await request(app).post('/api/auth/login').send({});
 
@@ -47,7 +43,6 @@ describe('POST /user/login', () => {
     expect(response.body).toHaveProperty('message', 'All fields are required');
   });
 
-  // ❌ Missing email
   it('should return 400 when email is missing', async () => {
     const response = await request(app).post('/api/auth/login').send({
       password: '123'
@@ -57,7 +52,6 @@ describe('POST /user/login', () => {
     expect(response.body).toHaveProperty('message', 'All fields are required');
   });
 
-  // ❌ Missing password
   it('should return 400 when password is missing', async () => {
     const response = await request(app).post('/api/auth/login').send({
       email: 'test@gmail.com'
@@ -72,15 +66,14 @@ describe("POST /api/auth/register", () => {
   const testUser = {
     username: "testuser",
     email: "testuser@example.com",
-    weight: "70",
+    weight: 70,
     dob: "2005-03-24T00:00:00Z",
-    height: "175",
+    height:175,
     gender: "male",
     password: "testpassword123",
     confirmPassword: "testpassword123",
   };
 
-  // Cleanup after test
   afterAll(async () => {
     await prisma.user.deleteMany({
       where: { email: testUser.email },
@@ -188,14 +181,12 @@ describe("POST /calculate", () => {
 describe("POST /user/addFeedback", () => {
   const url = "/api/user/addFeedback";
 
-  // Mock token and test user data
   let token;
   const testUser = {
     email: "testuser@example.com",
     password: "testpassword123",
   };
 
-  // Register + Login a user to get a valid token
   beforeAll(async () => {
     await request(app).post("/api/auth/register").send({
       username: "testuser",
@@ -212,7 +203,6 @@ describe("POST /user/addFeedback", () => {
     token = loginRes.body.token;
   });
 
-  // Cleanup feedbacks created by the test
   afterAll(async () => {
     const user = await prisma.user.findUnique({ where: { email: testUser.email } });
     if (user) {
@@ -240,7 +230,7 @@ describe("POST /user/addFeedback", () => {
     const res = await request(app)
       .post(url)
       .set("Authorization", `Bearer ${token}`)
-      .send({ feedback_type: "" }); // Missing description
+      .send({ feedback_type: "" }); 
 
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty("message", "All fields are required.");
@@ -254,7 +244,7 @@ describe("POST /user/addFeedback", () => {
         description: "This should fail due to missing token",
       });
 
-    expect(res.statusCode).toBe(401); // or 403 depending on your middleware
+    expect(res.statusCode).toBe(401); 
   });
 });
 
