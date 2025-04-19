@@ -1,36 +1,8 @@
-// import { View, Text, ActivityIndicator,StyleSheet } from 'react-native'
-// import React, { useEffect } from 'react'
-// import {Camera, useCameraDevices} from 'react-native-vision-camera'
 
-// const formCorrection = () => {
-//   const devices = useCameraDevices()
-//   const device = devices.back
-
-//   // const { hasPermission } = useCameraPermission()
-//   useEffect(()=>{
-//     checkPermission()
-//   },[])
-//   const checkPermission = async()=>{
-//     const newCameraPermission = await Camera.requestCameraPermission()
-//     // const microphonePermission = await Camera.getMicrophonePermissionStatus()
-//     console.log(newCameraPermission);
-//   }
-//   if (device == null) return <ActivityIndicator />
-
-//   return (
-//     <View className='flex:1'>
-//       <Camera 
-//       style={StyleSheet.absoluteFill}
-//       device={device}
-//       isActive={true}
-//     />
-//     </View>
-//   )
-// }
-
-// export default formCorrection
 import { View, Text, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import React from 'react';
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const FormCorrection = () => {
   const { width } = useWindowDimensions();
@@ -41,13 +13,13 @@ const FormCorrection = () => {
   const cardHeight = cardWidth * 0.6; // Adjust aspect ratio as needed
 
   return (
-    <View className="flex-1 bg-slate-50 pt-6 px-4">
-      <Text className="text-3xl font-bold text-gray-800 mb-6">Form Correction</Text>
+    <SafeAreaView className="flex-1 bg-slate-50">
+      <Text className="text-2xl font-bold text-gray-800 ml-5 ">Form Correction</Text>
       
       {/* Main exercise card with improved UI */}
       <TouchableOpacity
-        onPress={() => console.log('Card pressed')}
-        className="mb-4 rounded-3xl overflow-hidden"
+        onPress={() => router.push('/(postercorrection)/CameraScreen')}
+        className="mt-5 ml-5 mb-4 rounded-3xl overflow-hidden"
         style={{
           width: cardWidth,
           height: cardHeight,
@@ -85,7 +57,7 @@ const FormCorrection = () => {
           </View>
         </View>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
