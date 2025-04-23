@@ -229,19 +229,19 @@ const Calorie: React.FC = () => {
         name: 'Carbs', 
         grams: carbs, 
         percentage: `${Math.round((carbs / total) * 100)}%`, 
-        color: '#4361EE' 
+        color: '#2196F3' 
       },
       { 
         name: 'Protein', 
         grams: protein, 
         percentage: `${Math.round((protein / total) * 100)}%`, 
-        color: '#3A0CA3' 
+        color: '#4CAF50' 
       },
       { 
         name: 'Fats', 
         grams: fat, 
         percentage: `${Math.round((fat / total) * 100)}%`, 
-        color: '#F72585' 
+        color: '#FF9800' 
       },
     ];
   };

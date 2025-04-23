@@ -154,8 +154,8 @@ export const workoutPlan = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching user details:", error);
-    return { status: 400, message: "Error fetching user details." };
+    // console.error("Error fetching workout:", error);
+    return { status: 400, message: "Error fetching workout." };
   }
 };
 

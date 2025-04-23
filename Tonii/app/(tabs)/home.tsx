@@ -194,7 +194,7 @@ const Home = () => {
   return (
     <SafeAreaView className="flex-1 bg-gray-50" >
       {/* Sticky Header */}
-      <View className="pt-4 pb-3 px-5 bg-gray-50 z-10 border-b border-gray-200">
+      <View className="pt-4 pb-3 px-5 bg-gray-50 z-10 ">
         {loading ? (
           <ActivityIndicator size="large" color="#FF6F00" />
         ) : (

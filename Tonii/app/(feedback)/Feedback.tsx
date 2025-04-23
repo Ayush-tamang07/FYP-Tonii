@@ -14,7 +14,6 @@ const Feedback = () => {
     const submitFeedback = async () => {
         try {
             if (!feedbackType || !description) {
-                // console.log("Fill all fields");
                 Alert.alert("Error", "Fill all fields");
                 return;
             }
@@ -28,6 +27,7 @@ const Feedback = () => {
             } else {
                 Alert.alert("Success", response.message);
             }
+            router.push('/(tabs)/profile')
         } catch (error) {
             console.error("Error submitting feedback:", error);
             Alert.alert("Error", "Something went wrong. Please try again.");

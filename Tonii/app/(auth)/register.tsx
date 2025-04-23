@@ -81,7 +81,6 @@ const Register = () => {
       return;
     }
   
-    // Convert DOB to a valid JavaScript Date object
     const formattedDOB = new Date(form.dob).toISOString(); // Ensure ISO format
   
     const payload = { 
@@ -136,7 +135,7 @@ const Register = () => {
         >
           <View style={styles.headerContainer}>
             <Image 
-              source={require("../../assets/images/app_icon.png")} 
+              source={require("../../assets/images/logo.png")} 
               style={styles.logo} 
               resizeMode="contain"
             />

@@ -43,17 +43,16 @@ export default function TabLayout() {
         },
       }}
     >
-
-      {/* New Tab */}
-      {/* <Tabs.Screen
-        name="new"
+            {/* Home Tab */}
+            <Tabs.Screen
+        name="home"
         options={{
-          title: "New",
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
+            <MaterialCommunityIcons name="home" size={size} color={color} />
           ),
         }}
-      /> */}
+      />
 
       {/* Calorie Tab */}
       <Tabs.Screen
@@ -76,20 +75,11 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* Home Tab */}
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" size={size} color={color} />
-          ),
-        }}
-      />
+
 
 
       {/* Form Correction Tab */}
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="formCorrection"
         options={{
           title: "Form",
@@ -97,7 +87,7 @@ export default function TabLayout() {
             <Ionicons name="checkmark-done-circle-outline" size={size} color={color} />
           ),
         }}
-      />
+      /> */}
 
       {/* Profile Tab */}
       <Tabs.Screen

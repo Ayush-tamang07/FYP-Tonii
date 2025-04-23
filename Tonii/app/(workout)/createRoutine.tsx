@@ -26,7 +26,6 @@ const CreateRoutine: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
-  // Category image URLs
   const chest = "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*9OrxMWzC6ARoatL1rrufQg.jpeg"
   const back = "https://i.pinimg.com/474x/de/e7/41/dee741a33bf48089d71ffe5b4355e3ef.jpg"
   const shoulders = "https://i.pinimg.com/736x/06/10/f3/0610f3183ea0d933fabea62bb65e9c4e.jpg"
@@ -34,7 +33,6 @@ const CreateRoutine: React.FC = () => {
   const arms = "https://i.pinimg.com/736x/1c/07/e7/1c07e752bc6f56bc7e3df79c1980efea.jpg"
   const core = "https://st2.depositphotos.com/1726139/5347/i/950/depositphotos_53477943-stock-photo-strong-bodybuilder-with-perfect-abs.jpg"
 
-  // Categories for filter
   const categories = ["All", "Chest", "Back", "Shoulders", "Legs", "Arms", "Core"];
 
   useEffect(() => {
@@ -52,7 +50,6 @@ const CreateRoutine: React.FC = () => {
     fetchExercises();
   }, []);
 
-  // Simple filter implementation
   const filterByCategory = (category: string) => {
     setActiveCategory(category);
 
@@ -61,7 +58,6 @@ const CreateRoutine: React.FC = () => {
       return;
     }
 
-    // Simple filtering by category
     const filter = category.toLowerCase();
     const filtered = exercises.filter(exercise =>
       exercise.category.toLowerCase().includes(filter)
@@ -70,7 +66,6 @@ const CreateRoutine: React.FC = () => {
     setFilteredExercises(filtered);
   };
 
-  // Get appropriate image based on category
   const getCategoryImage = (category: string, fallbackImage: string): string => {
     const lowerCategory = category.toLowerCase();
     if (lowerCategory.includes('chest')) return chest;
@@ -82,7 +77,6 @@ const CreateRoutine: React.FC = () => {
     return fallbackImage || chest;
   };
 
-  // Toggle Exercise Selection
   const toggleSelection = (exerciseId: number) => {
     setSelectedExercises((prevSelected) =>
       prevSelected.includes(exerciseId)
@@ -91,7 +85,6 @@ const CreateRoutine: React.FC = () => {
     );
   };
 
-  // Handle Routine Creation
   const handleSave = async () => {
     if (!title) {
       Alert.alert("Error", "Please enter a routine title");
@@ -106,7 +99,6 @@ const CreateRoutine: React.FC = () => {
     try {
       const token = await SecureStore.getItemAsync("AccessToken");
 
-      // Create workout plan
       const response = await apiHandler.post(
         "/user/workout-plans",
         { name: title },
@@ -124,7 +116,6 @@ const CreateRoutine: React.FC = () => {
     }
   };
 
-  // Add Exercises to Workout Plan
   const addExercisesToWorkout = async (workoutPlanId: number) => {
     try {
       const token = await SecureStore.getItemAsync("AccessToken");
@@ -165,7 +156,6 @@ const CreateRoutine: React.FC = () => {
         onChangeText={setTitle}
       />
 
-      {/* Category Filter */}
       <View className="my-2.5">
         <ScrollView
           horizontal

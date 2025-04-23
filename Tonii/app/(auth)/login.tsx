@@ -31,12 +31,12 @@ function Login() {
 
       if (result?.status === 200) {
         await SecureStore.setItemAsync("AccessToken", result.data.token);
-        router.replace("../(tabs)/profile");
+        router.replace("../(tabs)/home");
       } else {
         Alert.alert("Error", result.data?.message || "Invalid credentials");
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       Alert.alert("Error", "Login failed. Please try again.");
     } finally {
       setLoading(false); // Stop loading
@@ -53,7 +53,7 @@ function Login() {
           <View style={styles.contentContainer}>
             <View style={styles.headerContainer}>
               <Image 
-                source={require("../../assets/images/app_icon.png")} 
+                source={require("../../assets/images/logo.png")} 
                 style={styles.image} 
                 resizeMode="contain"
               />

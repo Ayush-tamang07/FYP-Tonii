@@ -132,10 +132,10 @@ const Workout: React.FC = () => {
   
   return (
     // 
-    <SafeAreaView className="flex-1 bg-[#f8f9fa]">
+    <SafeAreaView className="flex-1 bg-slate-50">
       {/* <View className="px-4 pt-5 pb-4"> */}
-      <View className="bg-white p-3 shadow-sm">
-        <Text className="text-2xl font-bold text-[#333] text-center bg-white">Workout</Text>
+      <View className="">
+        <Text className="text-2xl font-bold text-[#333] text-center">Workout</Text>
       </View> 
 
       <View className="flex-1 px-4 pt-4">
@@ -171,7 +171,7 @@ const Workout: React.FC = () => {
             My Routines ({workoutPlans.length})
           </Text>
         </TouchableOpacity>
-
+{/* 
         {loading ? (
           <View className="flex-1 justify-center items-center pb-10">
             <ActivityIndicator size="large" color="#FF6F00" />
@@ -187,8 +187,8 @@ const Workout: React.FC = () => {
               <Text className="text-[#333] text-sm font-medium">Try Again</Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          expanded && (
+        ) : ( */}
+          {/* expanded && ( */}
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
               <View className="gap-3 pb-4">
                 {sortedWorkoutPlans.length === 0 ? (
@@ -205,7 +205,7 @@ const Workout: React.FC = () => {
                             <Ionicons name="pin" size={16} color="#10b981" style={{ marginRight: 6 }} />
                           )}
                           <Text className="text-base font-semibold text-[#333]">{plan.name}</Text>
-                          {/* <Text>{plan.id}</Text> */}
+                          {/* <Tex>{plan.id}</Tex t> */}
                         </View>
                         <TouchableOpacity className="p-1" onPress={() => openSheet(plan)}>
                           <Entypo name="dots-three-vertical" size={16} color="#555" />
@@ -219,7 +219,7 @@ const Workout: React.FC = () => {
                             pathname: "/(workout)/startWorkout",
                             params: { id: plan.id },
                           })
-                        }                      >
+                        }                >
                         <Text className="text-white text-sm font-semibold">Start Routine</Text>
                       </TouchableOpacity>
                     </View>
@@ -227,8 +227,8 @@ const Workout: React.FC = () => {
                 )}
               </View>
             </ScrollView>
-          )
-        )}
+          {/* ) */}
+        {/* )} */}
       </View>
       <BottomSheet
         ref={BottomSheetRef}

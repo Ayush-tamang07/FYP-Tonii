@@ -9,13 +9,16 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Modal,
-  Alert
+  Alert,
+  Image,
+  StatusBar
 } from "react-native";
 import apiHandler from "@/context/APIHandler";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { fetchUserDetails } from '../../context/userAPI';
 import * as SecureStore from "expo-secure-store";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface UserDetails {
   age: number | "";
@@ -247,12 +250,23 @@ const Explore: React.FC = () => {
     }
   };
 
+  // Difficulty level colors
+  const getDifficultyColor = (difficulty: string) => {
+    switch(difficulty.toLowerCase()) {
+      case 'beginner': return '#4CAF50';
+      case 'intermediate': return '#FF9800';
+      case 'advanced': return '#F44336';
+      default: return '#757575';
+    }
+  };
+
   if (initialLoading) {
     return (
       <SafeAreaView className="flex-1 bg-white">
+        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color="#FF6F00" />
-          <Text className="mt-2.5 text-gray-600 text-base">Loading profile data...</Text>
+          <Text className="mt-4 text-gray-600 text-base font-medium">Loading profile data...</Text>
         </View>
       </SafeAreaView>
     );
@@ -260,26 +274,35 @@ const Explore: React.FC = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      
       {/* Header with back button */}
-      <View className="px-4 pt-3 pb-4 flex-row items-center">
+      <View className="px-4 pt-4 pb-4 flex-row items-center border-b border-gray-100">
         <TouchableOpacity 
           onPress={() => router.push("/(tabs)/workout")} 
-          className="p-2 absolute left-2 z-10"
+          className="p-2 left-2 z-10"
         >
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-black text-center flex-1">Generate Workout</Text>
+        <Text className="text-xl font-bold text-gray-800 text-center flex-1 mr-10">Generate Workout</Text>
       </View>
       
-      <ScrollView className="flex-1" contentContainerClassName="px-4 pb-8">
+      <ScrollView 
+        className="flex-1 bg-gray-50" 
+        contentContainerClassName="px-4 py-6 pb-12"
+        showsVerticalScrollIndicator={false}
+      >
         {/* User Details Section */}
-        <View className="bg-gray-100 rounded-xl p-4 mb-4">
-          <Text className="text-base font-bold mb-3 text-black">Your Details</Text>
+        <View className="bg-white rounded-2xl p-5 mb-5 shadow-sm">
+          <View className="flex-row items-center mb-4">
+            <Ionicons name="person-circle-outline" size={22} color="#FF6F00" />
+            <Text className="text-lg font-bold ml-2 text-gray-800">Your Details</Text>
+          </View>
           
-          <View className="mb-3">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Age</Text>
+          <View className="mb-4">
+            <Text className="text-sm font-medium mb-2 text-gray-700">Age</Text>
             <TextInput
-              className="bg-white rounded-lg px-3 py-2.5 text-base"
+              className="bg-gray-50 rounded-xl px-4 py-3 text-base border border-gray-200"
               placeholder="Enter your age"
               keyboardType="numeric"
               value={userDetails.age.toString()}
@@ -287,20 +310,20 @@ const Explore: React.FC = () => {
             />
           </View>
           
-          <View className="mb-3">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Gender</Text>
+          <View className="mb-4">
+            <Text className="text-sm font-medium mb-2 text-gray-700">Gender</Text>
             <View className="flex-row mb-1">
               {["male", "female"].map(option => (
                 <TouchableOpacity
                   key={`gender-${option}`}
-                  className={`px-4 py-2 mr-2 rounded-lg ${
+                  className={`flex-1 px-4 py-3 mr-2 rounded-xl border ${
                     userDetails.gender === option 
-                      ? 'bg-[#FF6F00]' 
-                      : 'bg-white'
+                      ? 'bg-[#FF6F00] border-[#FF6F00]' 
+                      : 'bg-gray-50 border-gray-200'
                   }`}
                   onPress={() => handleChange("gender", option, "details")}
                 >
-                  <Text className={`${
+                  <Text className={`text-center ${
                     userDetails.gender === option 
                       ? 'text-white font-medium' 
                       : 'text-gray-700'
@@ -312,10 +335,10 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View className="mb-3">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Height (cm)</Text>
+          <View className="mb-4">
+            <Text className="text-sm font-medium mb-2 text-gray-700">Height (cm)</Text>
             <TextInput
-              className="bg-white rounded-lg px-3 py-2.5 text-base"
+              className="bg-gray-50 rounded-xl px-4 py-3 text-base border border-gray-200"
               placeholder="Enter your height"
               keyboardType="numeric"
               value={userDetails.height.toString()}
@@ -323,10 +346,10 @@ const Explore: React.FC = () => {
             />
           </View>
           
-          <View className="mb-1">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Weight (kg)</Text>
+          <View>
+            <Text className="text-sm font-medium mb-2 text-gray-700">Weight (kg)</Text>
             <TextInput
-              className="bg-white rounded-lg px-3 py-2.5 text-base"
+              className="bg-gray-50 rounded-xl px-4 py-3 text-base border border-gray-200"
               placeholder="Enter your weight"
               keyboardType="numeric"
               value={userDetails.weight.toString()}
@@ -336,19 +359,22 @@ const Explore: React.FC = () => {
         </View>
         
         {/* Workout Preferences Section */}
-        <View className="bg-gray-100 rounded-xl p-4 mb-4">
-          <Text className="text-base font-bold mb-3 text-black">Workout Preferences</Text>
+        <View className="bg-white rounded-2xl p-5 mb-5 shadow-sm">
+          <View className="flex-row items-center mb-4">
+            <Ionicons name="options-outline" size={22} color="#FF6F00" />
+            <Text className="text-lg font-bold ml-2 text-gray-800">Workout Preferences</Text>
+          </View>
           
-          <View className="mb-3">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Goal</Text>
+          <View className="mb-5">
+            <Text className="text-sm font-medium mb-3 text-gray-700">Goal</Text>
             <View className="flex-row flex-wrap">
               {goalOptions.map(option => (
                 <TouchableOpacity
                   key={`goal-${option}`}
-                  className={`px-3 py-2 mr-2 mb-2 rounded-lg ${
+                  className={`px-4 py-3 mr-2 mb-2 rounded-xl border ${
                     userPreferences.goal === option 
-                      ? 'bg-[#FF6F00]' 
-                      : 'bg-white'
+                      ? 'bg-[#FF6F00] border-[#FF6F00]' 
+                      : 'bg-gray-50 border-gray-200'
                   }`}
                   onPress={() => handleChange("goal", option, "preferences")}
                 >
@@ -364,16 +390,16 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View className="mb-3">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Experience Level</Text>
+          <View className="mb-5">
+            <Text className="text-sm font-medium mb-3 text-gray-700">Experience Level</Text>
             <View className="flex-row flex-wrap">
               {experienceOptions.map(option => (
                 <TouchableOpacity
                   key={`experience-${option}`}
-                  className={`px-3 py-2 mr-2 mb-2 rounded-lg ${
+                  className={`px-4 py-3 mr-2 mb-2 rounded-xl border ${
                     userPreferences.experience === option 
-                      ? 'bg-[#FF6F00]' 
-                      : 'bg-white'
+                      ? 'bg-[#FF6F00] border-[#FF6F00]' 
+                      : 'bg-gray-50 border-gray-200'
                   }`}
                   onPress={() => handleChange("experience", option, "preferences")}
                 >
@@ -389,16 +415,16 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View className="mb-3">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Equipment</Text>
+          <View className="mb-5">
+            <Text className="text-sm font-medium mb-3 text-gray-700">Equipment</Text>
             <View className="flex-row flex-wrap">
               {equipmentOptions.map(option => (
                 <TouchableOpacity
                   key={`equipment-${option}`}
-                  className={`px-3 py-2 mr-2 mb-2 rounded-lg ${
+                  className={`px-4 py-3 mr-2 mb-2 rounded-xl border ${
                     userPreferences.equipment === option 
-                      ? 'bg-[#FF6F00]' 
-                      : 'bg-white'
+                      ? 'bg-[#FF6F00] border-[#FF6F00]' 
+                      : 'bg-gray-50 border-gray-200'
                   }`}
                   onPress={() => handleChange("equipment", option, "preferences")}
                 >
@@ -414,16 +440,16 @@ const Explore: React.FC = () => {
             </View>
           </View>
           
-          <View className="mb-1">
-            <Text className="text-sm font-medium mb-1 text-gray-600">Target Muscles</Text>
+          <View>
+            <Text className="text-sm font-medium mb-3 text-gray-700">Target Muscles</Text>
             <View className="flex-row flex-wrap">
               {muscleOptions.map(muscle => (
                 <TouchableOpacity
                   key={`muscle-${muscle}`}
-                  className={`px-3 py-2 mr-2 mb-2 rounded-lg ${
+                  className={`px-4 py-3 mr-2 mb-2 rounded-xl border ${
                     userPreferences.muscle.includes(muscle) 
-                      ? 'bg-[#FF6F00]' 
-                      : 'bg-white'
+                      ? 'bg-[#FF6F00] border-[#FF6F00]' 
+                      : 'bg-gray-50 border-gray-200'
                   }`}
                   onPress={() => handleMuscleSelection(muscle)}
                 >
@@ -438,21 +464,26 @@ const Explore: React.FC = () => {
               ))}
             </View>
             {userPreferences.muscle ? (
-              <Text className="mt-2 text-sm text-gray-600">
-                Selected: {userPreferences.muscle.split(',').map(m => m.trim().charAt(0).toUpperCase() + m.trim().slice(1)).join(', ')}
+              <Text className="mt-3 text-sm text-gray-600 p-2 bg-gray-50 rounded-lg">
+                <Text className="font-medium">Selected: </Text>
+                {userPreferences.muscle.split(',').map(m => m.trim().charAt(0).toUpperCase() + m.trim().slice(1)).join(', ')}
               </Text>
             ) : (
-              <Text className="mt-2 text-sm text-gray-500 italic">
+              <Text className="mt-3 text-sm text-gray-500 italic p-2 bg-gray-50 rounded-lg">
                 Select one or more muscle groups
               </Text>
             )}
           </View>
         </View>
         
-        {error ? <Text className="text-red-500 mb-4 text-sm text-center">{error}</Text> : null}
+        {error ? (
+          <View className="bg-red-50 p-3 rounded-lg mb-5 border border-red-200">
+            <Text className="text-red-500 text-sm text-center">{error}</Text>
+          </View>
+        ) : null}
         
         <TouchableOpacity 
-          className="bg-[#FF6F00] rounded-xl py-3.5 items-center mb-6"
+          className="bg-[#FF6F00] rounded-xl py-4 items-center mb-6 shadow-sm"
           onPress={getSuggestions}
           disabled={loading}
         >
@@ -464,19 +495,51 @@ const Explore: React.FC = () => {
         </TouchableOpacity>
         
         {exercises.length > 0 ? (
-          <View className="bg-gray-100 rounded-xl p-4 mb-4">
-            <Text className="text-base font-bold mb-3 text-black">Your Personalized Workout</Text>
+          <View className="bg-white rounded-2xl p-5 mb-5 shadow-sm">
+            <View className="flex-row items-center mb-4">
+              <Ionicons name="fitness-outline" size={22} color="#FF6F00" />
+              <Text className="text-lg font-bold ml-2 text-gray-800">Your Personalized Workout</Text>
+            </View>
+            
             <FlatList
               data={exercises}
               keyExtractor={(item, index) => `exercise-${index}`}
               scrollEnabled={false}
+              ItemSeparatorComponent={() => <View className="h-3" />}
               renderItem={({ item }) => (
-                <View className="bg-white rounded-lg p-4 mb-2.5">
-                  <Text className="text-base font-bold mb-2 text-black">{item.name}</Text>
-                  <View className="mb-2">
-                    <Text className="text-sm text-gray-600">Muscle: {item.muscle}</Text>
-                    <Text className="text-sm text-gray-600">Equipment: {item.equipment}</Text>
-                    <Text className="text-sm text-gray-600">Difficulty: {item.difficulty}</Text>
+                <View className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <Text className="text-base font-bold mb-3 text-gray-800">{item.name}</Text>
+                  
+                  <View className="flex-row flex-wrap">
+                    <View className="bg-blue-50 rounded-full px-3 py-1 mr-2 mb-2 border border-blue-100">
+                      <Text className="text-xs text-blue-700">
+                        <Ionicons name="body-outline" size={12} style={{marginRight: 4}} />
+                        {item.muscle.charAt(0).toUpperCase() + item.muscle.slice(1)}
+                      </Text>
+                    </View>
+                    
+                    <View className="bg-purple-50 rounded-full px-3 py-1 mr-2 mb-2 border border-purple-100">
+                      <Text className="text-xs text-purple-700">
+                        <Ionicons name="barbell-outline" size={12} style={{marginRight: 4}} />
+                        {item.equipment.charAt(0).toUpperCase() + item.equipment.slice(1)}
+                      </Text>
+                    </View>
+                    
+                    <View 
+                      className="rounded-full px-3 py-1 mr-2 mb-2 border"
+                      style={{
+                        backgroundColor: `${getDifficultyColor(item.difficulty)}20`,
+                        borderColor: `${getDifficultyColor(item.difficulty)}40`
+                      }}
+                    >
+                      <Text 
+                        className="text-xs" 
+                        style={{color: getDifficultyColor(item.difficulty)}}
+                      >
+                        <Ionicons name="stats-chart-outline" size={12} style={{marginRight: 4}} />
+                        {item.difficulty.charAt(0).toUpperCase() + item.difficulty.slice(1)}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               )}
@@ -484,19 +547,28 @@ const Explore: React.FC = () => {
             
             {/* Save Workout Button */}
             <TouchableOpacity 
-              className="bg-[#FF6F00] rounded-lg py-3 items-center mt-4"
+              className="mt-5 rounded-xl py-4 items-center overflow-hidden"
               onPress={handleOpenSaveModal}
             >
-              <Text className="text-white text-base font-semibold">Save This Workout Plan</Text>
+              <LinearGradient
+                colors={['#FF6F00', '#FF9800']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="absolute top-0 bottom-0 left-0 right-0"
+              />
+              <View className="flex-row items-center">
+                <Ionicons name="save-outline" size={18} color="#fff" />
+                <Text className="text-white text-base font-semibold ml-2">Save This Workout Plan</Text>
+              </View>
             </TouchableOpacity>
           </View>
         ) : (
           loading ? null : (
-            <View className="bg-gray-100 rounded-xl p-6 items-center mb-4">
-              <Text className="text-gray-500 text-base text-center mb-3">
+            <View className="bg-white rounded-2xl p-8 items-center mb-5 shadow-sm">
+              <Ionicons name="fitness-outline" size={60} color="#DDDDDD" />
+              <Text className="text-gray-500 text-base text-center mt-4">
                 Your workout recommendations will appear here
               </Text>
-              <Ionicons name="fitness-outline" size={48} color="#DDDDDD" />
             </View>
           )
         )}
@@ -509,31 +581,34 @@ const Explore: React.FC = () => {
         visible={saveModalVisible}
         onRequestClose={() => setSaveModalVisible(false)}
       >
-        <View className="flex-1 justify-center items-center bg-black/50">
-          <View className="bg-white rounded-xl p-5 w-[90%] max-w-md">
-            <Text className="text-xl font-bold text-center mb-4">Save Workout Plan</Text>
+        <View className="flex-1 justify-center items-center bg-black/60">
+          <View className="bg-white rounded-2xl p-6 w-[90%] max-w-md shadow-xl">
+            <Text className="text-xl font-bold text-center mb-5 text-gray-800">Save Workout Plan</Text>
             
-            <TextInput
-              className="bg-gray-100 rounded-lg px-4 py-3 text-base mb-4"
-              placeholder="Enter workout title"
-              value={workoutTitle}
-              onChangeText={setWorkoutTitle}
-            />
+            <View className="mb-5">
+              <Text className="text-sm font-medium mb-2 text-gray-700">Workout Title</Text>
+              <TextInput
+                className="bg-gray-50 rounded-xl px-4 py-3.5 text-base border border-gray-200"
+                placeholder="Enter a name for your workout"
+                value={workoutTitle}
+                onChangeText={setWorkoutTitle}
+              />
+            </View>
             
-            <View className="flex-row justify-between mt-2">
+            <View className="flex-row justify-between mt-4">
               <TouchableOpacity 
-                className="bg-gray-300 rounded-lg py-3 px-5 flex-1 mr-2 items-center"
+                className="bg-gray-200 rounded-xl py-3.5 px-5 flex-1 mr-2 items-center"
                 onPress={() => {
                   setSaveModalVisible(false);
                   setWorkoutTitle("");
                 }}
                 disabled={savingWorkout}
               >
-                <Text className="font-semibold">Cancel</Text>
+                <Text className="font-semibold text-gray-700">Cancel</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
-                className="bg-[#FF6F00] rounded-lg py-3 px-5 flex-1 ml-2 items-center"
+                className="bg-[#FF6F00] rounded-xl py-3.5 px-5 flex-1 ml-2 items-center"
                 onPress={handleSaveWorkout}
                 disabled={savingWorkout}
               >

@@ -40,7 +40,7 @@ export default function RootLayout() {
         <Stack.Screen name="(streak)" options={{ headerShown: false }} />
         <Stack.Screen name="(resetPassword)" options={{ headerShown: false }} />
         <Stack.Screen name="(notification)" options={{ headerShown: false }} />
-        <Stack.Screen name="(postercorrection)" options={{ headerShown: false }} />
+        {/* <Stack.Screen name="(postercorrection)" options={{ headerShown: false }} /> */}
         <Stack.Screen name="+not-found" />
       </Stack>
       </GestureHandlerRootView>
