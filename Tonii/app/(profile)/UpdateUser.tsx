@@ -128,7 +128,7 @@ const UpdateUser = () => {
     <SafeAreaView className="flex-1 bg-[#FAFAFA]">
       {/* Header with improved shadow and padding */}
       <View className="bg-white flex-row items-center p-5 shadow-sm">
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => router.back()}
           className="w-10 h-10 justify-center items-center rounded-full"
         >
@@ -138,15 +138,15 @@ const UpdateUser = () => {
         <View className="w-10" />
       </View>
 
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         contentContainerClassName="px-5 py-8 pb-12"
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Image with animation hint */}
         <View className="items-center mb-8">
-          <TouchableOpacity 
-            onPress={handleImagePick} 
+          <TouchableOpacity
+            onPress={handleImagePick}
             className="relative"
             activeOpacity={0.8}
           >
@@ -238,12 +238,22 @@ const UpdateUser = () => {
               <Text className="mb-2 text-[#555] font-medium">Height (cm)</Text>
               <TextInput
                 value={user.height}
-                onChangeText={(val) => setUser({ ...user, height: val })}
+                onChangeText={(val) => {
+                  const num = Number(val);
+
+                  if (!isNaN(num) && num > 0) {
+                    setUser({ ...user, height: val });
+                  } else if (val === "") {
+                    setUser({ ...user, height: "" });
+                  }
+                  // Invalid input (0, negative, non-numeric) is ignored
+                }}
                 placeholder="Enter height"
                 keyboardType="number-pad"
                 className="border border-[#E0E0E0] rounded-xl px-4 py-3 text-[#333] bg-[#F9F9F9]"
                 placeholderTextColor="#999"
               />
+
             </View>
 
             {/* Weight */}
@@ -251,12 +261,25 @@ const UpdateUser = () => {
               <Text className="mb-2 text-[#555] font-medium">Weight (kg)</Text>
               <TextInput
                 value={user.weight}
-                onChangeText={(val) => setUser({ ...user, weight: val })}
+                onChangeText={(val) => {
+                  // Convert input to number
+                  const num = Number(val);
+
+                  // Check if input is a positive number greater than 0
+                  if (!isNaN(num) && num > 0) {
+                    setUser({ ...user, weight: val });
+                  } else if (val === "") {
+                    // Allow clearing the input
+                    setUser({ ...user, weight: "" });
+                  }
+                  // Do nothing if value is 0 or negative
+                }}
                 placeholder="Enter weight"
                 keyboardType="number-pad"
                 className="border border-[#E0E0E0] rounded-xl px-4 py-3 text-[#333] bg-[#F9F9F9]"
                 placeholderTextColor="#999"
               />
+
             </View>
           </View>
         </View>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import apiHandler from '@/context/APIHandler'; // Update path as needed
+import axios from 'axios';
 
 const Reset = () => {
   const [email, setEmail] = useState('');
@@ -13,26 +14,34 @@ const Reset = () => {
       Alert.alert('Error', 'Please enter your email address');
       return;
     }
-
+  
     setLoading(true);
     try {
       const response = await apiHandler.post('/requestOtp', { email });
-      
+  
       if (response.status === 200) {
-        // Store email in router params to access in verification screen
         router.push({
           pathname: "/(resetPassword)/Verification",
-          params: { email }
+          params: { email },
         });
       }
-    } catch (error) {
-      const errorMessage =  'Something went wrong. Please try again.';
+    } catch (error: unknown) {
+      let errorMessage = 'Something went wrong. Please try again.';
+  
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          errorMessage = 'This email is not registered.';
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+  
       Alert.alert('Error', errorMessage);
-      console.error('OTP request error:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleBack = () => {
     router.push("/(auth)/login");

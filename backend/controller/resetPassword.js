@@ -2,6 +2,7 @@ const transporter = require("../configs/mailconfigs.js");
 const prisma = require("../utils/PrismaClient.js");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
+const {generatePasswordResetTemplate } = require("../utils/emailTemplate.js")
 const reqOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -28,10 +29,11 @@ const reqOTP = async (req, res) => {
     console.log(otp);
     // Configure and send the email
     const mailOptions = {
-      from: "rai2059rabin@gmail.com",
+      from: "tamangayush052@gmail.com",
       to: email,
       subject: "OTP for password reset",
       text: `Your OTP is ${otp}`,
+      html: generatePasswordResetTemplate(otp)
     };
     console.log(mailOptions);
     await transporter.sendMail(mailOptions);

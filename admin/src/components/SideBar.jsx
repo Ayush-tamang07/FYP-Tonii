@@ -1,25 +1,21 @@
 import React from "react";
-import { useLocation ,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
 import { BiSolidUserDetail } from "react-icons/bi";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import { VscFeedback } from "react-icons/vsc";
 import { IoSettings } from "react-icons/io5";
-// import { BiClipboardCheck } from "react-icons/bi";
-// import { BiClipboardCheck } from "react-icons/bi";
 import { LuClipboardList } from "react-icons/lu";
 import { toast } from "react-toastify";
-
 
 function SideBar() {
   const location = useLocation(); 
   const navigate = useNavigate(); 
 
-  // Function to apply active background color and text color
   const getLinkClass = (path) =>
     location.pathname === path
-      ? "bg-[#E3F2FD] text-[#2D60FF]" // Active state
-      : "text-[#B1B1B1]"; // Inactive state
+      ? "bg-[#E3F2FD] text-[#2D60FF]"
+      : "text-[#B1B1B1]";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -29,66 +25,63 @@ function SideBar() {
 
   return (
     <aside className="flex flex-col h-full p-4">
-      {/* Navigation Links */}
       <nav className="space-y-4 flex-1">
-        <a
-          href="/dashboard"
+        <Link
+          to="/dashboard"
           className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
             "/dashboard"
           )}`}
         >
           <MdDashboard className="text-xl" />
           <span>Dashboard</span>
-        </a>
-        <a
-          href="/user"
+        </Link>
+        <Link
+          to="/user"
           className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
             "/user"
           )}`}
         >
           <BiSolidUserDetail className="text-xl" />
           <span>User Details</span>
-        </a>
-        <a
-          href="/exercise"
+        </Link>
+        <Link
+          to="/exercise"
           className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
             "/exercise"
           )}`}
         >
           <GiWeightLiftingUp className="text-xl" />
           <span>Exercise</span>
-        </a>
-        <a
-          href="/workoutPlans"
+        </Link>
+        {/* <Link
+          to="/workoutPlans"
           className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
             "/workoutPlans"
           )}`}
         >
-          {/* <BiClipboardCheck className="text-xl" /> */}
           <LuClipboardList className="text-xl" />
           <span>WorkoutPlans</span>
-        </a>
-        <a
-          href="/feedback"
+        </Link> */}
+        <Link
+          to="/feedback"
           className={`flex items-center space-x-2 p-2 rounded font-semibold hover:bg-[#E3F2FD] text-sm transition ${getLinkClass(
             "/feedback"
           )}`}
         >
           <VscFeedback className="text-xl" />
           <span>Feedback</span>
-        </a>
-        <a
-          href="/setting"
+        </Link>
+        <Link
+          to="/Setting"
           className={`flex items-center space-x-2 p-2 rounded font-semibold text-sm hover:bg-[#E3F2FD] transition ${getLinkClass(
-            "/settings"
+            "/Setting"
           )}`}
         >
           <IoSettings className="text-xl" />
           <span>Settings</span>
-        </a>
+        </Link>
       </nav>
 
-      {/* Logout Button at the Bottom */}
       <div className="mt-auto">
         <button
           type="button"

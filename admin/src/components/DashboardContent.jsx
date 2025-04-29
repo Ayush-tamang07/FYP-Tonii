@@ -10,8 +10,7 @@ function DashboardContent() {
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // Get token
-    // Fetch user count
-    // Fetch user count
+
     axios
       .get("http://localhost:5500/api/admin/readUser", {
         headers: {

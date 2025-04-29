@@ -81,7 +81,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "2d" }
+      { expiresIn: "7d" }
     );
 
     return res.status(200).json({
@@ -167,6 +167,7 @@ const logout = async (req, res) => {
 
   res.json({ message: "Logged out successfully" });
 };
+
 const readUser = async (req, res) => {
   try {
     const userId = req.user.userId;

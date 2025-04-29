@@ -7,6 +7,7 @@ import {
   categoryOptions,
   equipmentOptions,
 } from "../data/exerciseOption.js";
+import { toast } from 'react-toastify';
 
 function ExerciseContent() {
   const [exercises, setExercises] = useState([]); // Default empty array
@@ -14,7 +15,7 @@ function ExerciseContent() {
   const [expandedVideoUrls, setExpandedVideoUrls] = useState({}); // Track expanded video URLs
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // "success" or "error"
+  const [messageType, setMessageType] = useState("");
   const [newExercise, setNewExercise] = useState({
     name: "",
     type: "",
@@ -23,7 +24,7 @@ function ExerciseContent() {
     difficulty: "",
     category: "",
     instructions: "",
-    videoUrl: "", // Changed from videoURL to videoUrl to match backend
+    videoUrl: "", 
   });
   const [editExercise, setEditExercise] = useState(null); // Track the exercise being edited
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -128,11 +129,12 @@ function ExerciseContent() {
           );
           setMessageType("error");
         } else {
-          setMessage(`Error: ${error.response.data.message}`);
-          setMessageType("error");
+          toast.error(`Error: ${error.response?.data?.message || 'Something went wrong'}`);
+          // setMessage(`Error: ${error.response.data.message}`);
+          // setMessageType("error");
         }
       } else {
-        console.error("Error adding exercise:", error);
+        // console.error("Error adding exercise:", error);
         setMessage("An unexpected error occurred. Please try again.");
         setMessageType("error");
       }

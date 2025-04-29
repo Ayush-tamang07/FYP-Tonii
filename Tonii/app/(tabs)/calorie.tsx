@@ -204,7 +204,7 @@ const Calorie: React.FC = () => {
         setShowResults(true);
       }
     } catch (error) {
-      console.error('Error calculating calories:', error);
+      // console.error('Error calculating calories:', error);
       Alert.alert('Error', 'Failed to calculate calories. Please try again.');
     } finally {
       setLoading(false);

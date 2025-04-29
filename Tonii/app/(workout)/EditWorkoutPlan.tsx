@@ -157,7 +157,7 @@ const EditWorkoutPlan = () => {
           <TouchableOpacity 
             className="p-4 bg-[#FF6F00] mt-4 mx-4 rounded-lg shadow-sm flex-row items-center justify-center"
             onPress={() => router.push({
-              pathname: "/(workout)/AddExerciseToRoutine ",
+              pathname: "/(workout)/AddExerciseToRoutine",
               params: { workoutPlanId: id }
             })}
           >

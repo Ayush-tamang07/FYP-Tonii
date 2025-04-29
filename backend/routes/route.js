@@ -27,8 +27,7 @@ router.post('/requestOtp',resetPassword.reqOTP)
 router.post('/verifyOtp',resetPassword.verifyOTP)
 router.post('/resetPassword',resetPassword.resetPassword)
 
-// Admin Authentication routes
-// router.post("/admin/login", authController.loginAdmin)
+
 
 // User Function
 router.post('/user/addFeedback', authMiddleware(),userController.addFeedback) // test done
@@ -36,22 +35,19 @@ router.post("/calculate", calculate) // test done
 router.put("/user/updateUser", authMiddleware(), upload.single("image"), userController.updateUser);
 
 // custom workout plan
-router.get('/exercise',customWorkout.readExercise)
-router.get('/exercises',customWorkout.readExercises)
+router.get('/exercise',customWorkout.readExercise) // in use
+router.get('/exercises',customWorkout.readExercises) // not in use
 router.post('/user/workout-plans',authMiddleware(), customWorkout.createUserWorkoutPlan); // test done
 router.get('/user/workout-plans',authMiddleware(), customWorkout.getUserWorkoutPlans);  // test done
 router.get('/user/workout-plan/:planId/exercises', authMiddleware(), customWorkout.getWorkoutPlanExercises); // test done
-// router.get('/user/workout-plans',authMiddleware(), customWorkout.getWorkoutPlanExercises);  // Get user's workout plans
-// router.post('/workout-plans/add-exercise',  customWorkout.addExerciseToWorkoutPlan);  // Add exercise to workout plan
-router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan);  // Add exercise to workout plan
-router.delete('/workout-plans/remove-exercise', authMiddleware(),customWorkout.removeExerciseFromWorkoutPlan); 
+router.post('/workout-plans/add-exercise',  customWorkout.addExercisesToWorkoutPlan); // in use
+router.delete('/workout-plans/remove-exercise', authMiddleware(),customWorkout.removeExerciseFromWorkoutPlan); // don't know if it is in use or not
 router.delete('/workout-plans/:workoutPlanId', authMiddleware(), customWorkout.deleteWorkoutPlan); 
 router.get("/exercise-details/:id", customWorkout.exerciseDetails);
-// router.get("/home/calculate-bmi/:id", customWorkout.calculateBMI);
 router.post("/workout-plans/pin", customWorkout.pinWorkoutPlan)
-router.put("/user/workout-plan/:id/exercises", authMiddleware(), customWorkout.updateWorkoutPlanExercises);
+router.put("/user/workout-plan/:id/exercises", authMiddleware(), customWorkout.updateWorkoutPlanExercises); // it is in use
 
-
+// 
 // streak
 router.post("/user/finish-workout", authMiddleware(),customWorkout.finishWorkout);
 router.get("/user/getProgress", authMiddleware(),startWorkoutController.getUserProgress);
@@ -59,7 +55,7 @@ router.get("/user/getProgress", authMiddleware(),startWorkoutController.getUserP
 // Admin Function
 router.post("/admin/addExercise", adminController.addExercise); // Add a new exercise
 router.get("/readUser", authMiddleware(), authController.readUser);
-router.get("/admin/readUser", authMiddleware(), adminController.readUserDetailsByAdmin);
+router.get("/admin/readUser", authMiddleware(), adminController.readUserDetailsByAdmin); // in use by admin
 router.put("/admin/updateExercise/:id",adminController.updateExercise);
 router.delete("/admin/deleteExercise/:id",adminController.deleteExercise);
 router.get("/admin/readFeedback",adminController.readFeedback);

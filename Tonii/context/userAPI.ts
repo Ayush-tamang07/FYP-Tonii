@@ -258,7 +258,7 @@ export const updateUserDetails = async (formData: FormData) => {
     );
     return response.status === 200;
   } catch (error) {
-    console.error('Update error:', error);
+    // console.error('Update error:', error);
     return false;
   }
 };

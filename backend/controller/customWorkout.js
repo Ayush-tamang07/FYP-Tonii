@@ -397,6 +397,7 @@ const finishWorkout = async (req, res) => {
     });
   }
 };
+
 const exerciseDetails = async (req, res) => {
   try {
     const { id } = req.params; 
@@ -519,66 +520,7 @@ const removeExerciseFromWorkoutPlan = async (req, res) => {
     });
   }
 };
-// const updateWorkoutPlanExercises = async (req, res) => {
-//   try {
-//     const { exercises } = req.body;
-//     const workoutPlanId = parseInt(req.params.id);
-//     const userId = req.user.userId;
 
-//     if (!Array.isArray(exercises) || exercises.length === 0) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Exercise list must be a non-empty array.",
-//       });
-//     }
-
-//     // Verify workout plan access
-//     const workoutPlan = await prisma.workoutPlan.findFirst({
-//       where: {
-//         id: workoutPlanId,
-//         OR: [
-//           { assignedToUserId: userId }, // user-created
-//           { createdByAdmin: true },     // admin-created
-//         ],
-//       },
-//     });
-
-//     if (!workoutPlan) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Workout plan not found or not authorized.",
-//       });
-//     }
-
-//     // Remove existing exercises from the plan
-//     await prisma.workoutPlanExercise.deleteMany({
-//       where: { workoutPlanId },
-//     });
-
-//     // Create new entries
-//     const newEntries = exercises.map((exerciseId) => ({
-//       workoutPlanId,
-//       exerciseId,
-//     }));
-
-//     await prisma.workoutPlanExercise.createMany({
-//       data: newEntries,
-//     });
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Workout plan updated successfully.",
-//     });
-
-//   } catch (error) {
-//     console.error("Error updating workout plan:", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: "Server error while updating workout plan.",
-//       error: error.message,
-//     });
-//   }
-// };
 const updateWorkoutPlanExercises = async (req, res) => {
   try {
     const { add = [], remove = [] } = req.body;
@@ -653,7 +595,6 @@ module.exports = {
   readExercise,
   createUserWorkoutPlan,
   getUserWorkoutPlans,
-  // addExerciseToWorkoutPlan,
   removeExerciseFromWorkoutPlan,
   deleteWorkoutPlan,
   createWorkoutPlanWithExercises,

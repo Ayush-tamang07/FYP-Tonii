@@ -182,24 +182,24 @@ const ActiveUser = () => {
       {dauData.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
+            {/* <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-gray-600 text-sm">Total Active Users</p>
               <p className="text-xl font-bold text-blue-600">{insights.totalActiveUsers}</p>
               <p className="text-xs text-gray-500 mt-1">Across all recorded days</p>
-            </div>
+            </div> */}
             <div className="bg-green-50 p-4 rounded-lg">
               <p className="text-gray-600 text-sm">Active Days</p>
               <p className="text-xl font-bold text-green-600">{insights.uniqueDays}</p>
               <p className="text-xs text-gray-500 mt-1">Days with user activity</p>
             </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
+            {/* <div className="bg-purple-50 p-4 rounded-lg">
               <p className="text-gray-600 text-sm">Latest Day Count</p>
               <p className="text-xl font-bold text-purple-600">{insights.latestCount}</p>
               <p className="text-xs text-gray-500 mt-1">Most recent day's active users</p>
-            </div>
+            </div> */}
           </div>
 
-          <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+          {/* <div className="mt-4 p-4 border rounded-lg bg-gray-50">
             <h3 className="font-medium text-gray-700 mb-2">Usage Details</h3>
             <div className="text-sm text-gray-600">
               <p>• Data shows <strong>{insights.uniqueDays}</strong> days with user activity.</p>
@@ -210,7 +210,7 @@ const ActiveUser = () => {
                 <p>• Peak activity: <strong>{insights.highest}</strong> users on a single day.</p>
               )}
             </div>
-          </div>
+          </div> */}
         </>
       )}
     </div>

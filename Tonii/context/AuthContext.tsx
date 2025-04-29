@@ -3,8 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 
 interface DecodedToken {
-  exp: number; // Expiration timestamp in seconds
-  [key: string]: any; // Other token payload fields
+  exp: number; 
+  [key: string]: any; 
 }
 
 const AuthService = {
@@ -22,7 +22,7 @@ const AuthService = {
 
     try {
       const decoded: DecodedToken = jwtDecode(token);
-      const currentTime = Date.now() / 1000; // Current time in seconds
+      const currentTime = Date.now() / 1000; 
       return decoded.exp < currentTime;
     } catch (error) {
       console.error('Error decoding token:', error);
@@ -34,8 +34,8 @@ const AuthService = {
     const router = useRouter();
     const isExpired = await AuthService.isTokenExpired();
     if (isExpired) {
-      await AuthService.removeToken(); // Remove the expired token
-      router.replace('../(auth)/sign_in'); // Redirect to login page immediately
+      await AuthService.removeToken(); 
+      router.replace('/(auth)/login');
     }
   },
 };

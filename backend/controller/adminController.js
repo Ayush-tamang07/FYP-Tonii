@@ -12,7 +12,7 @@ const addExercise = async (req, res) => {
       category,
       videoUrl,
     } = req.body;
-
+// console.log(req.body)
     if (
       !name ||
       !type ||
@@ -291,8 +291,6 @@ const getDailyActiveUsers = async (req, res) => {
     res.status(500).json({ error: "Failed to get Daily Active Users" });
   }
 };
-
-
 
 
 module.exports = {
