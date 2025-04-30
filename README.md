@@ -28,7 +28,7 @@ Tonii is a full-stack fitness application that empowers users with personalized 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/tonii.git
+git clone https://github.com/Ayush-tamang07/FYP-Tonii.git
 cd tonii
 ```
 
